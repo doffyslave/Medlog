@@ -1,0 +1,267 @@
+
+/* Box sizing rules */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Remove default padding */
+ul[class],
+ol[class] {
+  padding: 0;
+}
+
+/* Remove default margin */
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+ul[class],
+ol[class],
+li,
+figure,
+figcaption,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+/* Set core body defaults */
+body {
+  min-height: 100vh;
+  scroll-behavior: smooth;
+  text-rendering: optimizeSpeed;
+  line-height: 1.5;
+}
+
+/* Remove list styles on ul, ol elements with a class attribute */
+ul[class],
+ol[class] {
+  list-style: none;
+}
+
+/* A elements that don't have a class get default styles */
+a:not([class]) {
+  text-decoration-skip-ink: auto;
+}
+
+/* Make images easier to work with */
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Natural flow and rhythm in articles by default */
+article > * + * {
+  margin-top: 1em;
+}
+
+/* Inherit fonts for inputs and buttons */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Remove all animations and transitions for people that prefer not to see them */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+} 
+
+*,*::before,*::after{box-sizing:border-box}body,h1,h2,h3,h4,p,figure,blockquote,dl,dd{margin:0}ul[role="list"],ol[role="list"]{list-style:none}html:focus-within{scroll-behavior:smooth}body{min-height:100vh;text-rendering:optimizeSpeed;line-height:1.5}a:not([class]){text-decoration-skip-ink:auto}img,picture{max-width:100%;display:block}input,button,textarea,select{font:inherit}@media(prefers-reduced-motion:reduce){html:focus-within{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important}}
+
+
+
+/*---------------------------------------------------- ako ra sa taas bai*/
+
+body#loginBody{
+    background : url('med.jpg') no-repeat center center fixed;
+    font-family: arial;
+} 
+
+body{
+
+    font-family: Arial;
+}
+
+
+div.loginHeader {
+    text-align: center;
+}
+div.loginHeader {
+    margin-bottom: 60px;
+}
+
+div.loginHeader h1 {
+    font-size: 100px;
+    color: #3b8efc;
+    padding: 0px;
+    margin: 0px;
+}
+
+div.loginHeader p {
+    color: #4487ddec;
+    font-size: 40px;
+    margin: 0px;
+    text-transform: uppercase;
+    display: inline-block;
+}
+div.loginHeader p:after {
+    content:'';
+    display: block;
+    height: 5px;
+    background: #ffffff;
+    margin: 0 auto;
+}
+
+div.loginBody form{
+    margin: 0 auto;
+    width:450px;
+    background: rgba(0,0,0,.65);
+    padding: 50px;
+    border: 2px solid #4487ddec;
+    border-radius: 8px;
+}
+div.loginInputsContainer{
+    margin-top: 30px;
+}
+div.loginInputsContainer label {
+    display: block;
+    text-transform: uppercase;
+    font-size: 20px;
+    font-weight: bold;
+    color: #70aefffd;
+}
+div.loginInputsContainer input{
+    height: 25px;
+    width: 100%;
+    border: 2px solid #70aefffd;
+    font-size: 15px;
+    padding: 5px;
+    text-align: center;
+    font-style: italic;
+}
+
+div.loginButtonContainer {
+    margin-top: 40px;
+    text-align: center;
+}
+
+div.loginButtonContainer button {
+    font-size: 20px;
+    padding: 8px 30px;
+    background:#70aefffd;
+    border: none;
+    color:#ffffff;
+}
+
+div.header{
+    width:100px;
+    height: 20px;
+    background:  #3b8efc;
+}
+
+div.banner{
+    background: url('BGmed.jpg') no-repeat center center fixed;
+    background-size: cover;
+    padding-top: 100px;
+    padding-bottom: 100px;
+    position: relative;
+}
+
+div.homepageContainer{
+    width:100%;
+    max-width: 900px;
+    /* height: 70vh; */
+    margin: 0 auto; 
+}
+
+div.bannerHeader h1{
+    font-size: 100px;
+    color:#88d3ff;
+    line-height: 100%;
+}
+
+div.bannerHeader p{
+    font-size: 20px;
+    color:#3b8efc;
+    text-transform: uppercase;
+    line-height: 100px;
+}
+
+p.bannerTagline{
+    margin-top: 20px;
+    font-size: 25px;
+    color:#ffffff;
+}
+div.bannerIcons{
+    margin-top: 150px;
+}
+div.bannerIcons a{
+    font-size: 23px;
+    margin-left: 40px;
+    padding: 7px 15px;
+    background: rgba(0,0,0,0.5);
+    color: #88d3ff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: inline-block;
+}
+div.bannerIcons a:first-child{
+    margin-left: 0px;
+}
+div.bannerIcons a:hover{
+    color:aliceblue;
+    font-size: 25px;
+    background: #88d3ff;
+}
+
+div.homepageFeatures{
+    display: flex;
+    flex-direction: row;
+}
+
+div.homepageFeature{
+    padding: 10px 20px;
+    text-align: center;
+}
+div.homepageFeature span.featureIcon{
+    height: 80px;
+    width: 80px;
+    display: inline-block;
+    font-size: 50px;
+    background: #88d3ff;
+    color: #ffffff;
+    /* padding-left: 18px; */
+    padding-top: 5px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+
+}
+
+div.homepageFeature h3.featureTitle{
+    margin-bottom: 20px;
+}
+
+div.homepageFeature p.featureDescription{
+    color: #848484;
+}
+
+
