@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedLog Register</title>
+    <link rel="stylesheet" href="Css/register.css">
+</head>
+<body>
+
+<!-- REGISTER CONTAINER -->
+<div class="registerContainer">
+
+    <!-- LOGO -->
+    <div class="logo">
+        <img src="Images/logo.png" alt="MedLog Logo"> <!-- Replace with actual logo -->
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div class="registerFormWrapper">
+        <h1>Register</h1>
+        <p>Create your MedLog account to access the clinic system</p>
+
+        <form action="register.php" method="POST">
+
+            <!-- STUDENT NUMBER -->
+            <div class="formGroup">
+                <input type="text" id="studentNumber" name="studentNumber" placeholder=" " required>
+                <label for="studentNumber">Student Number</label>
+            </div>
+
+            <!-- FULL NAME -->
+            <div class="formGroup">
+                <input type="text" id="fullName" name="fullName" placeholder=" " required>
+                <label for="fullName">Full Name</label>
+            </div>
+
+            <!-- EMAIL -->
+            <div class="formGroup">
+                <input type="email" id="email" name="email" placeholder=" " required>
+                <label for="email">Microsoft 365 Email</label>
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="formGroup">
+                <input type="password" id="password" name="password" placeholder=" " required>
+                <label for="password">Password</label>
+            </div>
+
+            <!-- CONFIRM PASSWORD -->
+            <div class="formGroup">
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder=" " required>
+                <label for="confirmPassword">Confirm Password</label>
+            </div>
+
+            <!-- TERMS -->
+            <div class="formGroup terms">
+                <input type="checkbox" id="terms" name="terms" required>
+                <label for="terms">I agree to the <a href="#">Terms & Conditions</a></label>
+            </div>
+
+            <!-- SUBMIT -->
+            <div class="formGroup">
+                <button type="submit" class="registerBtn">Register</button>
+            </div>
+
+            <!-- LOGIN LINK -->
+            <p class="loginLink">
+                Already have an account? <a href="login.html">Login here</a>
+            </p>
+
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,160 @@
+/* ---------------- BASE RESET ---------------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: url('../Images/bgLog.jpg') no-repeat center center fixed;
+    background-size: cover;
+    overflow: hidden;
+    position: relative;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6); 
+}
+
+/* ---------------- LOGIN CONTAINER ---------------- */
+.loginContainer {
+    position: relative;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.05); /* slightly transparent card */
+    padding: 50px 40px 40px 40px;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    animation: fadeIn 1s ease forwards;
+    backdrop-filter: blur(10px);
+}
+
+/* ---------------- LOGO ---------------- */
+.logoContainer img {
+    width: 100px;
+    height: auto;
+    margin-bottom: 20px;
+    animation: bounceIn 1s ease forwards;
+}
+
+/* ---------------- HEADER ---------------- */
+.loginHeader h1 {
+    color: #ffffff;
+    font-size: 36px;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+}
+
+.loginHeader p {
+    color: #d0e7ff;
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
+/* ---------------- INPUTS ---------------- */
+.loginInputsContainer {
+    text-align: left;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.loginInputsContainer label {
+    display: block;
+    color: #ffffffcc;
+    font-size: 14px;
+    margin-bottom: 5px;
+    transition: 0.3s;
+}
+
+.loginInputsContainer input {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    background: rgba(0, 0, 0, 0.15);
+    color: white;
+    transition: 0.3s;
+}
+
+.loginInputsContainer input:focus {
+    background: rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0 10px #3b8efc88;
+}
+
+/* ---------------- LOGIN BUTTON ---------------- */
+.loginButtonContainer button {
+    width: 100%;
+    padding: 12px;
+    background: #3b8efc;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.loginButtonContainer button:hover {
+    background: #2c6dd5;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+}
+
+/* ---------------- EXTRA LINKS ---------------- */
+.loginExtraLinks a {
+    display: block;
+    margin-top: 15px;
+    color: #d0e7ffcc;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.loginExtraLinks a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+/* ---------------- ANIMATIONS ---------------- */
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(-20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+@keyframes bounceIn {
+    0% {opacity:0; transform: scale(0.5);}
+    60% {opacity:1; transform: scale(1.2);}
+    80% {transform: scale(0.95);}
+    100% {transform: scale(1);}
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+@media(max-width: 450px){
+    .loginContainer {
+        padding: 40px 20px;
+    }
+
+    .loginHeader h1 {
+        font-size: 28px;
+    }
+
+    .loginHeader p {
+        font-size: 14px;
+    }
+}
