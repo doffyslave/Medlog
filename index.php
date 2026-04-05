@@ -14,26 +14,23 @@
 
 <body>
 
-<!-- HEADER -->
 <div class="header"></div>
 
-<!-- NAVBAR -->
 <nav class="navbar">
     <div class="navContainer">
         <div class="logo">
-            <img src="Images/MedLogo.png" alt="MedLog Logo"> <!-- placeholder for your logo -->
+            <img src="Images/MedLogo.png" alt="MedLog Logo"> 
         </div>
         <ul class="navMenu">
             <li><a href="#">Home</a></li>
             <li><a href="#">Features</a></li>
             <li><a href="#">About</a></li>
-            <li><a href="login.html" class="btn loginBtn">Login</a></li>
-            <li><a href="register.html" class="btn registerBtn">Register</a></li>
+            <li><a href="login.php" class="btn loginBtn">Login</a></li>
+            <li><a href="register.php" class="btn registerBtn">Register</a></li>
         </ul>
     </div>
 </nav>
 
-<!-- HERO / BANNER -->
 <div class="banner">
     <div class="homepageContainer">
         <div class="bannerHeader">
@@ -50,8 +47,8 @@
         </p>
 
         <div class="bannerButtons">
-            <a href="register.html" class="btn registerBtn">Register</a>
-            <a href="login.html" class="btn loginBtn">Login</a>
+            <a href="register.php" class="btn registerBtn">Register</a>
+            <a href="login.php" class="btn loginBtn">Login</a>
         </div>
 
         <div class="bannerIcons">
@@ -62,7 +59,6 @@
     </div>
 </div>
 
-<!-- FEATURES -->
 <div class="homepageContainer">
     <div class="homepageFeatures">
         <div class="homepageFeature">
@@ -103,7 +99,6 @@
     </div>
 </div>
 
-<!-- UPDATE / NOTIFICATION SECTION -->
 <div class="homepageNotified">
     <div class="homepageContainer">
         <div class="emailForm">

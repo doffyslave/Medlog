@@ -28,7 +28,6 @@ list-style:none;
 }
 
 /* ---------------- NAVBAR ---------------- */
-/* ---------------- NAVBAR ---------------- */
 .navbar {
     width: 100%;
     background: white;
@@ -71,7 +70,7 @@ list-style:none;
     padding: 5px 10px;
     border-radius: 5px;
     transition: all 0.3s ease;
-    outline: none; /* remove blue focus border */
+    outline: none; 
 }
 
 .navMenu li a:hover {

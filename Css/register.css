@@ -11,12 +11,12 @@ body {
     font-family: Arial, sans-serif;
     line-height: 1.5;
     min-height: 100vh;
-    background: url('../Images/bgLog.jpg') no-repeat center center fixed; /* placeholder bg */
+    background: url('../Images/bgLog.jpg') no-repeat center center fixed;
     background-size: cover;
     position: relative;
 }
 
-/* DARK OVERLAY ON BG */
+/* DARK OVERLAY */
 body::before {
     content: "";
     position: absolute;
@@ -26,7 +26,7 @@ body::before {
     z-index: 0;
 }
 
-/* ---------------- REGISTER CONTAINER ---------------- */
+/* ---------------- CONTAINER ---------------- */
 .registerContainer {
     position: relative;
     z-index: 1;
@@ -41,15 +41,14 @@ body::before {
 /* LOGO */
 .registerContainer .logo img {
     height: 60px;
-    width: auto;
     margin-bottom: 30px;
     animation: fadeInDown 1s ease forwards;
 }
 
-/* FORM WRAPPER */
+/* ---------------- FORM WRAPPER ---------------- */
 .registerFormWrapper {
     background: rgba(255, 255, 255, 0.95);
-    padding: 40px 50px;
+    padding: 40px 45px;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     width: 100%;
@@ -57,24 +56,25 @@ body::before {
     animation: fadeInUp 1s ease forwards;
 }
 
-/* FORM HEADER */
+/* HEADER */
 .registerFormWrapper h1 {
     text-align: center;
     margin-bottom: 10px;
-    font-size: 32px;
+    font-size: 30px;
     color: #333;
 }
 
 .registerFormWrapper p {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     color: #555;
+    font-size: 14px;
 }
 
-/* FORM GROUP */
+/* ---------------- FORM ---------------- */
 .formGroup {
     position: relative;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 /* INPUTS */
@@ -82,90 +82,120 @@ body::before {
 .formGroup input[type="email"],
 .formGroup input[type="password"] {
     width: 100%;
-    padding: 14px 15px;
+    padding: 13px 14px;
     border: 1px solid #ccc;
     border-radius: 8px;
     outline: none;
-    font-size: 16px;
+    font-size: 15px;
     transition: 0.3s;
     background: none;
 }
 
-/* FLOATING LABELS EFFECT */
+/* SELECT (FIXED UI 💀➡️🔥) */
+.formGroup select {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+    font-size: 15px;
+    background: white;
+    transition: 0.3s;
+    appearance: none;
+    cursor: pointer;
+}
+
+/* FOCUS EFFECT */
+.formGroup input:focus,
+.formGroup select:focus {
+    border-color: #3b8efc;
+    box-shadow: 0 0 8px rgba(59, 142, 252, 0.3);
+}
+
+/* FLOATING LABELS */
 .formGroup label {
     position: absolute;
     top: 50%;
-    left: 15px;
+    left: 14px;
     transform: translateY(-50%);
     color: #aaa;
-    font-size: 16px;
+    font-size: 15px;
     pointer-events: none;
     transition: 0.3s;
     background: white;
     padding: 0 5px;
 }
 
+/* FLOAT EFFECT */
 .formGroup input:focus + label,
 .formGroup input:valid + label {
-    top: -10px;
+    top: -9px;
     left: 10px;
-    font-size: 12px;
+    font-size: 11px;
     color: #3b8efc;
 }
 
-/* INPUT FOCUS SHADOW */
-.formGroup input:focus {
-    border-color: #3b8efc;
-    box-shadow: 0 0 10px rgba(59, 142, 252, 0.3);
+/* SECTION LABEL */
+.sectionLabel {
+    font-size: 13px;
+    font-weight: bold;
+    color: #666;
+    margin-bottom: 10px;
 }
 
-/* TERMS */
+/* ---------------- TERMS ---------------- */
 .formGroup.terms {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 10px;
-    font-size: 14px;
+    font-size: 13px;
+}
+
+.formGroup.terms input {
+    margin-top: 3px;
 }
 
 .formGroup.terms a {
     color: #3b8efc;
     text-decoration: none;
-    transition: 0.3s;
 }
 
 .formGroup.terms a:hover {
     text-decoration: underline;
 }
 
-/* REGISTER BUTTON */
+/* ---------------- BUTTON ---------------- */
 .registerBtn {
     width: 100%;
-    padding: 14px;
+    padding: 13px;
     background: linear-gradient(90deg, #3b8efc, #65b0ff);
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 15px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: 0.25s;
 }
 
 .registerBtn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(59,142,252,0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(59,142,252,0.4);
 }
 
-/* LOGIN LINK */
+.registerBtn:active {
+    transform: scale(0.98);
+}
+
+/* ---------------- LOGIN LINK ---------------- */
 .loginLink {
     text-align: center;
-    margin-top: 15px;
-    font-size: 14px;
+    margin-top: 12px;
+    font-size: 13px;
 }
 
 .loginLink a {
     color: #3b8efc;
     text-decoration: none;
-    transition: 0.3s;
 }
 
 .loginLink a:hover {
@@ -174,18 +204,18 @@ body::before {
 
 /* ---------------- ANIMATIONS ---------------- */
 @keyframes fadeInUp {
-    0% {opacity: 0; transform: translateY(20px);}
-    100% {opacity: 1; transform: translateY(0);}
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
 }
 
 @keyframes fadeInDown {
-    0% {opacity: 0; transform: translateY(-20px);}
-    100% {opacity: 1; transform: translateY(0);}
+    from {opacity: 0; transform: translateY(-20px);}
+    to {opacity: 1; transform: translateY(0);}
 }
 
-/* RESPONSIVE */
+/* ---------------- RESPONSIVE ---------------- */
 @media (max-width: 500px) {
     .registerFormWrapper {
-        padding: 30px 20px;
+        padding: 25px 18px;
     }
 }
