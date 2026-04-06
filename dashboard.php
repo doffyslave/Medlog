@@ -46,9 +46,9 @@ $user = $_SESSION['user'];
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="patients.php">
                         <i class="fas fa-user-injured"></i>
-                        <span class="menuText">Students</span>
+                        <span class="menuText">Patients</span>
                     </a>
                 </li>
                 <li>

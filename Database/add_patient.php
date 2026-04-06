@@ -3,26 +3,15 @@ include("connection.php");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $user_id = $_POST['studentNumber'];
-    $name = $_POST['fullName'];
+    $user_id = $_POST['user_id'];
+    $name = $_POST['name'];
     $email = $_POST['email'];
     $role = $_POST['role'];
     $course = $_POST['course'];
     $year_level = $_POST['year_level'];
     $password = $_POST['password'];
-    $confirmPassword = $_POST['confirmPassword'];
 
-    if (empty($user_id) || empty($name) || empty($email) || empty($role) || empty($password)) {
-        echo "Please fill in all required fields.";
-        exit();
-    }
-
-    if ($password !== $confirmPassword) {
-        echo "Passwords do not match!";
-        exit();
-    }
-
-    if ($role !== "Student") {
+    if ($role != "student") {
         $course = NULL;
         $year_level = NULL;
     }
@@ -30,6 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     try {
+        // Check duplicate
         $check = $conn->prepare("SELECT * FROM users WHERE user_id = :user_id OR email = :email");
         $check->execute([
             ':user_id' => $user_id,
@@ -40,11 +30,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "User already exists!";
             exit();
         }
-        
+
+        // Insert
         $stmt = $conn->prepare("INSERT INTO users 
-            (user_id, name, email, role, course, year_level, password)
-            VALUES 
-            (:user_id, :name, :email, :role, :course, :year_level, :password)");
+        (user_id, name, email, role, course, year_level, password)
+        VALUES (:user_id, :name, :email, :role, :course, :year_level, :password)");
 
         $stmt->execute([
             ':user_id' => $user_id,
@@ -56,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ':password' => $hashed_password
         ]);
 
-        header("Location: ../login.php");
+        header("Location: ../patients.php");
         exit();
 
     } catch (PDOException $e) {
