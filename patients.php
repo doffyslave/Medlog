@@ -24,51 +24,31 @@ $user = $_SESSION['user'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patients - MedLog</title>
 
+    <!-- ICONS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- GLOBAL LAYOUT -->
+    <link rel="stylesheet" href="Css/layout.css">
+
+    <!-- PAGE CSS -->
     <link rel="stylesheet" href="Css/patients.css">
-    <<link rel="stylesheet" href="Css/dashboard.css">
-
-
 </head>
 
 <body>
 
 <div class="dashboard">
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-        <h2 class="logo">MedLog</h2>
-
-        <div class="user">
-            <img src="Images/UserIcon.jpg" class="userImage">
-            <span class="menuText"><?php echo htmlspecialchars($user['name']); ?></span>
-        </div>
-
-        <nav class="menu">
-            <ul>
-                <li><a href="dashboard.php"><i class="fas fa-home"></i> <span class="menuText">Dashboard</span></a></li>
-                <li class="active"><a href="patients.php"><i class="fas fa-user-injured"></i> <span class="menuText">Patients</span></a></li>
-                <li><a href="medicines.php"><i class="fas fa-pills"></i> <span class="menuText">Inventory</span></a></li>
-                <li><a href="reports.php"><i class="fas fa-chart-line"></i> <span class="menuText">Reports</span></a></li>
-            </ul>
-        </nav>
-    </aside>
+    <!-- 🔥 SIDEBAR -->
+    <?php include 'includes/sidebar.php'; ?>
 
     <!-- MAIN -->
     <main class="main-content">
 
-        <header class="topnav">
-    <div class="toggle-btn">
-        <i class="fas fa-bars"></i>
-    </div>
-
-    <div class="actions">
-        <a href="Database/logout.php" class="logout" id="logoutBtn">
-            <i class="fas fa-sign-out-alt"></i> Logout
-        </a>
-    </div>
-</header>
+        <!-- 🔥 HEADER -->
+        <?php include 'includes/header.php'; ?>
 
         <section class="content">
+
             <div class="page-header">
                 <h1>Patients</h1>
                 <p>Manage clinic patients</p>
@@ -96,29 +76,27 @@ $user = $_SESSION['user'];
                 <?php if(count($patients) > 0): ?>
                     <?php foreach($patients as $row): ?>
                         <tr>
-                            <td><?php echo $row['user_id']; ?></td>
-                            <td><?php echo $row['name']; ?></td>
-                            <td><?php echo $row['email']; ?></td>
-                            <td><?php echo ucfirst($row['role']); ?></td>
-                            <td><?php echo $row['course'] ?: 'N/A'; ?></td>
-                            <td><?php echo $row['year_level'] ?: 'N/A'; ?></td>
+                            <td><?= $row['user_id'] ?></td>
+                            <td><?= $row['name'] ?></td>
+                            <td><?= $row['email'] ?></td>
+                            <td><?= ucfirst($row['role']) ?></td>
+                            <td><?= $row['course'] ?: 'N/A' ?></td>
+                            <td><?= $row['year_level'] ?: 'N/A' ?></td>
                             <td>
                                 <button class="editBtn"
-                                    data-id="<?php echo $row['user_id']; ?>"
-                                    data-name="<?php echo $row['name']; ?>"
-                                    data-email="<?php echo $row['email']; ?>"
-                                    data-role="<?php echo $row['role']; ?>"
-                                    data-course="<?php echo $row['course']; ?>"
-                                    data-year="<?php echo $row['year_level']; ?>"
-                                    >
-                                    Edit
-                                </button>
-                        <form action="Database/delete_patient.php" method="POST" style="display:inline;">
-                            <input type="hidden" name="user_id" value="<?php echo $row['user_id']; ?>">
-                            <button type="submit" onclick="return confirm('Are you sure you want to delete this patient?')">
-                                Delete
-                            </button>
-                        </form>
+                                    data-id="<?= $row['user_id'] ?>"
+                                    data-name="<?= $row['name'] ?>"
+                                    data-email="<?= $row['email'] ?>"
+                                    data-role="<?= $row['role'] ?>"
+                                    data-course="<?= $row['course'] ?>"
+                                    data-year="<?= $row['year_level'] ?>"
+                                >Edit</button>
+
+                                <form action="Database/delete_patient.php" method="POST" style="display:inline;">
+                                    <input type="hidden" name="user_id" value="<?= $row['user_id'] ?>">
+                                    <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
+                                </form>
+
                                 <button>View</button>
                             </td>
                         </tr>
@@ -134,14 +112,14 @@ $user = $_SESSION['user'];
     </main>
 </div>
 
-<!-- 🔥 MODAL -->
+<!-- ADD MODAL -->
 <div id="addModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
         <h2>Add Patient</h2>
 
         <form action="Database/add_patient.php" method="POST">
-            <input type="text" name="user_id" placeholder="User ID (e.g. 2024-001)" required>
+            <input type="text" name="user_id" placeholder="User ID" required>
             <input type="text" name="name" placeholder="Full Name" required>
             <input type="email" name="email" placeholder="Email" required>
 
@@ -152,8 +130,8 @@ $user = $_SESSION['user'];
                 <option value="visitor">Visitor</option>
             </select>
 
-            <input type="text" name="course" placeholder="Course (optional)">
-            <input type="text" name="year_level" placeholder="Year Level (optional)">
+            <input type="text" name="course" placeholder="Course">
+            <input type="text" name="year_level" placeholder="Year Level">
             <input type="password" name="password" placeholder="Password" required>
 
             <button type="submit">Add Patient</button>
@@ -161,7 +139,7 @@ $user = $_SESSION['user'];
     </div>
 </div>
 
- <!-- edit modal  -->
+<!-- EDIT MODAL -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <span class="closeEdit">&times;</span>
@@ -187,29 +165,27 @@ $user = $_SESSION['user'];
 </div>
 
 <script>
-// MODAL
+// ADD MODAL
 const modal = document.getElementById("addModal");
 const btn = document.getElementById("openModal");
 const closeBtn = document.querySelector(".close");
 
 btn.onclick = () => modal.style.display = "block";
 closeBtn.onclick = () => modal.style.display = "none";
-window.onclick = (e) => {
-    if (e.target == modal) modal.style.display = "none";
-};
 
+// EDIT MODAL
 const editModal = document.getElementById("editModal");
 const editBtns = document.querySelectorAll(".editBtn");
 const closeEdit = document.querySelector(".closeEdit");
 
 editBtns.forEach(btn => {
     btn.addEventListener("click", () => {
-        document.getElementById("edit_id").value = btn.dataset.id;
-        document.getElementById("edit_name").value = btn.dataset.name;
-        document.getElementById("edit_email").value = btn.dataset.email;
-        document.getElementById("edit_role").value = btn.dataset.role;
-        document.getElementById("edit_course").value = btn.dataset.course;
-        document.getElementById("edit_year").value = btn.dataset.year;
+        edit_id.value = btn.dataset.id;
+        edit_name.value = btn.dataset.name;
+        edit_email.value = btn.dataset.email;
+        edit_role.value = btn.dataset.role;
+        edit_course.value = btn.dataset.course;
+        edit_year.value = btn.dataset.year;
 
         editModal.style.display = "block";
     });
@@ -218,6 +194,7 @@ editBtns.forEach(btn => {
 closeEdit.onclick = () => editModal.style.display = "none";
 
 window.onclick = (e) => {
+    if (e.target == modal) modal.style.display = "none";
     if (e.target == editModal) editModal.style.display = "none";
 };
 </script>

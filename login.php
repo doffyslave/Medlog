@@ -12,13 +12,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     try {
 
-        // ✅ GET USER ONLY BY ID
         $stmt = $conn->prepare("SELECT * FROM users WHERE user_id = :user_id");
         $stmt->execute([':user_id' => $user_id]);
 
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // ✅ CHECK IF USER EXISTS + PASSWORD MATCHES
         if($user && password_verify($password, $user['password'])) {
 
             $_SESSION['user'] = $user;

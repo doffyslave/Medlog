@@ -19,7 +19,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     try {
-        // Check duplicate
         $check = $conn->prepare("SELECT * FROM users WHERE user_id = :user_id OR email = :email");
         $check->execute([
             ':user_id' => $user_id,
@@ -31,7 +30,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         }
 
-        // Insert
         $stmt = $conn->prepare("INSERT INTO users 
         (user_id, name, email, role, course, year_level, password)
         VALUES (:user_id, :name, :email, :role, :course, :year_level, :password)");
