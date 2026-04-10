@@ -38,7 +38,7 @@ $current = basename($_SERVER['PHP_SELF']);
                 </a>
             </li>
 
-            <li>
+            <li class="<?= $current == 'inventory.php' ? 'active' : '' ?>">
                 <a href="inventory.php">
                     <i class="fas fa-pills"></i>
                     <span class="menuText">Inventory</span>

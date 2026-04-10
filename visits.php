@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Redirect if not logged in
 if (!isset($_SESSION['user'])) {
     header("Location: login.php");
     exit();
@@ -9,7 +8,6 @@ if (!isset($_SESSION['user'])) {
 
 require 'Database/connection.php';
 
-// FETCH VISITS WITH PATIENT NAME
 $stmt = $conn->prepare("
     SELECT visits.*, users.name 
     FROM visits
@@ -29,13 +27,9 @@ $user = $_SESSION['user'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visits - MedLog</title>
 
-    <!-- ICONS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <!-- GLOBAL -->
     <link rel="stylesheet" href="Css/layout.css">
-
-    <!-- PAGE -->
     <link rel="stylesheet" href="Css/visits.css">
 </head>
 <body>
@@ -52,14 +46,16 @@ $user = $_SESSION['user'];
         <?php include 'includes/header.php'; ?>
 
         <section class="content">
-            <h1>Visits</h1>
-            <p>Manage clinic visit records</p>
+            <div class="header-row">
+    <div>
+        <h1>Visits</h1>
+        <p>Manage clinic visit records</p>
+    </div>
 
-            <div class="top-bar">
-                <button id="openVisitModal" class="add-btn">
-                    <i class="fas fa-plus"></i> Add Visit
-                </button>
-            </div>
+    <button id="openVisitModal" class="add-btn">
+        <i class="fas fa-plus"></i> Add Visit
+    </button>
+</div>
 
             <div class="table-container">
                 <table>
@@ -84,8 +80,18 @@ $user = $_SESSION['user'];
                                     <td><?= htmlspecialchars($visit['treatment']) ?></td>
                                     <td><?= htmlspecialchars($visit['recorded_by']) ?></td>
                                     <td>
-                                        <button class="edit-btn">Edit</button>
-                                        <button class="delete-btn">Delete</button>
+                                        <button class="edit-btn"
+                                            data-id="<?= $visit['visit_id'] ?>"
+                                            data-user="<?= $visit['user_id'] ?>"
+                                            data-date="<?= $visit['visit_date'] ?>"
+                                            data-complaint='<?= json_encode($visit['complaint']) ?>'
+                                            data-treatment='<?= json_encode($visit['treatment']) ?>'
+                                            data-recorded='<?= json_encode($visit['recorded_by']) ?>'>
+                                            Edit
+                                        </button>
+                                        <button class="delete-btn" data-id="<?= $visit['visit_id'] ?>">
+                                            Delete
+                                        </button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -134,31 +140,104 @@ $user = $_SESSION['user'];
     </div>
 </div>
 
+<div id="editVisitModal" class="modal">
+    <div class="modal-content">
+        <span class="closeEdit">&times;</span>
+        <h2>Edit Visit</h2>
+
+        <form action="Database/edit_visit.php" method="POST">
+
+            <input type="hidden" name="visit_id" id="edit_visit_id">
+
+            <select name="user_id" id="edit_user_id" required>
+                <option value="">Select Patient</option>
+                <?php foreach ($users as $u): ?>
+                    <option value="<?= $u['user_id'] ?>">
+                        <?= htmlspecialchars($u['name']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
+            <input type="datetime-local" name="visit_date" id="edit_visit_date" required>
+
+            <input type="text" name="complaint" id="edit_complaint" required>
+            <input type="text" name="treatment" id="edit_treatment" required>
+            <input type="text" name="recorded_by" id="edit_recorded_by" required>
+
+            <button type="submit">Update Visit</button>
+        </form>
+    </div>
+</div>
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
     const visitModal = document.getElementById("visitModal");
+    const editModal = document.getElementById("editVisitModal");
+
     const openVisitBtn = document.getElementById("openVisitModal");
     const closeVisit = document.querySelector(".closeVisit");
+    const closeEdit = document.querySelector(".closeEdit");
 
-    if (openVisitBtn && visitModal) {
-        openVisitBtn.addEventListener("click", () => {
-            visitModal.style.display = "block";
-        });
-    }
-
-    if (closeVisit) {
-        closeVisit.addEventListener("click", () => {
-            visitModal.style.display = "none";
-        });
-    }
-
-    window.addEventListener("click", (e) => {
-        if (e.target == visitModal) {
-            visitModal.style.display = "none";
-        }
+    // 🔥 OPEN ADD MODAL
+    openVisitBtn.addEventListener("click", () => {
+        visitModal.classList.add("show");
     });
 
+    // 🔥 CLOSE ADD MODAL
+    closeVisit.addEventListener("click", () => {
+        visitModal.classList.remove("show");
+    });
+
+    // 🔥 CLOSE WHEN CLICK OUTSIDE
+    window.addEventListener("click", (e) => {
+        if (e.target === visitModal) visitModal.classList.remove("show");
+        if (e.target === editModal) editModal.classList.remove("show");
+    });
+
+    // 🔥 EDIT BUTTON LOGIC
+    document.querySelectorAll(".edit-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+
+            editModal.classList.add("show");
+
+            document.getElementById("edit_visit_id").value = btn.dataset.id;
+            document.getElementById("edit_user_id").value = btn.dataset.user;
+
+            let rawDate = btn.dataset.date;
+            let formatted = rawDate.replace(" ", "T").slice(0,16);
+            document.getElementById("edit_visit_date").value = formatted;
+
+            document.getElementById("edit_complaint").value = JSON.parse(btn.dataset.complaint);
+            document.getElementById("edit_treatment").value = JSON.parse(btn.dataset.treatment);
+            document.getElementById("edit_recorded_by").value = JSON.parse(btn.dataset.recorded);
+        });
+    });
+
+    // 🔥 CLOSE EDIT MODAL
+    closeEdit.addEventListener("click", () => {
+        editModal.classList.remove("show");
+    });
+
+    // 🔥 DELETE FUNCTION
+    document.querySelectorAll(".delete-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+
+            const visitId = btn.dataset.id;
+
+            if (confirm("Are you sure you want to delete this visit?")) {
+                window.location.href = "Database/delete_visit.php?id=" + visitId;
+            }
+        });
+    });
+
+});
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+        visitModal.classList.remove("show");
+        editModal.classList.remove("show");
+    }
 });
 </script>
 
