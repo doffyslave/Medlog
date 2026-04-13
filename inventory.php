@@ -1,8 +1,13 @@
 <?php
 require 'database/connection.php';
 
-// FETCH DATA
-$stmt = $conn->query("SELECT * FROM inventory ORDER BY inventory_id DESC");
+// FETCH DATA WITH JOIN
+$stmt = $conn->query("
+    SELECT inventory.*, medicines.medicine_name 
+    FROM inventory 
+    LEFT JOIN medicines ON inventory.med_id = medicines.med_id
+    ORDER BY inventory.inventory_id DESC
+");
 $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -22,15 +27,12 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="dashboard">
 
-    <!-- SIDEBAR -->
     <?php include 'includes/sidebar.php'; ?>
 
     <div class="main-content">
 
-        <!-- HEADER -->
         <?php include 'includes/header.php'; ?>
 
-        <!-- CONTENT -->
         <div class="content">
 
             <div class="page-header">
@@ -56,7 +58,7 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     $status = ($row['quantity'] <= $row['min_stock']) ? 'Low Stock' : 'OK';
                 ?>
                     <tr>
-                        <td><?= htmlspecialchars($row['name']) ?></td>
+                        <td><?= htmlspecialchars($row['medicine_name'] ?? 'N/A') ?></td>
                         <td><?= $row['category'] ?></td>
                         <td><?= $row['quantity'] ?></td>
                         <td><?= $row['unit'] ?></td>
@@ -71,7 +73,7 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <td>
                             <button class="edit-btn" onclick='editItem(<?= json_encode($row) ?>)'>Edit</button>
 
-                            <form method="POST" action="delete_inventory.php" style="display:inline;">
+                            <form method="POST" action="Database/delete_inventory.php" style="display:inline;">
                                 <input type="hidden" name="id" value="<?= $row['inventory_id'] ?>">
                                 <button class="delete-btn" type="submit">Delete</button>
                             </form>
@@ -91,7 +93,20 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <h3>Add Item</h3>
 
         <form method="POST" action="Database/add_inventory.php">
-            <input type="text" name="name" placeholder="Item Name" required>
+
+            <!-- 🔥 DROPDOWN NA (IMPORTANT) -->
+            <select name="med_id" required>
+                <option value="">Select Medicine</option>
+
+                <?php
+                $meds = $conn->query("SELECT * FROM medicines");
+                foreach ($meds as $med):
+                ?>
+                    <option value="<?= $med['med_id'] ?>">
+                        <?= $med['medicine_name'] ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
 
             <select name="category" required>
                 <option value="Medicine">Medicine</option>
@@ -110,21 +125,13 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-<!-- EDIT MODAL -->
+<!-- EDIT MODAL (basic lang muna) -->
 <div class="modal" id="editModal">
     <div class="modal-content">
         <h3>Edit Item</h3>
 
-        <form method="POST" action="edit_inventory.php">
+        <form method="POST" action="Database/edit_inventory.php">
             <input type="hidden" name="id" id="edit_id">
-
-            <input type="text" name="name" id="edit_name" required>
-
-            <select name="category" id="edit_category">
-                <option value="Medicine">Medicine</option>
-                <option value="Supplies">Supplies</option>
-                <option value="Equipment">Equipment</option>
-            </select>
 
             <input type="number" name="quantity" id="edit_quantity" required>
             <input type="text" name="unit" id="edit_unit" required>
@@ -149,8 +156,6 @@ function editItem(data) {
     document.getElementById("editModal").style.display = "flex";
 
     edit_id.value = data.inventory_id;
-    edit_name.value = data.name;
-    edit_category.value = data.category;
     edit_quantity.value = data.quantity;
     edit_unit.value = data.unit;
     edit_expiration.value = data.expiration_date;

@@ -179,23 +179,23 @@ document.addEventListener("DOMContentLoaded", function () {
     const closeVisit = document.querySelector(".closeVisit");
     const closeEdit = document.querySelector(".closeEdit");
 
-    // 🔥 OPEN ADD MODAL
+    // OPEN ADD MODAL
     openVisitBtn.addEventListener("click", () => {
         visitModal.classList.add("show");
     });
 
-    // 🔥 CLOSE ADD MODAL
+    // CLOSE ADD MODAL
     closeVisit.addEventListener("click", () => {
         visitModal.classList.remove("show");
     });
 
-    // 🔥 CLOSE WHEN CLICK OUTSIDE
+    // CLOSE WHEN CLICK OUTSIDE
     window.addEventListener("click", (e) => {
         if (e.target === visitModal) visitModal.classList.remove("show");
         if (e.target === editModal) editModal.classList.remove("show");
     });
 
-    // 🔥 EDIT BUTTON LOGIC
+    // EDIT BUTTON LOGIC
     document.querySelectorAll(".edit-btn").forEach(btn => {
         btn.addEventListener("click", () => {
 
@@ -214,12 +214,12 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // 🔥 CLOSE EDIT MODAL
+    // CLOSE EDIT MODAL
     closeEdit.addEventListener("click", () => {
         editModal.classList.remove("show");
     });
 
-    // 🔥 DELETE FUNCTION
+    // DELETE FUNCTION
     document.querySelectorAll(".delete-btn").forEach(btn => {
         btn.addEventListener("click", () => {
 
@@ -238,7 +238,7 @@ document.addEventListener("keydown", (e) => {
         visitModal.classList.remove("show");
         editModal.classList.remove("show");
     }
-});
+}); 
 </script>
 
 
