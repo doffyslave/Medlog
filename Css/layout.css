@@ -15,9 +15,6 @@ body {
     background: #f4f7fb;
 }
 
-/* ===================== */
-/* MAIN LAYOUT */
-/* ===================== */
 .dashboard {
     display: flex;
     height: 100vh;

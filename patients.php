@@ -23,28 +23,16 @@ $user = $_SESSION['user'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patients - MedLog</title>
-
-    <!-- ICONS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-    <!-- GLOBAL LAYOUT -->
     <link rel="stylesheet" href="Css/layout.css">
-
-    <!-- PAGE CSS -->
     <link rel="stylesheet" href="Css/patients.css">
 </head>
 
 <body>
 
 <div class="dashboard">
-
-    <!-- 🔥 SIDEBAR -->
     <?php include 'includes/sidebar.php'; ?>
-
-    <!-- MAIN -->
     <main class="main-content">
-
-        <!-- 🔥 HEADER -->
         <?php include 'includes/header.php'; ?>
 
         <section class="content">
@@ -112,7 +100,6 @@ $user = $_SESSION['user'];
     </main>
 </div>
 
-<!-- ADD MODAL -->
 <div id="addModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
@@ -139,7 +126,6 @@ $user = $_SESSION['user'];
     </div>
 </div>
 
-<!-- EDIT MODAL -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <span class="closeEdit">&times;</span>

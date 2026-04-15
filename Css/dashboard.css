@@ -1,15 +1,10 @@
-/* ===================== */
-/* DASHBOARD-SPECIFIC */
-/* ===================== */
 
-/* CARDS */
 .cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
 }
 
-/* CARD STYLE */
 .card {
     background: #ffffff;
     padding: 20px;

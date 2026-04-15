@@ -38,10 +38,17 @@ $current = basename($_SERVER['PHP_SELF']);
                 </a>
             </li>
 
-            <li class="<?= $current == 'inventory.php' ? 'active' : '' ?>">
-                <a href="inventory.php">
+            <li class="<?= $current == 'stocks.php' ? 'active' : '' ?>">
+                <a href="stocks.php">
                     <i class="fas fa-pills"></i>
-                    <span class="menuText">Inventory</span>
+                    <span class="menuText">Stocks Inventory</span>
+                </a>
+            </li>
+
+            <li class="<?= $current == 'medicines.php' ? 'active' : '' ?>">
+                <a href="medicines.php">
+                    <i class="fas fa-capsules"></i>
+                    <span class="menuText">Medicines</span>
                 </a>
             </li>
 

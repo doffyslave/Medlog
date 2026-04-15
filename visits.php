@@ -9,11 +9,18 @@ if (!isset($_SESSION['user'])) {
 require 'Database/connection.php';
 
 $stmt = $conn->prepare("
-    SELECT visits.*, users.name 
+    SELECT 
+        visits.*, 
+        users.name,
+        GROUP_CONCAT(medicines.medicine_name SEPARATOR ', ') AS medicines_used
     FROM visits
     JOIN users ON visits.user_id = users.user_id
+    LEFT JOIN treatments ON visits.visit_id = treatments.visit_id
+    LEFT JOIN medicines ON treatments.med_id = medicines.med_id
+    GROUP BY visits.visit_id
     ORDER BY visit_date DESC
 ");
+
 $stmt->execute();
 $visits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -77,7 +84,7 @@ $user = $_SESSION['user'];
                                     <td><?= htmlspecialchars($visit['name']) ?></td>
                                     <td><?= htmlspecialchars($visit['visit_date']) ?></td>
                                     <td><?= htmlspecialchars($visit['complaint']) ?></td>
-                                    <td><?= htmlspecialchars($visit['treatment']) ?></td>
+                                    <td><?= htmlspecialchars($visit['medicines_used'] ?? 'None') ?></td>
                                     <td><?= htmlspecialchars($visit['recorded_by']) ?></td>
                                     <td>
                                         <button class="edit-btn"
@@ -131,7 +138,19 @@ $user = $_SESSION['user'];
             </select>
 
             <input type="text" name="complaint" placeholder="Complaint" required>
-            <input type="text" name="treatment" placeholder="Treatment" required>
+            <select name="med_id" required>
+    <option value="">Select Medicine</option>
+    <?php
+    $meds = $conn->query("SELECT med_id, medicine_name FROM medicines")->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($meds as $m):
+    ?>
+        <option value="<?= $m['med_id'] ?>">
+            <?= htmlspecialchars($m['medicine_name']) ?>
+        </option>
+    <?php endforeach; ?>
+</select>
+
+<input type="number" name="quantity" placeholder="Quantity" required>
 
             <input type="text" name="recorded_by" placeholder="Recorded By" required>
 

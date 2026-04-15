@@ -3,11 +3,12 @@ require 'database/connection.php';
 
 // FETCH DATA WITH JOIN
 $stmt = $conn->query("
-    SELECT inventory.*, medicines.medicine_name 
-    FROM inventory 
-    LEFT JOIN medicines ON inventory.med_id = medicines.med_id
-    ORDER BY inventory.inventory_id DESC
+    SELECT stocks.*, medicines.medicine_name 
+    FROM stocks 
+    LEFT JOIN medicines ON stocks.med_id = medicines.med_id
+    ORDER BY stocks.stock_id DESC
 ");
+
 $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -15,12 +16,11 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Inventory</title>
+<title>Stocks Inventory</title>
 
 <link rel="stylesheet" href="css/layout.css">
-<link rel="stylesheet" href="css/inventory.css">
+<link rel="stylesheet" href="css/stocks.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
 </head>
 
 <body>
@@ -36,47 +36,42 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="content">
 
             <div class="page-header">
-                <h1>Inventory</h1>
-                <button class="add-btn" onclick="openModal()">+ Add Item</button>
+                <h1>Stocks Inventory</h1>
+                <button class="add-btn" onclick="openModal()">+ Add / Adjust Stock</button>
             </div>
 
             <table class="inventory-table">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Category</th>
+                        <th>Medicine</th>
                         <th>Quantity</th>
-                        <th>Unit</th>
                         <th>Expiration</th>
-                        <th>Status</th>
+                        <th>Type</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
 
                 <tbody>
                 <?php foreach($items as $row): 
-                    $status = ($row['quantity'] <= $row['min_stock']) ? 'Low Stock' : 'OK';
+                    $type = ($row['quantity'] < 0) ? 'Adjustment' : 'Stock In';
                 ?>
                     <tr>
                         <td><?= htmlspecialchars($row['medicine_name'] ?? 'N/A') ?></td>
-                        <td><?= $row['category'] ?></td>
-                        <td><?= $row['quantity'] ?></td>
-                        <td><?= $row['unit'] ?></td>
+
+                        <td style="color: <?= $row['quantity'] < 0 ? 'red' : 'green' ?>">
+                            <?= $row['quantity'] > 0 ? '+' : '' ?><?= $row['quantity'] ?>
+                        </td>
+
                         <td><?= $row['expiration_date'] ?: '-' ?></td>
 
                         <td>
-                            <span class="<?= $status == 'Low Stock' ? 'badge-low' : 'badge-ok' ?>">
-                                <?= $status ?>
+                            <span class="<?= $row['quantity'] < 0 ? 'badge-low' : 'badge-ok' ?>">
+                                <?= $type ?>
                             </span>
                         </td>
 
                         <td>
                             <button class="edit-btn" onclick='editItem(<?= json_encode($row) ?>)'>Edit</button>
-
-                            <form method="POST" action="Database/delete_inventory.php" style="display:inline;">
-                                <input type="hidden" name="id" value="<?= $row['inventory_id'] ?>">
-                                <button class="delete-btn" type="submit">Delete</button>
-                            </form>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -87,37 +82,29 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-<!-- ADD MODAL -->
+<!-- ADD / ADJUST MODAL -->
 <div class="modal" id="addModal">
     <div class="modal-content">
-        <h3>Add Item</h3>
+        <h3>Add / Adjust Stock</h3>
 
-        <form method="POST" action="Database/add_inventory.php">
+        <form method="POST" action="Database/add_stocks.php">
 
-            <!-- 🔥 DROPDOWN NA (IMPORTANT) -->
             <select name="med_id" required>
                 <option value="">Select Medicine</option>
-
                 <?php
                 $meds = $conn->query("SELECT * FROM medicines");
                 foreach ($meds as $med):
                 ?>
                     <option value="<?= $med['med_id'] ?>">
-                        <?= $med['medicine_name'] ?>
+                        <?= htmlspecialchars($med['medicine_name']) ?>
                     </option>
                 <?php endforeach; ?>
             </select>
 
-            <select name="category" required>
-                <option value="Medicine">Medicine</option>
-                <option value="Supplies">Supplies</option>
-                <option value="Equipment">Equipment</option>
-            </select>
+            <input type="number" name="quantity" placeholder="(+ add, - adjust)" required>
+            <small style="color:gray;">Use negative values to correct mistakes</small>
 
-            <input type="number" name="quantity" placeholder="Quantity" required>
-            <input type="text" name="unit" placeholder="Unit (e.g. tablets)" required>
             <input type="date" name="expiration_date">
-            <input type="number" name="min_stock" placeholder="Min Stock" required>
 
             <button type="submit" class="save-btn">Save</button>
             <button type="button" onclick="closeModal()" class="cancel-btn">Cancel</button>
@@ -125,18 +112,16 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-<!-- EDIT MODAL (basic lang muna) -->
+<!-- EDIT MODAL -->
 <div class="modal" id="editModal">
     <div class="modal-content">
-        <h3>Edit Item</h3>
+        <h3>Edit Stock Record</h3>
+        <p id="edit_name" style="font-size: 14px; color: gray;"></p>
 
-        <form method="POST" action="Database/edit_inventory.php">
+        <form method="POST" action="Database/edit_stocks.php">
             <input type="hidden" name="id" id="edit_id">
 
-            <input type="number" name="quantity" id="edit_quantity" required>
-            <input type="text" name="unit" id="edit_unit" required>
             <input type="date" name="expiration_date" id="edit_expiration">
-            <input type="number" name="min_stock" id="edit_min">
 
             <button type="submit" class="save-btn">Update</button>
             <button type="button" onclick="closeEdit()" class="cancel-btn">Cancel</button>
@@ -155,11 +140,11 @@ function closeModal() {
 function editItem(data) {
     document.getElementById("editModal").style.display = "flex";
 
-    edit_id.value = data.inventory_id;
-    edit_quantity.value = data.quantity;
-    edit_unit.value = data.unit;
-    edit_expiration.value = data.expiration_date;
-    edit_min.value = data.min_stock;
+    document.getElementById("edit_id").value = data.stock_id;
+    document.getElementById("edit_expiration").value = data.expiration_date;
+
+    document.getElementById("edit_name").innerText = 
+        "Medicine: " + (data.medicine_name ?? "Unknown");
 }
 
 function closeEdit() {

@@ -1,14 +1,12 @@
 <?php
 require 'Database/connection.php';
 
-// get visit id
 if (!isset($_GET['id'])) {
     die("Invalid request.");
 }
 
 $visit_id = $_GET['id'];
 
-// fetch visit data
 $stmt = $conn->prepare("
     SELECT visits.*, users.name 
     FROM visits
