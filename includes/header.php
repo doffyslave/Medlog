@@ -4,7 +4,7 @@
     </div>
 
     <div class="actions">
-        <a href="Database/logout.php" class="logout" id="logoutBtn">
+        <a href="auth/logout.php" class="logout" id="logoutBtn">
             <i class="fas fa-sign-out-alt"></i> Logout
         </a>
     </div>

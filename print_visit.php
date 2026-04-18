@@ -1,4 +1,4 @@
-<?php
+<!-- <?php
 require 'Database/connection.php';
 
 if (!isset($_GET['id'])) {
@@ -112,4 +112,4 @@ if (!$visit) {
 </div>
 
 </body>
-</html>
+</html> -->  <?php echo password_hash("676767", PASSWORD_DEFAULT); ?>

@@ -1,4 +1,13 @@
 <?php
+session_start();
+
+$user = $_SESSION['user'] ?? null;
+
+if (!$user || $user['role'] !== 'admin') {
+    header("Location: dashboard.php");
+    exit();
+}
+
 require 'database/connection.php';
 
 // FETCH DATA WITH JOIN

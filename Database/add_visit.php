@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     try {
         $conn->beginTransaction();
 
-        // 🔥 1. CHECK STOCK FIRST
+        // CHECK STOCK FIRST
         $stmt = $conn->prepare("
             SELECT total_quantity FROM medicines WHERE med_id = ?
         ");
@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             throw new Exception("Not enough stock!");
         }
 
-        // 🔥 2. INSERT INTO visits
+        // INSERT INTO visits
         $stmt = $conn->prepare("
             INSERT INTO visits (user_id, visit_date, complaint, recorded_by)
             VALUES (?, NOW(), ?, ?)
@@ -33,14 +33,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $visit_id = $conn->lastInsertId();
 
-        // 🔥 3. INSERT INTO treatments
+        // INSERT INTO treatments
         $stmt = $conn->prepare("
             INSERT INTO treatments (visit_id, med_id, quantity)
             VALUES (?, ?, ?)
         ");
         $stmt->execute([$visit_id, $med_id, $quantity]);
 
-        // 🔥 4. DEDUCT STOCK
+        // DEDUCT STOCK
         $stmt = $conn->prepare("
             UPDATE medicines 
             SET total_quantity = total_quantity - ? 

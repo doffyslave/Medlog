@@ -25,7 +25,7 @@
             <li><a href="#">Home</a></li>
             <li><a href="#">Features</a></li>
             <li><a href="#">About</a></li>
-            <li><a href="login.php" class="btn loginBtn">Login</a></li>
+            <li><a href="auth/login.php" class="btn loginBtn">Login</a></li>
             <li><a href="register.php" class="btn registerBtn">Register</a></li>
         </ul>
     </div>
@@ -48,7 +48,7 @@
 
         <div class="bannerButtons">
             <a href="register.php" class="btn registerBtn">Register</a>
-            <a href="login.php" class="btn loginBtn">Login</a>
+            <a href="auth/login.php" class="btn loginBtn">Login</a>
         </div>
 
         <div class="bannerIcons">

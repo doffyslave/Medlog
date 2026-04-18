@@ -1,7 +1,9 @@
 <?php
 if (!isset($user)) {
     session_start();
-    $user = $_SESSION['user'];
+    $user = [
+    'name' => $_SESSION['name'] ?? 'User'
+];
 }
 
 $current = basename($_SERVER['PHP_SELF']);
