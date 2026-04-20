@@ -1,0 +1,3 @@
+# Ignore auth secrets
+auth/callback.php
+auth/login_redirect.php

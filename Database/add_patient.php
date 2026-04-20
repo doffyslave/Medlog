@@ -9,30 +9,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $role = $_POST['role'];
     $course = $_POST['course'];
     $year_level = $_POST['year_level'];
-    $password = $_POST['password'];
 
     if ($role != "student") {
         $course = NULL;
         $year_level = NULL;
     }
 
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
     try {
-        $check = $conn->prepare("SELECT * FROM users WHERE user_id = :user_id OR email = :email");
-        $check->execute([
-            ':user_id' => $user_id,
-            ':email' => $email
-        ]);
-
-        if ($check->rowCount() > 0) {
-            echo "User already exists!";
-            exit();
-        }
-
         $stmt = $conn->prepare("INSERT INTO users 
-        (user_id, name, email, role, course, year_level, password)
-        VALUES (:user_id, :name, :email, :role, :course, :year_level, :password)");
+        (user_id, name, email, role, course, year_level, status)
+        VALUES (:user_id, :name, :email, :role, :course, :year_level, 'active')");
 
         $stmt->execute([
             ':user_id' => $user_id,
@@ -40,8 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ':email' => $email,
             ':role' => $role,
             ':course' => $course,
-            ':year_level' => $year_level,
-            ':password' => $hashed_password
+            ':year_level' => $year_level
         ]);
 
         header("Location: ../patients.php");

@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Redirect if not logged in
 if (!isset($_SESSION['user'])) {
     header("Location: login.php");
     exit();
@@ -9,180 +8,269 @@ if (!isset($_SESSION['user'])) {
 
 include 'Database/connection.php';
 
-// Fetch patients (exclude admin)
-$stmt = $conn->prepare("SELECT * FROM users WHERE role != 'admin'");
-$stmt->execute();
-$patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$search = $_GET['search'] ?? '';
+$showInactive = $_GET['show_inactive'] ?? 0;
 
-$user = $_SESSION['user'];
+$query = "SELECT * FROM users 
+          WHERE role != 'admin'
+          AND (name LIKE :search OR email LIKE :search)";
+
+if (!$showInactive) {
+    $query .= " AND status = 'active'";
+}
+
+$query .= " ORDER BY status ASC, name ASC";
+
+$stmt = $conn->prepare($query);
+$stmt->execute([
+    ':search' => "%$search%"
+]);
+    
+$patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patients - MedLog</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="Css/layout.css">
-    <link rel="stylesheet" href="Css/patients.css">
+<title>Patients</title>
+<link rel="stylesheet" href="Css/layout.css">
+<link rel="stylesheet" href="Css/patients.css">
 </head>
 
 <body>
 
 <div class="dashboard">
-    <?php include 'includes/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include 'includes/header.php'; ?>
+<?php include 'includes/sidebar.php'; ?>
 
-        <section class="content">
+<main class="main-content">
+<?php include 'includes/header.php'; ?>
 
-            <div class="page-header">
-                <h1>Patients</h1>
-                <p>Manage clinic patients</p>
-            </div>
+<section class="content">
 
-            <div class="top-bar">
-                <input type="text" placeholder="Search by name or email...">
-                <button id="openModal">Add Patient</button>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>User ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Course</th>
-                        <th>Year Level</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                <?php if(count($patients) > 0): ?>
-                    <?php foreach($patients as $row): ?>
-                        <tr>
-                            <td><?= $row['user_id'] ?></td>
-                            <td><?= $row['name'] ?></td>
-                            <td><?= $row['email'] ?></td>
-                            <td><?= ucfirst($row['role']) ?></td>
-                            <td><?= $row['course'] ?: 'N/A' ?></td>
-                            <td><?= $row['year_level'] ?: 'N/A' ?></td>
-                            <td>
-                                <button class="editBtn"
-                                    data-id="<?= $row['user_id'] ?>"
-                                    data-name="<?= $row['name'] ?>"
-                                    data-email="<?= $row['email'] ?>"
-                                    data-role="<?= $row['role'] ?>"
-                                    data-course="<?= $row['course'] ?>"
-                                    data-year="<?= $row['year_level'] ?>"
-                                >Edit</button>
-
-                                <form action="Database/delete_patient.php" method="POST" style="display:inline;">
-                                    <input type="hidden" name="user_id" value="<?= $row['user_id'] ?>">
-                                    <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
-                                </form>
-
-                                <button>View</button>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr><td colspan="7">No patients found.</td></tr>
-                <?php endif; ?>
-                </tbody>
-            </table>
-
-        </section>
-
-    </main>
+<div class="page-header">
+    <h1>Patients</h1>
+    <p>Manage clinic patients</p>
 </div>
 
+<?php if (isset($_GET['success'])): ?>
+    <div style="color:green; margin-bottom:10px;">
+        Patient updated successfully.
+    </div>
+<?php endif; ?>
+
+<div class="top-bar">
+    <form method="GET">
+        <input type="text" name="search" placeholder="Search patient..." value="<?= htmlspecialchars($search) ?>">
+        <button type="submit">Search</button>
+    </form>
+
+    <div>
+        <a href="?show_inactive=1" class="filter-btn">Show Inactive</a>
+        <a href="patients.php" class="filter-btn">Active Only</a>
+        <button id="openModal">+ Add Patient</button>
+    </div>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Email</th>
+<th>Role</th>
+<th>Status</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody>
+<?php foreach($patients as $row): ?>    
+<tr 
+    class="<?= $row['status'] == 'inactive' ? 'inactive-row' : '' ?>">
+
+<td onclick="openProfile('<?= $row['user_id'] ?>')" style="cursor:pointer;">
+    <?= htmlspecialchars($row['name']) ?>
+</td>
+
+<td onclick="openProfile('<?= $row['user_id'] ?>')" style="cursor:pointer;">
+    <?= htmlspecialchars($row['email']) ?>
+</td>
+
+<td><?= ucfirst($row['role']) ?></td>
+<td><?= ucfirst($row['status']) ?></td>
+
+<td onclick="event.stopPropagation();">
+<button class="editBtn"
+    data-id="<?= $row['user_id'] ?>"
+    data-name="<?= htmlspecialchars($row['name']) ?>"
+    data-email="<?= htmlspecialchars($row['email']) ?>"
+    data-role="<?= $row['role'] ?>"
+    data-course="<?= htmlspecialchars($row['course']) ?>"
+    data-year="<?= htmlspecialchars($row['year_level']) ?>"
+    data-status="<?= $row['status'] ?>">
+Edit
+</button>
+</td>
+
+</tr>
+<?php endforeach; ?>
+</tbody>
+</table>
+
+</section>
+</main>
+</div>
+
+<!-- PROFILE PANEL -->
+<div id="profileContainer" class="profile-hidden">
+    <div class="profile-box">
+        <button onclick="closeProfile()" class="close-profile">✕</button>
+        <div id="profileContent"></div>
+    </div>
+</div>
+
+<!-- ADD MODAL -->
 <div id="addModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Add Patient</h2>
+<div class="modal-content">
+<span class="close">&times;</span>
+<h2>Add Patient</h2>
 
-        <form action="Database/add_patient.php" method="POST">
-            <input type="text" name="user_id" placeholder="User ID" required>
-            <input type="text" name="name" placeholder="Full Name" required>
-            <input type="email" name="email" placeholder="Email" required>
+<form action="Database/add_patient.php" method="POST">
+<input type="text" name="name" placeholder="Full Name" required>
+<input type="email" name="email" placeholder="Email" required>
 
-            <select name="role" required>
-                <option value="">Select Role</option>
-                <option value="student">Student</option>
-                <option value="teacher">Teacher</option>
-                <option value="visitor">Visitor</option>
-            </select>
+<select name="role" required>
+<option value="">Select Role</option>
+<option value="student">Student</option>
+<option value="teacher">Teacher</option>
+<option value="visitor">Visitor</option>
+</select>
 
-            <input type="text" name="course" placeholder="Course">
-            <input type="text" name="year_level" placeholder="Year Level">
-            <input type="password" name="password" placeholder="Password" required>
+<input type="text" name="course" placeholder="Course">
+<input type="text" name="year_level" placeholder="Year Level">
 
-            <button type="submit">Add Patient</button>
-        </form>
-    </div>
+<button type="submit">Add Patient</button>
+</form>
+</div>
 </div>
 
+<!-- EDIT MODAL -->
 <div id="editModal" class="modal">
-    <div class="modal-content">
-        <span class="closeEdit">&times;</span>
-        <h2>Edit Patient</h2>
+<div class="modal-content">
+<span class="closeEdit">&times;</span>
+<h2>Edit Patient</h2>
 
-        <form action="Database/edit_patient.php" method="POST">
-            <input type="text" name="user_id" id="edit_id" readonly>
-            <input type="text" name="name" id="edit_name" required>
-            <input type="email" name="email" id="edit_email" required>
+<form action="Database/edit_patient.php" method="POST">
+<input type="text" name="user_id" id="edit_id" readonly>
+<input type="text" name="name" id="edit_name" required>
+<input type="email" name="email" id="edit_email" required>
 
-            <select name="role" id="edit_role" required>
-                <option value="student">Student</option>
-                <option value="teacher">Teacher</option>
-                <option value="visitor">Visitor</option>
-            </select>
+<select name="role" id="edit_role" required>
+<option value="student">Student</option>
+<option value="teacher">Teacher</option>
+<option value="visitor">Visitor</option>
+</select>
 
-            <input type="text" name="course" id="edit_course">
-            <input type="text" name="year_level" id="edit_year">
+<input type="text" name="course" id="edit_course">
+<input type="text" name="year_level" id="edit_year">
 
-            <button type="submit">Update Patient</button>
-        </form>
-    </div>
+<select name="status" id="edit_status">
+<option value="active">Active</option>
+<option value="inactive">Inactive</option>
+</select>
+
+<button type="submit">Update Patient</button>
+</form>
+</div>
 </div>
 
 <script>
-// ADD MODAL
-const modal = document.getElementById("addModal");
-const btn = document.getElementById("openModal");
-const closeBtn = document.querySelector(".close");
+document.addEventListener("DOMContentLoaded", function () {
 
-btn.onclick = () => modal.style.display = "block";
-closeBtn.onclick = () => modal.style.display = "none";
+    // ===== ADD MODAL =====
+    const modal = document.getElementById("addModal");
+    const openBtn = document.getElementById("openModal");
+    const closeBtn = document.querySelector("#addModal .close");
 
-// EDIT MODAL
-const editModal = document.getElementById("editModal");
-const editBtns = document.querySelectorAll(".editBtn");
-const closeEdit = document.querySelector(".closeEdit");
+    if (openBtn && modal) {
+        openBtn.addEventListener("click", function () {
+            console.log("Add clicked");
+            modal.classList.add("show");
+        });
+    }
 
-editBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-        edit_id.value = btn.dataset.id;
-        edit_name.value = btn.dataset.name;
-        edit_email.value = btn.dataset.email;
-        edit_role.value = btn.dataset.role;
-        edit_course.value = btn.dataset.course;
-        edit_year.value = btn.dataset.year;
+    if (closeBtn && modal) {
+        closeBtn.addEventListener("click", function () {
+            modal.classList.remove("show");
+        });
+    }
 
-        editModal.style.display = "block";
+    // ===== EDIT MODAL =====
+    const editBtns = document.querySelectorAll(".editBtn");
+    const editModal = document.getElementById("editModal");
+    const closeEdit = document.querySelector(".closeEdit");
+
+    editBtns.forEach(btn => {
+        btn.addEventListener("click", function(e) {
+            e.stopPropagation();
+
+            console.log("Edit clicked");
+
+            const id = this.dataset.id;
+            const name = this.dataset.name;
+            const email = this.dataset.email;
+            const role = this.dataset.role;
+            const course = this.dataset.course;
+            const year = this.dataset.year;
+            const status = this.dataset.status;
+
+            document.getElementById("edit_id").value = id;
+            document.getElementById("edit_name").value = name;
+            document.getElementById("edit_email").value = email;
+            document.getElementById("edit_role").value = role;
+            document.getElementById("edit_course").value = course;
+            document.getElementById("edit_year").value = year;
+            document.getElementById("edit_status").value = status;
+
+            if (editModal) {
+                editModal.classList.add("show");
+            }
+        });
     });
+
+    if (closeEdit && editModal) {
+        closeEdit.addEventListener("click", function () {
+            editModal.classList.remove("show");
+        });
+    }
+
 });
 
-closeEdit.onclick = () => editModal.style.display = "none";
+// ===== PROFILE =====
+function openProfile(user_id) {
+    fetch("Database/get_patient.php?id=" + user_id)
+    .then(res => res.text())
+    .then(data => {
+        document.getElementById("profileContent").innerHTML = data;
 
-window.onclick = (e) => {
-    if (e.target == modal) modal.style.display = "none";
-    if (e.target == editModal) editModal.style.display = "none";
-};
+        document.getElementById("profileContent").innerHTML += `
+            <div style="margin-top:15px;">
+                <a href="visits.php?user_id=${user_id}" class="filter-btn">
+                    View Full Visits →
+                </a>
+            </div>
+        `;
+
+        const panel = document.getElementById("profileContainer");
+        panel.classList.remove("profile-hidden");
+        panel.classList.add("active");
+    });
+}
+
+function closeProfile() {
+    const panel = document.getElementById("profileContainer");
+    panel.classList.remove("active");
+    panel.classList.add("profile-hidden");
+}
 </script>
 
 </body>
