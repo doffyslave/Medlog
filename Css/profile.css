@@ -1,0 +1,104 @@
+.profile-container {
+    padding: 25px;
+}
+
+/* CARD BASE */
+.profile-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+/* HEADER CARD */
+.header-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-card img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.header-card h2 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.role {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.student-id {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 13px;
+    background: #eef2ff;
+    color: #3b6ef5;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+/* INFO GRID */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.info-item {
+    background: #f9fafb;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.info-item span {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.info-item p {
+    margin: 5px 0 0;
+    font-weight: 500;
+}
+
+/* VISITS */
+.visit-summary {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.visit-summary span {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.visit-summary h2 {
+    margin: 5px 0;
+    color: #3b6ef5;
+}
+
+/* BUTTON */
+.view-btn {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 16px;
+    background: #3b6ef5;
+    color: #fff;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.view-btn:hover {
+    background: #2f5ce0;
+}
