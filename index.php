@@ -4,125 +4,200 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>MedLog | Clinic Inventory System</title>
+<title>MedLog | Smart Clinic System</title>
 
-<link rel="stylesheet" href="Css/homepage.css">
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
 
-<script src="https://kit.fontawesome.com/5a5781f094.js" crossorigin="anonymous"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui']
+      },
+      colors: {
+        primary: '#0A1931',
+        secondary: '#1A3D63',
+        accent: '#4A7FA7',
+        soft: '#B3CFE5',
+        light: '#F6FAFD',
+      }
+    }
+  }
+}
+</script>
 
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- Lottie -->
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+<!-- AOS -->
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+<link rel="stylesheet" href="homepage.css">
 </head>
 
-<body>
+<body class="bg-light font-sans">
 
-<div class="header"></div>
-
-<nav class="navbar">
-    <div class="navContainer">
-        <div class="logo">
-            <img src="Images/MedLogo.png" alt="MedLog Logo"> 
-        </div>
-        <ul class="navMenu">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Features</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="auth/login.php" class="btn loginBtn">Login</a></li>
-            <li><a href="register.php" class="btn registerBtn">Register</a></li>
-        </ul>
-    </div>
+<!-- NAVBAR -->
+<nav class="bg-primary text-white sticky top-0 z-50 shadow">
+  <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
+    <h1 class="font-bold text-xl">MedLog</h1>
+    <a href="auth/login.php"
+       class="px-4 py-2 border border-soft rounded-lg hover:bg-secondary btn-hover">
+      Login
+    </a>
+  </div>
 </nav>
 
-<div class="banner">
-    <div class="homepageContainer">
-        <div class="bannerHeader">
-            <h1>MEDLOG</h1>
-            <p>
-                A Web-based Clinic Inventory and Health Monitoring System
-                for STI College Davao 
-            </p>
-        </div>
+<!-- HERO -->
+<section class="hero-animated text-white py-28 text-center relative">
+  <div class="max-w-5xl mx-auto px-6 glass p-10" data-aos="fade-up">
 
-        <p class="bannerTagline">
-            Efficiently manage student health records, clinic visits,
-            and medicine inventory in one centralized platform.
-        </p>
+    <h1 class="text-5xl md:text-6xl font-extrabold leading-tight">
+      Modern Clinic Management for Schools
+    </h1>
 
-        <div class="bannerButtons">
-            <a href="register.php" class="btn registerBtn">Register</a>
-            <a href="auth/login.php" class="btn loginBtn">Login</a>
-        </div>
+    <p class="mt-6 text-lg text-soft">
+      Replace paperwork with a smart, centralized system for student health,
+      inventory, and analytics.
+    </p>
 
-        <div class="bannerIcons">
-            <a href="#"><i class="fa-solid fa-user-graduate"></i></a>
-            <a href="#"><i class="fa-solid fa-briefcase-medical"></i></a>
-            <a href="#"><i class="fa-solid fa-chalkboard-user"></i></a>
-        </div>
+    <div class="mt-8">
+      <a href="auth/login.php"
+         class="px-6 py-3 bg-white text-primary rounded-xl btn-hover">
+        Get Started
+      </a>
     </div>
-</div>
 
-<div class="homepageContainer">
-    <div class="homepageFeatures">
-        <div class="homepageFeature">
-            <span class="featureIcon">
-                <i class="fa-solid fa-user-doctor"></i>
-            </span>
-            <h3 class="featureTitle">Student Health Records</h3>
-            <p class="featureDescription">
-                Record and monitor student clinic visits,
-                symptoms, and treatments efficiently in
-                a centralized database.
-            </p>
-        </div>
+    <lottie-player
+      src="https://assets10.lottiefiles.com/packages/lf20_0yfsb3a1.json"
+      style="width:320px;height:320px;margin:auto;"
+      loop autoplay>
+    </lottie-player>
 
-        <div class="homepageFeature">
-            <span class="featureIcon">
-                <i class="fa-solid fa-pills"></i>
-            </span>
-            <h3 class="featureTitle">Medicine Inventory</h3>
-            <p class="featureDescription">
-                Track medicine stock levels, monitor
-                expiration dates, and maintain an
-                organized inventory system.
-            </p>
-        </div>
+  </div>
+</section>
 
-        <div class="homepageFeature">
-            <span class="featureIcon">
-                <i class="fa-solid fa-chart-line"></i>
-            </span>
-            <h3 class="featureTitle">Analytics & Reports</h3>
-            <p class="featureDescription">
-                Generate reports and gain insights
-                about clinic visits, medicine usage,
-                and overall clinic activity.
-            </p>
-        </div>
+<!-- PROBLEM SECTION -->
+<section class="py-20 text-center bg-white">
+  <h2 class="text-3xl font-bold text-primary mb-10" data-aos="fade-up">
+    Clinic Problems We Solve
+  </h2>
+
+  <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-6 px-6">
+
+    <div class="glass-light p-6" data-aos="fade-up">
+      <h3 class="font-bold">Manual Records</h3>
+      <p class="text-gray-600 text-sm">Paper-based tracking is slow and messy.</p>
     </div>
-</div>
 
-<div class="homepageNotified">
-    <div class="homepageContainer">
-        <div class="emailForm">
-            <h3>Get Notified of Updates</h3>
-            <p>
-                Enter your student ID to receive notifications
-                about clinic records and updates from MedLog.
-            </p>
-            <form>
-                <input type="text" placeholder="Student ID">
-                <button type="submit">Notify</button>
-            </form>
-        </div>
-        <div class="video">
-            <iframe
-                src="https://www.youtube.com/embed/tqz7JYLVqxk"
-                width="500"
-                height="300"
-                frameborder="0"
-                allowfullscreen>
-            </iframe>
-        </div>
+    <div class="glass-light p-6" data-aos="fade-up" data-aos-delay="100">
+      <h3 class="font-bold">Inventory Issues</h3>
+      <p class="text-gray-600 text-sm">Medicines are hard to monitor.</p>
     </div>
-</div>
+
+    <div class="glass-light p-6" data-aos="fade-up" data-aos-delay="200">
+      <h3 class="font-bold">No Insights</h3>
+      <p class="text-gray-600 text-sm">No reports for decision-making.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="py-20 bg-light text-center">
+  <h2 class="text-3xl font-bold text-primary mb-12" data-aos="fade-up">
+    One System. Everything You Need.
+  </h2>
+
+  <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-6 px-6">
+
+    <div class="glass-light p-6" data-aos="zoom-in">
+      <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_5tkzkblw.json"
+        style="width:120px;margin:auto;" loop autoplay></lottie-player>
+      <h3 class="font-bold mt-4">Health Records</h3>
+    </div>
+
+    <div class="glass-light p-6" data-aos="zoom-in" data-aos-delay="100">
+      <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_jcikwtux.json"
+        style="width:120px;margin:auto;" loop autoplay></lottie-player>
+      <h3 class="font-bold mt-4">Inventory</h3>
+    </div>
+
+    <div class="glass-light p-6" data-aos="zoom-in" data-aos-delay="200">
+      <lottie-player src="https://assets9.lottiefiles.com/packages/lf20_3rwasyjy.json"
+        style="width:120px;margin:auto;" loop autoplay></lottie-player>
+      <h3 class="font-bold mt-4">Analytics</h3>
+    </div>
+
+  </div>
+</section>
+
+<!-- DASHBOARD PREVIEW -->
+<section class="py-24 bg-white text-center">
+  <h2 class="text-3xl font-bold text-primary mb-12" data-aos="fade-up">
+    See MedLog in Action
+  </h2>
+
+  <div class="max-w-5xl mx-auto glass-light p-6" data-aos="zoom-in">
+    <img 
+      src="https://cdn-icons-png.flaticon.com/512/4149/4149674.png"
+      class="rounded-xl shadow-lg mx-auto block"
+    >
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="py-20 bg-secondary text-white text-center">
+  <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-6">
+
+    <div data-aos="fade-up">
+      <h2 class="text-4xl font-bold">1000+</h2>
+      <p class="text-soft">Records</p>
+    </div>
+
+    <div data-aos="fade-up" data-aos-delay="100">
+      <h2 class="text-4xl font-bold">500+</h2>
+      <p class="text-soft">Visits</p>
+    </div>
+
+    <div data-aos="fade-up" data-aos-delay="200">
+      <h2 class="text-4xl font-bold">99%</h2>
+      <p class="text-soft">Efficiency</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-20 text-center hero-animated text-white">
+  <div class="glass p-10 max-w-xl mx-auto" data-aos="fade-up">
+
+    <h2 class="text-3xl font-bold mb-4">Start Using MedLog Today</h2>
+
+    <a href="auth/login.php"
+       class="px-6 py-3 bg-white text-primary rounded-xl btn-hover">
+      Get Started
+    </a>
+
+  </div>
+</section>
+
+<footer class="bg-primary text-white text-center py-6 text-sm">
+  <p>© 2026 MedLog</p>
+</footer>
+
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+AOS.init({
+  once: true,
+  duration: 1000
+});
+</script>
 
 </body>
 </html>

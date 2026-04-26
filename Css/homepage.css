@@ -1,344 +1,48 @@
-/* ---------------- RESET / BASE ---------------- */
-
-*,
-*::before,
-*::after{
-box-sizing:border-box;
-margin:0;
-padding:0;
+html {
+  scroll-behavior: smooth;
 }
 
-body{
-font-family: Arial, sans-serif;
-line-height:1.5;
-min-height:100vh;
+body {
+  font-family: 'Inter', system-ui;
 }
 
-img{
-max-width:100%;
-display:block;
+/* Gradient */
+.hero-animated {
+  background: linear-gradient(-45deg, #0A1931, #1A3D63, #4A7FA7);
+  background-size: 400% 400%;
+  animation: gradientMove 10s ease infinite;
 }
 
-a{
-text-decoration:none;
+@keyframes gradientMove {
+  0% { background-position: 0% }
+  50% { background-position: 100% }
+  100% { background-position: 0% }
 }
 
-ul{
-list-style:none;
+/* Glass */
+.glass {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(14px);
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.2);
 }
 
-/* ---------------- NAVBAR ---------------- */
-.navbar {
-    width: 100%;
-    background: white;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+.glass-light {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
 }
 
-.navContainer {
-    width: 90%;
-    max-width: 1100px;
-    margin: auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 0;
+/* Hover */
+.btn-hover {
+  transition: 0.25s;
 }
 
-.logo img {
-    height: 40px;
-    width: auto;
-    transition: transform 0.3s;
+.btn-hover:hover {
+  transform: translateY(-3px);
 }
 
-.logo img:hover {
-    transform: scale(1.1);
-}
-
-.navMenu {
-    display: flex;
-    gap: 25px;
-    align-items: center;
-}
-
-.navMenu li a {
-    color: #333;
-    font-size: 16px;
-    position: relative;
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-    outline: none; 
-}
-
-.navMenu li a:hover {
-    background: #f0f4ff;
-    transform: translateY(-2px);
-}
-
-.btn {
-    padding: 8px 18px;
-    border-radius: 5px;
-    color: white !important;
-    transition: all 0.3s ease;
-    text-decoration: none;
-}
-
-.loginBtn {
-    background: #3b8efc;
-}
-
-.loginBtn:hover {
-    background: #2271d3;
-    transform: translateY(-2px);
-}
-
-.registerBtn {
-    background: #20c997;
-}
-
-.registerBtn:hover {
-    background: #198f6f;
-    transform: translateY(-2px);
-}
-
-/* ---------------- HERO BUTTONS ---------------- */
-.bannerButtons {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    margin-top: 40px;
-}
-
-.bannerButtons a {
-    padding: 12px 25px;
-    border-radius: 6px;
-    color: white;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.bannerButtons .loginBtn {
-    background: #3b8efc;
-}
-
-.bannerButtons .loginBtn:hover {
-    background: #2271d3;
-    transform: translateY(-3px);
-}
-
-.bannerButtons .registerBtn {
-    background: #20c997;
-}
-
-.bannerButtons .registerBtn:hover {
-    background: #198f6f;
-    transform: translateY(-3px);
-}
-/* ---------------- HEADER BAR ---------------- */
-
-.header{
-width:100%;
-height:20px;
-background:#3b8efc;
-}
-
-/* ---------------- HERO BANNER ---------------- */
-
-.banner{
-background:url('../Images/BGmed.jpg') no-repeat center center fixed;
-background-size:cover;
-padding:140px 0;
-position:relative;
-}
-
-.banner::before{
-content:"";
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.55);
-}
-
-.homepageContainer{
-width:90%;
-max-width:1100px;
-margin:auto;
-position:relative;
-z-index:2;
-}
-
-/* ---------------- HERO TEXT ---------------- */
-
-.bannerHeader{
-text-align:center;
-}
-
-.bannerHeader h1{
-font-size:72px;
-color:white;
-letter-spacing:3px;
-}
-
-.bannerHeader p{
-font-size:20px;
-color:#d6eaff;
-margin-top:15px;
-}
-
-.bannerTagline{
-margin-top:25px;
-font-size:22px;
-color:white;
-text-align:center;
-max-width:700px;
-margin-left:auto;
-margin-right:auto;
-}
-
-/* ---------------- HERO ICONS ---------------- */
-
-.bannerIcons{
-margin-top:60px;
-text-align:center;
-}
-
-.bannerIcons a{
-font-size:24px;
-margin:0 10px;
-padding:14px;
-background:rgba(0,0,0,0.5);
-color:#88d3ff;
-border-radius:50%;
-width:55px;
-height:55px;
-display:inline-flex;
-align-items:center;
-justify-content:center;
-transition:0.3s;
-}
-
-.bannerIcons a:hover{
-color:white;
-background:#3b8efc;
-transform:translateY(-3px);
-}
-
-/* ---------------- FEATURES SECTION ---------------- */
-
-.homepageFeatures{
-display:flex;
-justify-content:space-between;
-gap:30px;
-margin-top:70px;
-margin-bottom:70px;
-flex-wrap:wrap;
-}
-
-.homepageFeature{
-flex:1;
-min-width:250px;
-padding:30px;
-text-align:center;
-background:#ffffff;
-border-radius:10px;
-box-shadow:0 4px 15px rgba(0,0,0,0.08);
-transition:0.3s;
-}
-
-.homepageFeature:hover{
-transform:translateY(-6px);
-box-shadow:0 6px 20px rgba(0,0,0,0.12);
-}
-
-.featureIcon{
-height:80px;
-width:80px;
-display:inline-flex;
-align-items:center;
-justify-content:center;
-font-size:38px;
-background:#3b8efc;
-color:white;
-border-radius:50%;
-margin-bottom:20px;
-}
-
-.featureTitle{
-margin-bottom:15px;
-font-size:20px;
-}
-
-.featureDescription{
-color:#666;
-font-size:15px;
-}
-
-/* ---------------- UPDATE / VIDEO SECTION ---------------- */
-
-.homepageNotified{
-background:#f6f8fb;
-padding:80px 0;
-}
-
-.homepageNotified .homepageContainer{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:40px;
-flex-wrap:wrap;
-}
-
-.emailForm{
-flex:1;
-min-width:300px;
-}
-
-.emailForm h3{
-font-size:28px;
-margin-bottom:15px;
-}
-
-.emailForm p{
-color:#666;
-margin-bottom:20px;
-}
-
-.emailForm form{
-display:flex;
-gap:10px;
-}
-
-.emailForm input{
-flex:1;
-padding:12px;
-border:1px solid #ccc;
-border-radius:4px;
-}
-
-.emailForm button{
-padding:12px 25px;
-background:#3b8efc;
-border:none;
-color:white;
-border-radius:4px;
-cursor:pointer;
-transition:0.2s;
-}
-
-.emailForm button:hover
-
-.video{
-flex:1;
-min-width:300px;
-}
-
-.video iframe{
-width:100%;
-border-radius:8px;
+.glass-light:hover {
+  transform: translateY(-8px) scale(1.02);
+  transition: 0.3s;
 }
