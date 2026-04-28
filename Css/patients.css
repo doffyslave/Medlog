@@ -283,3 +283,39 @@ tbody tr:hover {
     padding: 12px;
     border-radius: 8px;
 }
+
+.search-wrapper {
+    position: relative;
+    width: 250px;
+}
+
+.suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 999;
+}
+
+.suggestion-item {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    background: #f1f1f1;
+}
+
+#searchInput {
+    width: 100%;
+    padding: 10px;
+}
+
+.profile-hidden {
+    transform: translateX(100%);
+    pointer-events: none; /* 🔥 THIS FIXES CLICK BLOCKING */
+}
