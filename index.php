@@ -28,7 +28,7 @@ tailwind.config = {
 }
 </script>
 
-<!-- Google Font -->
+<!-- Font -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <!-- Lottie -->
@@ -37,7 +37,9 @@ tailwind.config = {
 <!-- AOS -->
 <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
-<link rel="stylesheet" href="homepage.css">
+<!-- ✅ FIXED PATH -->
+<link rel="stylesheet" href="Css/homepage.css">
+
 </head>
 
 <body class="bg-light font-sans">
@@ -46,6 +48,14 @@ tailwind.config = {
 <nav class="bg-primary text-white sticky top-0 z-50 shadow">
   <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
     <h1 class="font-bold text-xl">MedLog</h1>
+
+    <!-- NAV LINKS -->
+    <div class="hidden md:flex space-x-6">
+      <a href="#problems">Problems</a>
+      <a href="#solution">Features</a>
+      <a href="#preview">Preview</a>
+    </div>
+
     <a href="auth/login.php"
        class="px-4 py-2 border border-soft rounded-lg hover:bg-secondary btn-hover">
       Login
@@ -54,7 +64,7 @@ tailwind.config = {
 </nav>
 
 <!-- HERO -->
-<section class="hero-animated text-white py-28 text-center relative">
+<section class="hero-animated text-white py-28 text-center">
   <div class="max-w-5xl mx-auto px-6 glass p-10" data-aos="fade-up">
 
     <h1 class="text-5xl md:text-6xl font-extrabold leading-tight">
@@ -67,7 +77,7 @@ tailwind.config = {
     </p>
 
     <div class="mt-8">
-      <a href="auth/login.php"
+      <a href="auth/login.php?redirect=dashboard.php"
          class="px-6 py-3 bg-white text-primary rounded-xl btn-hover">
         Get Started
       </a>
@@ -82,8 +92,8 @@ tailwind.config = {
   </div>
 </section>
 
-<!-- PROBLEM SECTION -->
-<section class="py-20 text-center bg-white">
+<!-- PROBLEMS -->
+<section id="problems" class="py-20 text-center bg-white">
   <h2 class="text-3xl font-bold text-primary mb-10" data-aos="fade-up">
     Clinic Problems We Solve
   </h2>
@@ -109,7 +119,7 @@ tailwind.config = {
 </section>
 
 <!-- SOLUTION -->
-<section class="py-20 bg-light text-center">
+<section id="solution" class="py-20 bg-light text-center">
   <h2 class="text-3xl font-bold text-primary mb-12" data-aos="fade-up">
     One System. Everything You Need.
   </h2>
@@ -117,28 +127,22 @@ tailwind.config = {
   <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-6 px-6">
 
     <div class="glass-light p-6" data-aos="zoom-in">
-      <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_5tkzkblw.json"
-        style="width:120px;margin:auto;" loop autoplay></lottie-player>
       <h3 class="font-bold mt-4">Health Records</h3>
     </div>
 
     <div class="glass-light p-6" data-aos="zoom-in" data-aos-delay="100">
-      <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_jcikwtux.json"
-        style="width:120px;margin:auto;" loop autoplay></lottie-player>
       <h3 class="font-bold mt-4">Inventory</h3>
     </div>
 
     <div class="glass-light p-6" data-aos="zoom-in" data-aos-delay="200">
-      <lottie-player src="https://assets9.lottiefiles.com/packages/lf20_3rwasyjy.json"
-        style="width:120px;margin:auto;" loop autoplay></lottie-player>
       <h3 class="font-bold mt-4">Analytics</h3>
     </div>
 
   </div>
 </section>
 
-<!-- DASHBOARD PREVIEW -->
-<section class="py-24 bg-white text-center">
+<!-- PREVIEW -->
+<section id="preview" class="py-24 bg-white text-center">
   <h2 class="text-3xl font-bold text-primary mb-12" data-aos="fade-up">
     See MedLog in Action
   </h2>
@@ -193,9 +197,11 @@ tailwind.config = {
 
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 <script>
-AOS.init({
-  once: true,
-  duration: 1000
+document.addEventListener("DOMContentLoaded", function() {
+  AOS.init({
+    once: true,
+    duration: 1000
+  });
 });
 </script>
 
