@@ -38,7 +38,7 @@ tailwind.config = {
 <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
 <!-- ✅ FIXED PATH -->
-<link rel="stylesheet" href="Css/homepage.css">
+<link rel="stylesheet" href="./Css/homepage.css">
 
 </head>
 
