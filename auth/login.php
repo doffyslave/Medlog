@@ -16,12 +16,12 @@ session_start();
 
         <!-- LOGO -->
         <div class="logoContainer">
-            <img src="../Images/MedLogo.png" alt="MedLog Logo">
+            <img src="../Images/MEDLOG, BG-REMOVED.png" alt="MedLog Logo">
         </div>
 
         <!-- HEADER -->
         <div class="loginHeader">
-            <h1>MEDLOG</h1>
+           <h1>MEDLOG</h1> 
             <p>Inventory Management System</p>
         </div>
 
@@ -46,7 +46,7 @@ session_start();
 
         <!-- EXTRA TEXT -->
         <div class="loginExtraLinks">
-            <p style="text-align:center; font-size:14px;">
+            <p style="text-align:center; font-size:12px;">
                 Use your STI Microsoft account to continue
             </p>
         </div>
