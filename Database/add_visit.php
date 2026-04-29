@@ -5,7 +5,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $user_id = $_POST['user_id'];
     $complaint = $_POST['complaint'];
-    $recorded_by = $_POST['recorded_by'];
+    $notes = $_POST['notes'] ?? null;
+    session_start();
+    $recorded_by = $_SESSION['user']['name'];
 
     $med_id = $_POST['med_id'];
     $quantity = $_POST['quantity'];
@@ -26,10 +28,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // INSERT INTO visits
         $stmt = $conn->prepare("
-            INSERT INTO visits (user_id, visit_date, complaint, recorded_by)
-            VALUES (?, NOW(), ?, ?)
+        INSERT INTO visits (user_id, visit_date, complaint, recorded_by, notes)
+        VALUES (?, NOW(), ?, ?, ?)
         ");
-        $stmt->execute([$user_id, $complaint, $recorded_by]);
+        $stmt->execute([$user_id, $complaint, $recorded_by, $notes]);
 
         $visit_id = $conn->lastInsertId();
 

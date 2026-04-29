@@ -51,7 +51,11 @@ $visits = $visitsStmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="profile-section">
         <h4>General Information</h4>
         <p><strong>Email:</strong> <?= htmlspecialchars($user['email']) ?></p>
-        <p><strong>User ID:</strong> <?= $user['user_id'] ?></p>
+        
+
+        <!-- 🔥 ADD THIS HERE -->
+        <p><strong>Student ID:</strong> <?= $user['student_id'] ?? 'N/A' ?></p>
+
         <p><strong>Course:</strong> <?= $user['course'] ?: 'N/A' ?></p>
         <p><strong>Year Level:</strong> <?= $user['year_level'] ?: 'N/A' ?></p>
         <p><strong>Status:</strong> <?= ucfirst($user['status']) ?></p>
