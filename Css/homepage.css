@@ -4,13 +4,18 @@ html {
 
 body {
   font-family: 'Inter', system-ui;
+  overflow-x: hidden;
 }
 
-/* Gradient */
+/* =========================
+   🌈 ENHANCED GRADIENT
+========================= */
 .hero-animated {
-  background: linear-gradient(-45deg, #0A1931, #1A3D63, #4A7FA7);
+  background: linear-gradient(-45deg, #0A1931, #1A3D63, #4A7FA7, #6EA8D9);
   background-size: 400% 400%;
-  animation: gradientMove 10s ease infinite;
+  animation: gradientMove 12s ease infinite;
+  position: relative;
+  overflow: hidden;
 }
 
 @keyframes gradientMove {
@@ -19,30 +24,81 @@ body {
   100% { background-position: 0% }
 }
 
-/* Glass (FIXED contrast) */
+/* =========================
+   ✨ FLOATING PARTICLES
+========================= */
+.particles span {
+  position: absolute;
+  display: block;
+  width: 6px;
+  height: 6px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 50%;
+  animation: float 20s linear infinite;
+  bottom: -50px;
+}
+
+.particles span:nth-child(1) { left: 10%; animation-duration: 18s; }
+.particles span:nth-child(2) { left: 20%; animation-duration: 22s; }
+.particles span:nth-child(3) { left: 30%; animation-duration: 17s; }
+.particles span:nth-child(4) { left: 40%; animation-duration: 25s; }
+.particles span:nth-child(5) { left: 50%; animation-duration: 19s; }
+.particles span:nth-child(6) { left: 60%; animation-duration: 21s; }
+.particles span:nth-child(7) { left: 70%; animation-duration: 23s; }
+.particles span:nth-child(8) { left: 80%; animation-duration: 20s; }
+.particles span:nth-child(9) { left: 90%; animation-duration: 18s; }
+
+@keyframes float {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  20% { opacity: 1; }
+  100% {
+    transform: translateY(-100vh) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* =========================
+   GLASS
+========================= */
 .glass {
   background: rgba(0,0,0,0.35);
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(16px);
   border-radius: 20px;
   border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
 }
 
 .glass-light {
-  background: rgba(255,255,255,0.75);
-  backdrop-filter: blur(10px);
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(12px);
   border-radius: 20px;
+  transition: 0.3s;
 }
 
-/* Hover */
+/* =========================
+   HOVER + GLOW
+========================= */
 .btn-hover {
   transition: 0.25s;
 }
 
 .btn-hover:hover {
   transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(74,127,167,0.4);
 }
 
 .glass-light:hover {
-  transform: translateY(-8px) scale(1.02);
-  transition: 0.3s;
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+/* =========================
+   GLOW TEXT
+========================= */
+.glow {
+  text-shadow: 0 0 10px rgba(255,255,255,0.3),
+               0 0 20px rgba(74,127,167,0.4);
 }
