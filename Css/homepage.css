@@ -7,9 +7,7 @@ body {
   overflow-x: hidden;
 }
 
-/* =========================
-   🌈 ENHANCED GRADIENT
-========================= */
+/* GRADIENT */
 .hero-animated {
   background: linear-gradient(-45deg, #0A1931, #1A3D63, #4A7FA7, #6EA8D9);
   background-size: 400% 400%;
@@ -24,12 +22,9 @@ body {
   100% { background-position: 0% }
 }
 
-/* =========================
-   ✨ FLOATING PARTICLES
-========================= */
+/* PARTICLES */
 .particles span {
   position: absolute;
-  display: block;
   width: 6px;
   height: 6px;
   background: rgba(255,255,255,0.6);
@@ -49,26 +44,17 @@ body {
 .particles span:nth-child(9) { left: 90%; animation-duration: 18s; }
 
 @keyframes float {
-  0% {
-    transform: translateY(0) scale(1);
-    opacity: 0;
-  }
+  0% { transform: translateY(0); opacity: 0; }
   20% { opacity: 1; }
-  100% {
-    transform: translateY(-100vh) scale(0.5);
-    opacity: 0;
-  }
+  100% { transform: translateY(-100vh); opacity: 0; }
 }
 
-/* =========================
-   GLASS
-========================= */
+/* GLASS */
 .glass {
   background: rgba(0,0,0,0.35);
   backdrop-filter: blur(16px);
   border-radius: 20px;
   border: 1px solid rgba(255,255,255,0.2);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
 }
 
 .glass-light {
@@ -78,9 +64,7 @@ body {
   transition: 0.3s;
 }
 
-/* =========================
-   HOVER + GLOW
-========================= */
+/* HOVER */
 .btn-hover {
   transition: 0.25s;
 }
@@ -92,13 +76,9 @@ body {
 
 .glass-light:hover {
   transform: translateY(-8px) scale(1.03);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
 }
 
-/* =========================
-   GLOW TEXT
-========================= */
-.glow {
-  text-shadow: 0 0 10px rgba(255,255,255,0.3),
-               0 0 20px rgba(74,127,167,0.4);
+/* LOWERED LOTTIE */
+.lottie-adjust {
+  margin-top: 40px; /* 👈 THIS LOWERS THE GUY */
 }
