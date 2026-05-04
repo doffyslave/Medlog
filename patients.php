@@ -11,7 +11,6 @@ include 'Database/connection.php';
 $search = $_GET['search'] ?? '';
 $showInactive = $_GET['show_inactive'] ?? 0;
 
-// 🔥 FIX SEARCH (IGNORE DASHES)
 $cleanSearch = str_replace('-', '', $search);
 
 $query = "SELECT * FROM users 
@@ -33,7 +32,7 @@ $stmt->execute([
     ':search' => "%$search%",
     ':cleanSearch' => "%$cleanSearch%"
 ]);
-    
+
 $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -43,8 +42,6 @@ $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <title>Patients</title>
 <link rel="stylesheet" href="Css/layout.css">
 <link rel="stylesheet" href="Css/patients.css">
-
-
 </head>
 
 <body>
@@ -62,29 +59,19 @@ $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <p>Manage clinic patients</p>
 </div>
 
-<?php if (isset($_GET['success'])): ?>
-    <div style="color:green; margin-bottom:10px;">
-        Patient updated successfully.
-    </div>
-<?php endif; ?>
-
 <div class="top-bar">
 
-    <form method="GET" autocomplete="off">
-        
-        <div class="search-wrapper">
-            <input type="text" id="searchInput" name="search" placeholder="Search patient..." value="<?= htmlspecialchars($search) ?>">
-        </div>
+<form method="GET">
+    <input type="text" name="search" placeholder="Search..." value="<?= htmlspecialchars($search) ?>">
+    <button type="submit">Search</button>
+</form>
 
-        <button type="submit">Search</button>
+<div>
+    <a href="?show_inactive=1" class="filter-btn">Show Inactive</a>
+    <a href="patients.php" class="filter-btn">Active Only</a>
+    <button id="openModal">+ Add Patient</button>
+</div>
 
-    </form>
-
-    <div>
-        <a href="?show_inactive=1" class="filter-btn">Show Inactive</a>
-        <a href="patients.php" class="filter-btn">Active Only</a>
-        <button id="openModal">+ Add Patient</button>
-    </div>
 </div>
 
 <table>
@@ -99,21 +86,15 @@ $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </thead>
 
 <tbody>
-<?php foreach($patients as $row): ?>    
-<tr class="<?= $row['status'] == 'inactive' ? 'inactive-row' : '' ?>">
+<?php foreach($patients as $row): ?>
+<tr>
 
-<td onclick="openProfile('<?= $row['user_id'] ?>')" style="cursor:pointer;">
-    <?= htmlspecialchars($row['name']) ?>
-</td>
-
-<td onclick="openProfile('<?= $row['user_id'] ?>')" style="cursor:pointer;">
-    <?= htmlspecialchars($row['email']) ?>
-</td>
-
+<td><?= htmlspecialchars($row['name']) ?></td>
+<td><?= htmlspecialchars($row['email']) ?></td>
 <td><?= ucfirst($row['role']) ?></td>
 <td><?= ucfirst($row['status']) ?></td>
 
-<td onclick="event.stopPropagation();">
+<td>
 <button class="editBtn"
     data-id="<?= $row['user_id'] ?>"
     data-name="<?= htmlspecialchars($row['name']) ?>"
@@ -135,60 +116,96 @@ Edit
 </main>
 </div>
 
-<!-- PROFILE PANEL -->
-<div id="profileContainer" class="profile-hidden">
-    <div class="profile-box">
-        <button onclick="closeProfile()" class="close-profile">✕</button>
-        <div id="profileContent"></div>
-    </div>
+<!-- ADD MODAL -->
+<div id="addModal" class="modal">
+<div class="modal-content">
+<span class="close">&times;</span>
+<h2>Add Patient</h2>
+
+<form method="POST" action="Database/add_patient.php">
+<input type="text" name="name" placeholder="Name" required>
+<input type="email" name="email" placeholder="Email" required>
+
+<select name="role" required>
+<option value="student">Student</option>
+<option value="teacher">Teacher</option>
+</select>
+
+<input type="text" name="course" placeholder="Course">
+<input type="text" name="year_level" placeholder="Year Level">
+
+<button type="submit">Save</button>
+</form>
+</div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="editModal" class="modal">
+<div class="modal-content">
+<span class="closeEdit">&times;</span>
+<h2>Edit Patient</h2>
+
+<form method="POST" action="Database/edit_patient.php">
+<input type="hidden" name="user_id" id="edit_id">
+
+<input type="text" name="name" id="edit_name" required>
+<input type="email" name="email" id="edit_email" required>
+
+<select name="role" id="edit_role">
+<option value="student">Student</option>
+<option value="teacher">Teacher</option>
+</select>
+
+<input type="text" name="course" id="edit_course">
+<input type="text" name="year_level" id="edit_year">
+
+<select name="status" id="edit_status">
+<option value="active">Active</option>
+<option value="inactive">Inactive</option>
+</select>
+
+<button type="submit">Update</button>
+</form>
+</div>
 </div>
 
 <script>
-// 🔥 LIVE SEARCH
-const searchInput = document.getElementById("searchInput");
+// ADD MODAL
+const addModal = document.getElementById("addModal");
+const openBtn = document.getElementById("openModal");
+const closeBtn = document.querySelector(".close");
 
-searchInput.addEventListener("input", function () {
-    let value = this.value.toLowerCase();
+openBtn.onclick = () => addModal.classList.add("show");
+closeBtn.onclick = () => addModal.classList.remove("show");
 
-    let rows = document.querySelectorAll("tbody tr");
+window.onclick = (e) => {
+    if (e.target === addModal) addModal.classList.remove("show");
+};
 
-    rows.forEach(row => {
-        let text = row.innerText.toLowerCase();
+// EDIT MODAL
+const editModal = document.getElementById("editModal");
+const closeEdit = document.querySelector(".closeEdit");
 
-        if (text.includes(value)) {
-            row.style.display = "";
-        } else {
-            row.style.display = "none";
-        }
+document.querySelectorAll(".editBtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+
+        document.getElementById("edit_id").value = btn.dataset.id;
+        document.getElementById("edit_name").value = btn.dataset.name;
+        document.getElementById("edit_email").value = btn.dataset.email;
+        document.getElementById("edit_role").value = btn.dataset.role;
+        document.getElementById("edit_course").value = btn.dataset.course;
+        document.getElementById("edit_year").value = btn.dataset.year;
+        document.getElementById("edit_status").value = btn.dataset.status;
+
+        editModal.classList.add("show");
     });
 });
 
-// PROFILE
-function openProfile(user_id) {
-    fetch("Database/get_patient.php?id=" + user_id)
-    .then(res => res.text())
-    .then(data => {
-        document.getElementById("profileContent").innerHTML = data;
+closeEdit.onclick = () => editModal.classList.remove("show");
 
-        document.getElementById("profileContent").innerHTML += `
-            <div style="margin-top:15px;">
-                <a href="visits.php?user_id=${user_id}" class="filter-btn">
-                    View Full Visits →
-                </a>
-            </div>
-        `;
-
-        const panel = document.getElementById("profileContainer");
-        panel.classList.remove("profile-hidden");
-        panel.classList.add("active");
-    });
-}
-
-function closeProfile() {
-    const panel = document.getElementById("profileContainer");
-    panel.classList.remove("active");
-    panel.classList.add("profile-hidden");
-}
+window.addEventListener("click", (e) => {
+    if (e.target === editModal) editModal.classList.remove("show");
+});
 </script>
 
 </body>

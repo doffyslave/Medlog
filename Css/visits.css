@@ -151,3 +151,46 @@ tbody tr:nth-child(even) {
 .closeEdit:hover {
     color: #000;
 }
+
+/* 🔥 CARD UI (SHARED FOR ADMIN + STUDENT) */
+.visit-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.visit-card {
+    background: #fff;
+    padding: 18px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.visit-card:hover {
+    transform: translateY(-2px);
+}
+
+.visit-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+}
+
+.visit-meta {
+    font-size: 13px;
+    color: #64748b;
+}
+
+.visit-body {
+    margin-top: 10px;
+}
+
+.badge {
+    background: #e2e8f0;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}

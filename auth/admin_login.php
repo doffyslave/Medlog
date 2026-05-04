@@ -1,3 +1,34 @@
+<?php
+session_start();
+require '../Database/connection.php';
+
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? AND role = 'admin'");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch();
+
+    if ($user && password_verify($password, $user['password'])) {
+        $_SESSION['user'] = [
+            'user_id' => $user['user_id'],
+            'name' => $user['name'],
+            'email' => $user['email'],
+            'role' => $user['role']
+        ];
+
+        header("Location: ../dashboard.php");
+        exit();
+    } else {
+        $error = "Invalid admin credentials";
+    }
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -249,7 +280,7 @@
                     <p>Welcome back!</p>
                 </div>
 
-                <form action="admin_login_process.php" method="POST" class="form">
+                <form method="POST" class="form">
                     <div class="input-group">
                         <label class="input-label">Admin Email</label>
                         <input required class="input" type="email" name="email" placeholder="@ email.com">
