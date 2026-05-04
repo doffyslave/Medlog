@@ -61,8 +61,8 @@ $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="top-bar">
 
-<form method="GET">
-    <input type="text" name="search" placeholder="Search..." value="<?= htmlspecialchars($search) ?>">
+<form method="GET" autocomplete="off">
+    <input type="text" id="searchInput" name="search" placeholder="Search patient..." value="<?= htmlspecialchars($search) ?>">
     <button type="submit">Search</button>
 </form>
 
@@ -86,15 +86,21 @@ $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </thead>
 
 <tbody>
-<?php foreach($patients as $row): ?>
-<tr>
+<?php foreach($patients as $row): ?>    
+<tr class="<?= $row['status'] == 'inactive' ? 'inactive-row' : '' ?>">
 
-<td><?= htmlspecialchars($row['name']) ?></td>
-<td><?= htmlspecialchars($row['email']) ?></td>
+<td onclick="openProfile('<?= $row['user_id'] ?>')" style="cursor:pointer;">
+    <?= htmlspecialchars($row['name']) ?>
+</td>
+
+<td onclick="openProfile('<?= $row['user_id'] ?>')" style="cursor:pointer;">
+    <?= htmlspecialchars($row['email']) ?>
+</td>
+
 <td><?= ucfirst($row['role']) ?></td>
 <td><?= ucfirst($row['status']) ?></td>
 
-<td>
+<td onclick="event.stopPropagation();">
 <button class="editBtn"
     data-id="<?= $row['user_id'] ?>"
     data-name="<?= htmlspecialchars($row['name']) ?>"
@@ -116,7 +122,15 @@ Edit
 </main>
 </div>
 
-<!-- ADD MODAL -->
+<!-- ================= PROFILE PANEL ================= -->
+<div id="profileContainer" class="profile-hidden">
+    <div class="profile-box">
+        <button onclick="closeProfile()" class="close-profile">✕</button>
+        <div id="profileContent"></div>
+    </div>
+</div>
+
+<!-- ================= ADD MODAL ================= -->
 <div id="addModal" class="modal">
 <div class="modal-content">
 <span class="close">&times;</span>
@@ -139,7 +153,7 @@ Edit
 </div>
 </div>
 
-<!-- EDIT MODAL -->
+<!-- ================= EDIT MODAL ================= -->
 <div id="editModal" class="modal">
 <div class="modal-content">
 <span class="closeEdit">&times;</span>
@@ -170,7 +184,47 @@ Edit
 </div>
 
 <script>
-// ADD MODAL
+// ===== LIVE SEARCH =====
+const searchInput = document.getElementById("searchInput");
+
+searchInput.addEventListener("input", function () {
+    let value = this.value.toLowerCase();
+    let rows = document.querySelectorAll("tbody tr");
+
+    rows.forEach(row => {
+        let text = row.innerText.toLowerCase();
+        row.style.display = text.includes(value) ? "" : "none";
+    });
+});
+
+// ===== PROFILE =====
+function openProfile(user_id) {
+    fetch("Database/get_patient.php?id=" + user_id)
+    .then(res => res.text())
+    .then(data => {
+        document.getElementById("profileContent").innerHTML = data;
+
+        document.getElementById("profileContent").innerHTML += `
+            <div style="margin-top:15px;">
+                <a href="visits.php?user_id=${user_id}" class="filter-btn">
+                    View Full Visits →
+                </a>
+            </div>
+        `;
+
+        const panel = document.getElementById("profileContainer");
+        panel.classList.remove("profile-hidden");
+        panel.classList.add("active");
+    });
+}
+
+function closeProfile() {
+    const panel = document.getElementById("profileContainer");
+    panel.classList.remove("active");
+    panel.classList.add("profile-hidden");
+}
+
+// ===== ADD MODAL =====
 const addModal = document.getElementById("addModal");
 const openBtn = document.getElementById("openModal");
 const closeBtn = document.querySelector(".close");
@@ -182,7 +236,7 @@ window.onclick = (e) => {
     if (e.target === addModal) addModal.classList.remove("show");
 };
 
-// EDIT MODAL
+// ===== EDIT MODAL =====
 const editModal = document.getElementById("editModal");
 const closeEdit = document.querySelector(".closeEdit");
 

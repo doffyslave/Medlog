@@ -15,10 +15,8 @@ $start = $_GET['start'] ?? date('Y-m-01');
 $end   = $_GET['end'] ?? date('Y-m-t');
 
 /* =======================
-   KPI DATA (FILTERED)
+   KPI DATA
 ======================= */
-
-// Visits
 $stmt = $conn->prepare("
     SELECT COUNT(*) FROM visits
     WHERE visit_date BETWEEN ? AND ?
@@ -26,10 +24,8 @@ $stmt = $conn->prepare("
 $stmt->execute([$start, $end]);
 $totalVisits = $stmt->fetchColumn();
 
-// Patients
 $totalPatients = $conn->query("SELECT COUNT(*) FROM users")->fetchColumn();
 
-// Low stock (aggregated)
 $totalLowStock = $conn->query("
     SELECT COUNT(*) FROM (
         SELECT SUM(quantity) as total_quantity
@@ -42,8 +38,6 @@ $totalLowStock = $conn->query("
 /* =======================
    CHART DATA
 ======================= */
-
-// Visits over time
 $stmt = $conn->prepare("
     SELECT DATE(visit_date) as date, COUNT(*) as total
     FROM visits
@@ -54,7 +48,6 @@ $stmt = $conn->prepare("
 $stmt->execute([$start, $end]);
 $visitsData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Illness
 $stmt = $conn->prepare("
     SELECT complaint, COUNT(*) as total
     FROM visits
@@ -66,7 +59,6 @@ $stmt = $conn->prepare("
 $stmt->execute([$start, $end]);
 $illnessData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Most used medicines
 $topMeds = $conn->query("
     SELECT m.medicine_name, SUM(t.quantity) as total_used
     FROM treatments t
@@ -79,8 +71,6 @@ $topMeds = $conn->query("
 /* =======================
    TABLE DATA
 ======================= */
-
-// Recent visits
 $stmt = $conn->prepare("
     SELECT v.visit_date, v.complaint, u.name
     FROM visits v
@@ -92,45 +82,32 @@ $stmt = $conn->prepare("
 $stmt->execute([$start, $end]);
 $recentVisits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Low stock list (correct)
-try {
-    $lowStockItems = $conn->query("
-        SELECT medicine_name, total_quantity 
-        FROM medicines 
-        ORDER BY total_quantity ASC
-        LIMIT 5
-    ");
-    $lowStockItems = $lowStockItems ? $lowStockItems->fetchAll() : [];
-} catch (Exception $e) {
-    $lowStockItems = [];
-}
-
+$lowStockItems = $conn->query("
+    SELECT medicine_name, total_quantity 
+    FROM medicines 
+    ORDER BY total_quantity ASC
+    LIMIT 5
+")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <title>Reports</title>
 
-<link rel="stylesheet" href="Css/layout.css">
-<link rel="stylesheet" href="Css/dashboard.css">
+<link rel="stylesheet" href="/Medlog/Css/layout.css">
+<link rel="stylesheet" href="/Medlog/Css/dashboard.css">
+<link rel="stylesheet" href="/Medlog/Css/reports.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-.section { margin-top: 25px; }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.full { grid-column: span 2; }
-.filter-bar { margin-bottom: 20px; display:flex; gap:10px; }
-.badge-low { color:#fff; background:#ef4444; padding:3px 8px; border-radius:5px; }
-.badge-ok { color:#fff; background:#22c55e; padding:3px 8px; border-radius:5px; }
-</style>
-
 </head>
 
 <body>
 
 <div class="dashboard">
+
 <?php include 'includes/sidebar.php'; ?>
 
 <main class="main-content">
@@ -149,14 +126,34 @@ try {
 </form>
 
 <!-- KPI -->
-<div class="kpi-row">
-    <div class="card kpi"><h2><?= $totalPatients ?></h2><p>Total Patients</p></div>
-    <div class="card kpi"><h2><?= $totalVisits ?></h2><p>Visits (Filtered)</p></div>
-    <div class="card kpi danger"><h2><?= $totalLowStock ?></h2><p>Low Stock</p></div>
+<div class="grid-3">
+    <div class="card stat">
+        <i class="fas fa-users"></i>
+        <div>
+            <h2><?= $totalPatients ?></h2>
+            <p>Total Patients</p>
+        </div>
+    </div>
+
+    <div class="card stat">
+        <i class="fas fa-heartbeat"></i>
+        <div>
+            <h2><?= $totalVisits ?></h2>
+            <p>Visits</p>
+        </div>
+    </div>
+
+    <div class="card stat danger">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div>
+            <h2><?= $totalLowStock ?></h2>
+            <p>Low Stock</p>
+        </div>
+    </div>
 </div>
 
 <!-- CHARTS -->
-<div class="section grid-2">
+<div class="grid-2">
 
     <div class="card chart">
         <h3>Visits Over Time</h3>
@@ -175,38 +172,51 @@ try {
 
 </div>
 
-<!-- TABLES -->
-<div class="section grid-2">
+<!-- TABLES / LISTS -->
+<div class="grid-2">
 
+    <!-- RECENT VISITS -->
     <div class="card">
         <h3>Recent Visits</h3>
-        <table>
-            <tr><th>Name</th><th>Date</th><th>Complaint</th></tr>
-            <?php foreach($recentVisits as $row): ?>
-            <tr>
-                <td><?= $row['name'] ?></td>
-                <td><?= $row['visit_date'] ?></td>
-                <td><?= $row['complaint'] ?></td>
-            </tr>
-            <?php endforeach; ?>
-        </table>
+
+        <?php foreach ($recentVisits as $row): ?>
+        <div class="list-item">
+            <div>
+                <strong><?= $row['name'] ?></strong>
+                <p><?= $row['complaint'] ?></p>
+            </div>
+
+            <span class="visit-meta">
+                <?= date("M d, Y", strtotime($row['visit_date'])) ?><br>
+                <?= date("h:i A", strtotime($row['visit_date'])) ?>
+            </span>
+        </div>
+        <?php endforeach; ?>
     </div>
 
+    <!-- LOW STOCK -->
     <div class="card">
-        <h3>Medicine Inventory Status</h3>
-        <table>
-            <tr><th>Medicine</th><th>Qty</th><th>Status</th></tr>
-                <?php if (empty($lowStockItems)): ?>
-                    <li>No low stock items</li>
-                <?php else: ?>
-                    <?php foreach ($lowStockItems as $item): ?>
-                    <li>
+        <h3>Medicine Inventory</h3>
+
+        <?php if (empty($lowStockItems)): ?>
+            <div class="list-item">No low stock items</div>
+        <?php else: ?>
+
+            <?php foreach ($lowStockItems as $item): ?>
+                <?php $qty = (int)$item['total_quantity']; ?>
+
+                <div class="list-item danger-bg">
+                    <div>
                         <strong><?= htmlspecialchars($item['medicine_name']) ?></strong>
-                        <span><?= $item['total_quantity'] ?> left</span>
-                    </li>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-        </table>
+                    </div>
+
+                    <div>
+                        <?= $qty ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+
+        <?php endif; ?>
     </div>
 
 </div>
@@ -217,8 +227,6 @@ try {
 
 <!-- CHARTS -->
 <script>
-
-// Visits chart
 new Chart(document.getElementById('visitsChart'), {
     type: 'line',
     data: {
@@ -226,12 +234,17 @@ new Chart(document.getElementById('visitsChart'), {
         datasets: [{
             label: 'Visits',
             data: <?= json_encode(array_column($visitsData, 'total')) ?>,
-            borderColor: '#2563eb'
+            borderColor: '#2563eb',
+            tension: 0.3,
+            fill: false
         }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
     }
 });
 
-// Illness chart
 new Chart(document.getElementById('illnessChart'), {
     type: 'bar',
     data: {
@@ -241,20 +254,40 @@ new Chart(document.getElementById('illnessChart'), {
             data: <?= json_encode(array_column($illnessData, 'total')) ?>,
             backgroundColor: '#ef4444'
         }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false }
+        }
     }
 });
 
-// Medicine usage chart
 new Chart(document.getElementById('medChart'), {
-    type: 'pie',
+    type: 'bar',
     data: {
         labels: <?= json_encode(array_column($topMeds, 'medicine_name')) ?>,
         datasets: [{
-            data: <?= json_encode(array_column($topMeds, 'total_used')) ?>
+            label: 'Usage Count',
+            data: <?= json_encode(array_column($topMeds, 'total_used')) ?>,
+            backgroundColor: '#3b82f6'
         }]
+    },
+    options: {
+        indexAxis: 'y', // 🔥 makes it horizontal
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            x: {
+                beginAtZero: true
+            }
+        }
     }
 });
-
 </script>
 
 </body>

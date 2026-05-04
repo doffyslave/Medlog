@@ -47,7 +47,10 @@ $totalLowStock = getSingle($conn, "SELECT COUNT(*) as total FROM medicines WHERE
 $recentVisits = [];
 try {
     $q = $conn->query("
-        SELECT v.complaint, u.name 
+        SELECT 
+            v.complaint, 
+            v.visit_date,
+            u.name 
         FROM visits v
         JOIN users u ON v.user_id = u.user_id
         ORDER BY v.visit_date DESC
@@ -185,7 +188,7 @@ while ($row = $q->fetch()) {
         <i class="fas fa-users"></i>
         <div>
             <h2><?= $totalPatients ?></h2>
-            <p>Students</p>
+            <p>Patients</p>
         </div>
     </div>
 
@@ -226,7 +229,13 @@ while ($row = $q->fetch()) {
         <strong><?= $visit['name'] ?></strong>
         <p><?= $visit['complaint'] ?></p>
     </div>
-    <span class="status-tag">done</span>
+
+    <div class="visit-meta">
+        <div><?= date("M d, Y", strtotime($visit['visit_date'])) ?></div>
+        <div class="visit-time">
+            <?= date("h:i A", strtotime($visit['visit_date'])) ?>
+        </div>
+    </div>
 </div>
 <?php endforeach; ?>
 
