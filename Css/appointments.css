@@ -1,0 +1,193 @@
+/* ===============================
+   APPOINTMENTS PAGE STYLES
+================================ */
+
+/* FORM */
+.appointment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #444;
+}
+
+.form-group input,
+.form-group textarea,
+.admin-actions input,
+.admin-actions select {
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 13px;
+    transition: 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.admin-actions input:focus,
+.admin-actions select:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.form-group textarea {
+    resize: none;
+    min-height: 70px;
+}
+
+
+/* ===============================
+   APPOINTMENT CARD
+================================ */
+
+.appointment-card {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    background: #f9f9f9;
+    margin-bottom: 12px;
+    transition: 0.2s ease;
+}
+
+.appointment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+
+/* LEFT SIDE */
+.appointment-left {
+    flex: 1;
+}
+
+.student-name {
+    font-size: 15px;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.appointment-datetime {
+    font-size: 13px;
+    color: #666;
+    display: flex;
+    gap: 15px;
+    margin-bottom: 6px;
+}
+
+.appointment-datetime i {
+    margin-right: 4px;
+}
+
+.appointment-reason {
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+.appointment-note {
+    font-size: 13px;
+    color: #555;
+}
+
+
+/* RIGHT SIDE */
+.appointment-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    min-width: 180px;
+}
+
+
+/* ===============================
+   STATUS BADGES
+================================ */
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.badge-approved {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge-rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+
+/* ===============================
+   ADMIN ACTIONS
+================================ */
+
+.admin-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+}
+
+.admin-actions select,
+.admin-actions input {
+    width: 100%;
+}
+
+
+/* ===============================
+   EMPTY STATE
+================================ */
+
+.empty-state {
+    text-align: center;
+    color: #777;
+    font-size: 14px;
+    padding: 20px;
+}
+
+/* 🔥 CANCELLED (IMPROVED) */
+.cancelled-card {
+    opacity: 0.45;
+    transform: scale(0.97);
+    background: #f1f1f1;
+    pointer-events: none; /* disables hover + clicks */
+}
+
+/* remove hover effect */
+.cancelled-card:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* badge */
+.badge-cancelled {
+    background: #d6d8db;
+    color: #495057;
+}
+
+/* make text smaller */
+.cancelled-card .appointment-left {
+    font-size: 13px;
+}

@@ -7,12 +7,14 @@ if (!isset($_SESSION['user'])) {
 }
 
 $user = $_SESSION['user'];
+$role = $user['role'];
+$user_id = $user['user_id'];
 
 require 'Database/connection.php';
 
 
 // ================= STATUS =================
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status']) && $role === 'admin') {
     $clinic = $_POST['clinic_status'];
     $nurse = $_POST['nurse_status'];
 
@@ -36,77 +38,74 @@ function getSingle($conn, $query) {
 }
 
 
-// ================= KPI =================
+// ================= ADMIN KPI =================
 $totalPatients = getSingle($conn, "SELECT COUNT(*) as total FROM users WHERE role='student'");
 $totalVisits = getSingle($conn, "SELECT COUNT(*) as total FROM visits WHERE MONTH(visit_date)=MONTH(CURRENT_DATE())");
 $totalRecords = getSingle($conn, "SELECT COUNT(*) as total FROM visits");
 $totalLowStock = getSingle($conn, "SELECT COUNT(*) as total FROM medicines WHERE total_quantity <= 10");
 
 
-// ================= RECENT VISITS =================
+// ================= STUDENT DATA =================
+$myVisits = [];
+$myTotalVisits = 0;
+$lastVisit = null;
+
+if ($role === 'student') {
+    try {
+        $stmt = $conn->prepare("
+            SELECT complaint, visit_date 
+            FROM visits 
+            WHERE user_id = ? 
+            ORDER BY visit_date DESC 
+            LIMIT 5
+        ");
+        $stmt->execute([$user_id]);
+        $myVisits = $stmt->fetchAll();
+
+        $stmt = $conn->prepare("SELECT COUNT(*) as total FROM visits WHERE user_id = ?");
+        $stmt->execute([$user_id]);
+        $myTotalVisits = $stmt->fetch()['total'] ?? 0;
+
+        $stmt = $conn->prepare("
+            SELECT visit_date 
+            FROM visits 
+            WHERE user_id = ? 
+            ORDER BY visit_date DESC 
+            LIMIT 1
+        ");
+        $stmt->execute([$user_id]);
+        $lastVisit = $stmt->fetch()['visit_date'] ?? null;
+
+    } catch (Exception $e) {}
+}
+
+
+// ================= ADMIN DATA =================
 $recentVisits = [];
-try {
-    $q = $conn->query("
-        SELECT 
-            v.complaint, 
-            v.visit_date,
-            u.name 
-        FROM visits v
-        JOIN users u ON v.user_id = u.user_id
-        ORDER BY v.visit_date DESC
-        LIMIT 5
-    ");
-    $recentVisits = $q ? $q->fetchAll() : [];
-} catch (Exception $e) {}
-
-
-// ================= LOW STOCK =================
 $lowStockItems = [];
-try {
-    $q = $conn->query("
-        SELECT medicine_name, total_quantity 
-        FROM medicines 
-        ORDER BY total_quantity ASC
-        LIMIT 5
-    ");
-    $lowStockItems = $q ? $q->fetchAll() : [];
-} catch (Exception $e) {}
 
+if ($role === 'admin') {
+    try {
+        $q = $conn->query("
+            SELECT v.complaint, v.visit_date, u.name 
+            FROM visits v
+            JOIN users u ON v.user_id = u.user_id
+            ORDER BY v.visit_date DESC
+            LIMIT 5
+        ");
+        $recentVisits = $q ? $q->fetchAll() : [];
+    } catch (Exception $e) {}
 
-// ================= CHART DATA =================
-
-// Monthly visits
-$months = [];
-$totals = [];
-
-$q = $conn->query("
-    SELECT MONTH(visit_date) as month, COUNT(*) as total
-    FROM visits
-    GROUP BY MONTH(visit_date)
-");
-
-while ($row = $q->fetch()) {
-    $months[] = $row['month'];
-    $totals[] = $row['total'];
+    try {
+        $q = $conn->query("
+            SELECT medicine_name, total_quantity 
+            FROM medicines 
+            ORDER BY total_quantity ASC
+            LIMIT 5
+        ");
+        $lowStockItems = $q ? $q->fetchAll() : [];
+    } catch (Exception $e) {}
 }
-
-
-// Illness distribution
-$illnessLabels = [];
-$illnessCounts = [];
-
-$q = $conn->query("
-    SELECT complaint, COUNT(*) as total
-    FROM visits
-    GROUP BY complaint
-    LIMIT 5
-");
-
-while ($row = $q->fetch()) {
-    $illnessLabels[] = $row['complaint'];
-    $illnessCounts[] = $row['total'];
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -137,6 +136,7 @@ while ($row = $q->fetch()) {
 <h1>Dashboard</h1>
 <p class="subtitle">Welcome back! Here's your clinic overview.</p>
 
+<!-- 🔷 SHARED STATUS -->
 <div class="grid-3">
 
     <div class="card status">
@@ -159,6 +159,7 @@ while ($row = $q->fetch()) {
         </div>
     </div>
 
+    <?php if ($role === 'admin'): ?>
     <div class="card">
         <h3>Clinic Control</h3>
 
@@ -179,8 +180,12 @@ while ($row = $q->fetch()) {
             </button>
         </form>
     </div>
+    <?php endif; ?>
 
 </div>
+
+<!-- 🔴 ADMIN DASHBOARD -->
+<?php if ($role === 'admin'): ?>
 
 <div class="grid-4">
 
@@ -244,33 +249,16 @@ while ($row = $q->fetch()) {
 <div class="card">
 <h3>Low Stock</h3>
 
-<?php foreach ($lowStockItems as $item): ?>
-
-<?php
+<?php foreach ($lowStockItems as $item): 
 $qty = (int) $item['total_quantity'];
-
-if ($qty > 10) {
-    continue; // skip non-low-stock items
-}
-
-if ($qty <= 0) {
-    $status = 'Out of Stock';
-    $class = 'badge-low';
-} else {
-    $status = 'Low Stock';
-    $class = 'badge-low';
-}
+if ($qty > 10) continue;
 ?>
 
 <div class="list-item danger-bg">
     <div>
         <strong><?= $item['medicine_name'] ?></strong>
-        <span class="<?= $class ?>"></span>
     </div>
-
-    <div>
-        <?= $qty ?>
-    </div>
+    <div><?= $qty ?></div>
 </div>
 
 <?php endforeach; ?>
@@ -279,34 +267,57 @@ if ($qty <= 0) {
 
 </div>
 
+<?php endif; ?>
+
+
+<!-- 🔵 STUDENT DASHBOARD -->
+<?php if ($role === 'student'): ?>
+
+<div class="grid-2">
+
+<div class="card stat">
+    <i class="fas fa-heartbeat"></i>
+    <div>
+        <h2><?= $myTotalVisits ?></h2>
+        <p>My Visits</p>
+    </div>
+</div>
+
+<div class="card stat">
+    <i class="fas fa-calendar-check"></i>
+    <div>
+        <h2><?= $lastVisit ? date("M d", strtotime($lastVisit)) : 'N/A' ?></h2>
+        <p>Last Visit</p>
+    </div>
+</div>
+
+</div>
+
+<div class="card">
+<h3>My Recent Visits</h3>
+
+<?php if ($myVisits): ?>
+<?php foreach ($myVisits as $visit): ?>
+<div class="list-item">
+    <div>
+        <p><?= $visit['complaint'] ?></p>
+    </div>
+    <div class="visit-meta">
+        <?= date("M d, Y h:i A", strtotime($visit['visit_date'])) ?>
+    </div>
+</div>
+<?php endforeach; ?>
+<?php else: ?>
+<p>No visit records yet.</p>
+<?php endif; ?>
+
+</div>
+
+<?php endif; ?>
+
 </section>
 </main>
 </div>
-
-
-<!-- 🔥 CHART JS -->
-<script>
-new Chart(document.getElementById('visitsChart'), {
-    type: 'bar',
-    data: {
-        labels: <?= json_encode($months) ?>,
-        datasets: [{
-            label: 'Visits',
-            data: <?= json_encode($totals) ?>
-        }]
-    }
-});
-
-new Chart(document.getElementById('illnessChart'), {
-    type: 'pie',
-    data: {
-        labels: <?= json_encode($illnessLabels) ?>,
-        datasets: [{
-            data: <?= json_encode($illnessCounts) ?>
-        }]
-    }
-});
-</script>
 
 </body>
 </html>

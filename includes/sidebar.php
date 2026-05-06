@@ -17,6 +17,7 @@ $current = basename($_SERVER['PHP_SELF']);
             <h2 class="logo">MedLog</h2>
         </div>
     </div>
+
     <div class="user">
         <img src="Images/UserIcon.jpg" class="userImage" alt="User avatar">
         <div class="user-copy">
@@ -31,10 +32,10 @@ $current = basename($_SERVER['PHP_SELF']);
         <p class="section-title">GENERAL</p>
         <ul>
 
-            <!-- ALWAYS -->
+            <!-- DASHBOARD -->
             <li class="<?= $current == 'dashboard.php' ? 'active' : '' ?>">
                 <a href="dashboard.php">
-                    <span class="menu-icon" aria-hidden="true"><i class="fa-solid fa-chart-line"></i></span>
+                    <span class="menu-icon"><i class="fa-solid fa-chart-line"></i></span>
                     <span class="menuText">Dashboard</span>
                 </a>
             </li>
@@ -44,24 +45,32 @@ $current = basename($_SERVER['PHP_SELF']);
 
                 <li class="<?= $current == 'profile.php' ? 'active' : '' ?>">
                     <a href="profile.php">
-                        <span class="menu-icon profile-menu-icon" aria-hidden="true"><span class="profile-head"></span><span class="profile-body"></span></span>
+                        <span class="menu-icon profile-menu-icon"><span class="profile-head"></span><span class="profile-body"></span></span>
                         <span class="menuText">Profile</span>
                     </a>
                 </li>
 
                 <li class="<?= $current == 'my_visits.php' ? 'active' : '' ?>">
                     <a href="my_visits.php">
-                        <span class="menu-icon" aria-hidden="true"><i class="fa-solid fa-clipboard-list"></i></span>
+                        <span class="menu-icon"><i class="fa-solid fa-clipboard-list"></i></span>
                         <span class="menuText">My Visits</span>
+                    </a>
+                </li>
+
+                <li class="<?= $current == 'appointments.php' ? 'active' : '' ?>">
+                    <a href="appointments.php">
+                        <span class="menu-icon"><i class="fa-solid fa-calendar-check"></i></span>
+                        <span class="menuText">Appointments</span>
                     </a>
                 </li>
 
                 <li class="<?= $current == 'medicines.php' ? 'active' : '' ?>">
                     <a href="medicines.php">
-                        <span class="menu-icon" aria-hidden="true"><i class="fa-solid fa-pills"></i></span>
+                        <span class="menu-icon"><i class="fa-solid fa-pills"></i></span>
                         <span class="menuText">Medicines</span>
                     </a>
                 </li>
+
             <?php endif; ?>
 
             <!-- ================= ADMIN VIEW ================= -->
@@ -69,35 +78,42 @@ $current = basename($_SERVER['PHP_SELF']);
 
                 <li class="<?= $current == 'patients.php' ? 'active' : '' ?>">
                     <a href="patients.php">
-                        <span class="menu-icon" aria-hidden="true"><i class="fa-solid fa-users"></i></span>
+                        <span class="menu-icon"><i class="fa-solid fa-users"></i></span>
                         <span class="menuText">Patients</span>
                     </a>
                 </li>
 
                 <li class="<?= $current == 'visits.php' ? 'active' : '' ?>">
                     <a href="visits.php">
-                        <span class="menu-icon" aria-hidden="true"><i class="fa-solid fa-clipboard-list"></i></span>
+                        <span class="menu-icon"><i class="fa-solid fa-clipboard-list"></i></span>
                         <span class="menuText">Visits</span>
+                    </a>
+                </li>
+
+                <li class="<?= $current == 'appointments.php' ? 'active' : '' ?>">
+                    <a href="appointments.php">
+                        <span class="menu-icon"><i class="fa-solid fa-calendar-check"></i></span>
+                        <span class="menuText">Appointments</span>
                     </a>
                 </li>
 
                 <li class="<?= $current == 'stocks.php' ? 'active' : '' ?>">
                     <a href="stocks.php">
-                        <span class="menu-icon" aria-hidden="true"><i class="fa-solid fa-boxes-stacked"></i></span>
+                        <span class="menu-icon"><i class="fa-solid fa-boxes-stacked"></i></span>
                         <span class="menuText">Stocks Inventory</span>
                     </a>
                 </li>
 
                 <li class="<?= $current == 'medicines.php' ? 'active' : '' ?>">
                     <a href="medicines.php">
-                        <span class="menu-icon" aria-hidden="true"><i class="fa-solid fa-pills"></i></span>
+                        <span class="menu-icon"><i class="fa-solid fa-pills"></i></span>
                         <span class="menuText">Medicines</span>
                     </a>
                 </li>
 
                 <li class="<?= $current == 'reports.php' ? 'active' : '' ?>">
                     <a href="reports.php">
-                        <span class="menu-icon" aria-hidden="true"><i class="fa-solid fa-chart-column"></i></span>
+                        <span class="menu-icon"><i class="fa-solid fa-chart-column"></i></span>
                         <span class="menuText">Reports</span>
                     </a>
                 </li>
