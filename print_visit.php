@@ -14,7 +14,6 @@ if (!isset($_GET['id'])) {
 $visit_id = $_GET['id'];
 $user = $_SESSION['user'];
 
-/* 🔥 FETCH VISIT WITH MEDICINES */
 $stmt = $conn->prepare("
     SELECT 
         visits.*, 
@@ -34,7 +33,6 @@ if (!$visit) {
     die("Visit not found.");
 }
 
-/* 🔐 ACCESS CONTROL */
 if ($user['role'] === 'student' && $visit['user_id'] != $user['user_id']) {
     die("Unauthorized access.");
 }
@@ -60,21 +58,30 @@ body {
     padding: 30px;
 }
 
-/* 🔥 HEADER WITH LOGOS */
+/* 🔥 HEADER */
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.logo {
+/* 🔥 LOGO STYLE */
+.logo img {
     width: 80px;
     height: 80px;
-    border: 1px dashed #aaa; /* placeholder */
+    object-fit: contain;
+}
+
+/* fallback if no logo */
+.logo-placeholder {
+    width: 80px;
+    height: 80px;
+    border: 1px dashed #aaa;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 11px;
+    color: #888;
 }
 
 .title {
@@ -103,7 +110,6 @@ body {
     font-weight: bold;
 }
 
-/* 🔥 CERTIFICATE TEXT */
 .notice {
     margin-top: 25px;
     line-height: 1.6;
@@ -131,21 +137,32 @@ body {
 
 <div class="container">
 
-<!-- 🔥 HEADER -->
 <div class="header">
-    <div class="logo">LOGO 1</div>
 
+    <!-- 🔥 LEFT LOGO (STI) -->
+    <div class="logo">
+        <img src="Images/sti-logo.png" alt="STI Logo"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="logo-placeholder" style="display:none;">STI LOGO</div>
+    </div>
+
+    <!-- 🔥 TITLE -->
     <div class="title">
         <h2>STI College Davao Clinic</h2>
         <div class="subtitle">Official Visit Certification</div>
     </div>
 
-    <div class="logo">LOGO 2</div>
+    <!-- 🔥 RIGHT LOGO (YOUR LOGO) -->
+    <div class="logo">
+        <img src="Images/medlog-logo.png" alt="MedLog Logo"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="logo-placeholder" style="display:none;">MEDLOG</div>
+    </div>
+
 </div>
 
 <div class="divider"></div>
 
-<!-- 🔥 DETAILS -->
 <div class="field">
     <span class="label">Patient Name:</span>
     <?= htmlspecialchars($visit['name']) ?>
@@ -173,14 +190,12 @@ body {
 </div>
 <?php endif; ?>
 
-<!-- 🔥 OFFICIAL NOTICE -->
 <div class="notice">
     This is to certify that the above-named individual visited the STI College Davao Clinic on the date and time indicated above for medical consultation and appropriate care.
 
     This document is issued upon request as proof of clinic visitation and may be presented as a valid excuse for absence or late attendance, subject to institutional policies and verification if necessary.
 </div>
 
-<!-- 🔥 SIGNATURE -->
 <div class="signature">
     ___________________________<br>
     <?= htmlspecialchars($visit['recorded_by']) ?><br>

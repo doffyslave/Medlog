@@ -40,8 +40,11 @@ $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html>
 <head>
 <title>Patients</title>
-<link rel="stylesheet" href="Css/layout.css">
-<link rel="stylesheet" href="Css/patients.css">
+
+<!-- ✅ FIXED PATH -->
+<link rel="stylesheet" href="/Medlog/Css/layout.css">
+<link rel="stylesheet" href="/Medlog/Css/patients.css">
+
 </head>
 
 <body>
@@ -52,34 +55,37 @@ $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <main class="main-content">
 <?php include 'includes/header.php'; ?>
 
-<section class="content">
+<!-- ✅ IMPORTANT: patients-page scope -->
+<section class="content patients-page">
 
+<!-- HEADER -->
 <div class="page-header">
     <h1>Patients</h1>
     <p>Manage clinic patients</p>
 </div>
 
+<!-- TOP BAR -->
 <div class="top-bar">
 
-<form method="GET" autocomplete="off">
+<form method="GET" autocomplete="off" class="search-form">
     <input type="text" id="searchInput" name="search" placeholder="Search patient..." value="<?= htmlspecialchars($search) ?>">
     <button type="submit">Search</button>
 </form>
 
-<div>
+<div class="actions">
     <a href="?show_inactive=1" class="filter-btn">Show Inactive</a>
     <a href="patients.php" class="filter-btn">Active Only</a>
-    <button id="openModal">+ Add Patient</button>
+    <button id="openModal" class="add-btn">+ Add Patient</button>
 </div>
 
 </div>
 
-<table>
+<!-- TABLE -->
+<table class="patients-table">
 <thead>
 <tr>
 <th>Name</th>
 <th>Email</th>
-<th>Role</th>
 <th>Status</th>
 <th>Actions</th>
 </tr>
@@ -89,28 +95,43 @@ $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <?php foreach($patients as $row): ?>    
 <tr class="<?= $row['status'] == 'inactive' ? 'inactive-row' : '' ?>">
 
-<td onclick="openProfile('<?= $row['user_id'] ?>')" style="cursor:pointer;">
-    <?= htmlspecialchars($row['name']) ?>
+<!-- NAME -->
+<td class="patient-name" onclick="openProfile('<?= $row['user_id'] ?>')">
+    <div class="name-wrapper">
+        <div class="avatar">
+            <?= strtoupper(substr($row['name'], 0, 1)) ?>
+        </div>
+        <div>
+            <div class="name"><?= htmlspecialchars($row['name']) ?></div>
+            <div class="sub"><?= ucfirst($row['role']) ?></div>
+        </div>
+    </div>
 </td>
 
-<td onclick="openProfile('<?= $row['user_id'] ?>')" style="cursor:pointer;">
+<!-- EMAIL -->
+<td onclick="openProfile('<?= $row['user_id'] ?>')" class="clickable">
     <?= htmlspecialchars($row['email']) ?>
 </td>
 
-<td><?= ucfirst($row['role']) ?></td>
-<td><?= ucfirst($row['status']) ?></td>
+<!-- STATUS -->
+<td>
+    <span class="status <?= $row['status'] ?>">
+        <?= ucfirst($row['status']) ?>
+    </span>
+</td>
 
+<!-- ACTION -->
 <td onclick="event.stopPropagation();">
-<button class="editBtn"
-    data-id="<?= $row['user_id'] ?>"
-    data-name="<?= htmlspecialchars($row['name']) ?>"
-    data-email="<?= htmlspecialchars($row['email']) ?>"
-    data-role="<?= $row['role'] ?>"
-    data-course="<?= htmlspecialchars($row['course']) ?>"
-    data-year="<?= htmlspecialchars($row['year_level']) ?>"
-    data-status="<?= $row['status'] ?>">
-Edit
-</button>
+    <button class="editBtn"
+        data-id="<?= $row['user_id'] ?>"
+        data-name="<?= htmlspecialchars($row['name']) ?>"
+        data-email="<?= htmlspecialchars($row['email']) ?>"
+        data-role="<?= $row['role'] ?>"
+        data-course="<?= htmlspecialchars($row['course']) ?>"
+        data-year="<?= htmlspecialchars($row['year_level']) ?>"
+        data-status="<?= $row['status'] ?>">
+        Edit
+    </button>
 </td>
 
 </tr>
@@ -122,7 +143,7 @@ Edit
 </main>
 </div>
 
-<!-- ================= PROFILE PANEL ================= -->
+<!-- PROFILE PANEL -->
 <div id="profileContainer" class="profile-hidden">
     <div class="profile-box">
         <button onclick="closeProfile()" class="close-profile">✕</button>
@@ -130,7 +151,7 @@ Edit
     </div>
 </div>
 
-<!-- ================= ADD MODAL ================= -->
+<!-- ADD MODAL -->
 <div id="addModal" class="modal">
 <div class="modal-content">
 <span class="close">&times;</span>
@@ -153,7 +174,7 @@ Edit
 </div>
 </div>
 
-<!-- ================= EDIT MODAL ================= -->
+<!-- EDIT MODAL -->
 <div id="editModal" class="modal">
 <div class="modal-content">
 <span class="closeEdit">&times;</span>
@@ -184,7 +205,7 @@ Edit
 </div>
 
 <script>
-// ===== LIVE SEARCH =====
+// SEARCH
 const searchInput = document.getElementById("searchInput");
 
 searchInput.addEventListener("input", function () {
@@ -197,7 +218,7 @@ searchInput.addEventListener("input", function () {
     });
 });
 
-// ===== PROFILE =====
+// PROFILE
 function openProfile(user_id) {
     fetch("Database/get_patient.php?id=" + user_id)
     .then(res => res.text())
@@ -224,7 +245,7 @@ function closeProfile() {
     panel.classList.add("profile-hidden");
 }
 
-// ===== ADD MODAL =====
+// ADD MODAL
 const addModal = document.getElementById("addModal");
 const openBtn = document.getElementById("openModal");
 const closeBtn = document.querySelector(".close");
@@ -236,7 +257,7 @@ window.onclick = (e) => {
     if (e.target === addModal) addModal.classList.remove("show");
 };
 
-// ===== EDIT MODAL =====
+// EDIT MODAL
 const editModal = document.getElementById("editModal");
 const closeEdit = document.querySelector(".closeEdit");
 

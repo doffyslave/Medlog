@@ -10,7 +10,6 @@ require 'Database/connection.php';
 
 $user_id = $_GET['user_id'] ?? null;
 
-/* ===== MAIN QUERY (WITH QUANTITY DISPLAY 🔥) ===== */
 if ($user_id) {
     $stmt = $conn->prepare("
         SELECT 
@@ -132,7 +131,7 @@ $user = $_SESSION['user'];
     <button id="openVisitModal" class="add-btn">+ Add Visit</button>
 </div>
 
-<!-- 🔥 CARD LIST -->
+<!-- Card vis -->
 <div class="visit-grid">
 
 <?php if (!empty($visits)): ?>
@@ -248,7 +247,6 @@ window.onclick = (e) => {
     if (e.target === viewModal) viewModal.classList.remove("show");
 };
 
-// 🔥 UPDATED VIEW MODAL WITH PRINT
 function openViewModal(data) {
     document.getElementById("viewContent").innerHTML = `
         <p><strong>Patient:</strong> ${data.name}</p>

@@ -1,21 +1,23 @@
-/* ===== FORCE FULL WIDTH ===== */
+/* ================= BASE LAYOUT ================= */
 .main-content {
     width: 100%;
 }
 
 .content {
     width: 100%;
-    padding: 25px;
+    padding: 30px;
+    background: #f8fafc;
 }
 
-/* ===== HEADER ===== */
+/* ================= HEADER ================= */
 .page-header {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .page-header h1 {
-    font-size: 24px;
-    color: #1e293b;
+    font-size: 28px;
+    font-weight: 700;
+    color: #0f172a;
 }
 
 .page-header p {
@@ -23,52 +25,66 @@
     font-size: 14px;
 }
 
-/* ===== TOP BAR ===== */
+/* ================= TOP BAR ================= */
 .top-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 10px;
     margin-bottom: 20px;
     flex-wrap: wrap;
+    gap: 15px;
 }
 
-.top-bar form {
+/* SEARCH */
+.search-form {
     display: flex;
     gap: 10px;
 }
 
-.top-bar input {
-    padding: 10px 14px;
-    width: 260px;
-    border-radius: 8px;
+.search-form input {
+    padding: 12px 14px;
+    width: 280px;
+    border-radius: 10px;
     border: 1px solid #e2e8f0;
     outline: none;
+    transition: 0.2s;
+    background: white;
 }
 
-.top-bar button {
-    padding: 10px 16px;
+.search-form input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+}
+
+.search-form button {
+    padding: 12px 18px;
     background: #2563eb;
     color: #fff;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
+    font-weight: 500;
     transition: 0.2s;
 }
 
-.top-bar button:hover {
+.search-form button:hover {
     background: #1d4ed8;
 }
 
-/* FILTER BUTTON */
+/* ACTIONS */
+.actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
 .filter-btn {
-    padding: 8px 12px;
+    padding: 8px 14px;
     background: #e2e8f0;
-    border-radius: 6px;
+    border-radius: 8px;
     text-decoration: none;
     color: #1e293b;
     font-size: 13px;
-    margin-right: 5px;
     transition: 0.2s;
 }
 
@@ -76,61 +92,136 @@
     background: #cbd5f5;
 }
 
-/* ===== TABLE ===== */
-table {
+/* ADD BUTTON */
+.add-btn {
+    padding: 10px 16px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.add-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+/* ================= TABLE ================= */
+.patients-table {
     width: 100%;
-    border-collapse: collapse;
-    background: #ffffff;
-    border-radius: 12px;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: white;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
 }
 
-thead {
-    background: #2563eb;
-    color: #fff;
+/* HEADER */
+.patients-table thead {
+    background: linear-gradient(to right, #2563eb, #3b82f6);
+    color: white;
 }
 
-th {
+.patients-table th {
+    padding: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ROWS */
+.patients-table td {
     padding: 14px;
-    text-align: left;
-}
-
-/* FIX: prevent header hover bug */
-thead tr:hover {
-    background: #2563eb;
-}
-
-td {
-    padding: 12px;
     border-bottom: 1px solid #f1f5f9;
 }
 
-tbody tr:hover {
-    background: #f8fafc;
+.patients-table tbody tr {
+    transition: 0.2s ease;
+}
+
+.patients-table tbody tr:hover {
+    background: #f1f5ff;
+    transform: scale(1.002);
+}
+
+/* ================= NAME SECTION ================= */
+.name-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* AVATAR */
+.avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 14px;
+}
+
+/* NAME TEXT */
+.name {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.sub {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* ================= STATUS ================= */
+.status {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status.active {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.status.inactive {
+    background: #fee2e2;
+    color: #dc2626;
 }
 
 /* INACTIVE ROW */
 .inactive-row {
-    opacity: 0.5;
+    opacity: 0.6;
 }
 
-/* ===== EDIT BUTTON ===== */
+/* ================= BUTTONS ================= */
 .editBtn {
-    padding: 5px 10px;
+    padding: 6px 14px;
     font-size: 12px;
-    border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     background: #facc15;
+    border: none;
     cursor: pointer;
+    font-weight: 500;
     transition: 0.2s;
 }
 
 .editBtn:hover {
     background: #eab308;
+    transform: translateY(-1px);
 }
 
-/* ===== SLIDE PANEL (FIXED) ===== */
+/* ================= PROFILE PANEL ================= */
 #profileContainer {
     position: fixed;
     top: 0;
@@ -152,42 +243,38 @@ tbody tr:hover {
     width: 100%;
     height: 100%;
     background: #ffffff;
-    padding: 20px;
+    padding: 25px;
     overflow-y: auto;
-    box-shadow: -8px 0 20px rgba(0,0,0,0.15);
+    box-shadow: -10px 0 30px rgba(0,0,0,0.15);
 }
 
-/* ===== MODAL ===== */
-/* ===== MODAL BACKDROP ===== */
+/* ================= MODAL ================= */
 .modal {
     display: none;
     position: fixed;
     inset: 0;
     background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(5px);
     justify-content: center;
     align-items: center;
     z-index: 1000;
 }
 
-/* SHOW MODAL */
 .modal.show {
     display: flex;
 }
 
-/* ===== MODAL BOX ===== */
 .modal-content {
     background: #ffffff;
     padding: 25px;
-    border-radius: 16px;
+    border-radius: 18px;
     width: 420px;
     max-width: 95%;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.25);
     animation: modalFade 0.25s ease;
     position: relative;
 }
 
-/* ANIMATION */
 @keyframes modalFade {
     from {
         opacity: 0;
@@ -199,14 +286,14 @@ tbody tr:hover {
     }
 }
 
-/* ===== MODAL HEADER ===== */
+/* MODAL HEADER */
 .modal-content h2 {
     margin-bottom: 15px;
     font-size: 20px;
-    color: #1e293b;
+    color: #0f172a;
 }
 
-/* ===== CLOSE BUTTON ===== */
+/* CLOSE */
 .modal-content .close,
 .modal-content .closeEdit {
     position: absolute;
@@ -215,7 +302,6 @@ tbody tr:hover {
     font-size: 20px;
     cursor: pointer;
     color: #64748b;
-    transition: 0.2s;
 }
 
 .modal-content .close:hover,
@@ -223,99 +309,43 @@ tbody tr:hover {
     color: #ef4444;
 }
 
-/* ===== FORM ===== */
+/* FORM */
 .modal-content form {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
-/* INPUTS */
 .modal-content input,
 .modal-content select {
-    padding: 10px 12px;
-    border-radius: 8px;
+    padding: 12px;
+    border-radius: 10px;
     border: 1px solid #e2e8f0;
     font-size: 14px;
     transition: 0.2s;
 }
 
-/* INPUT FOCUS */
 .modal-content input:focus,
 .modal-content select:focus {
     border-color: #2563eb;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
 }
 
-/* ===== SUBMIT BUTTON ===== */
+/* SUBMIT */
 .modal-content button[type="submit"] {
     margin-top: 10px;
     padding: 12px;
-    border: none;
     border-radius: 10px;
     background: #2563eb;
     color: white;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    transition: 0.2s;
 }
 
 .modal-content button[type="submit"]:hover {
     background: #1d4ed8;
 }
 
-/* ===== SMALL POLISH ===== */
-.modal-content input[readonly] {
-    background: #f1f5f9;
-    cursor: not-allowed;
-}
-
-/* ===== PROFILE CONTENT ===== */
-.profile-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.profile-section {
-    background: #f8fafc;
-    padding: 12px;
-    border-radius: 8px;
-}
-
-.search-wrapper {
-    position: relative;
-    width: 250px;
-}
-
-.suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #ddd;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 999;
-}
-
-.suggestion-item {
-    padding: 8px;
-    cursor: pointer;
-}
-
-.suggestion-item:hover {
-    background: #f1f1f1;
-}
-
-#searchInput {
-    width: 100%;
-    padding: 10px;
-}
-
-.profile-hidden {
-    transform: translateX(100%);
-    pointer-events: none; /* 🔥 THIS FIXES CLICK BLOCKING */
+body {
+    background: red !important;
 }

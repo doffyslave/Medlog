@@ -133,54 +133,40 @@ if ($role === 'admin') {
 
 <section class="content">
 
-<h1>Dashboard</h1>
-<p class="subtitle">Welcome back! Here's your clinic overview.</p>
-
 <!-- 🔷 SHARED STATUS -->
-<div class="grid-3">
+<div class="top-row">
 
-    <div class="card status">
-        <i class="fas fa-clinic-medical icon"></i>
-        <div>
-            <p>Clinic Status</p>
+    <div class="title-group">
+        <h1>Dashboard</h1>
+        <p class="subtitle">Welcome back! Here's your clinic overview.</p>
+    </div>
+
+    <div class="status-inline">
+
+        <!-- Clinic Status (CLICKABLE) -->
+        <div class="inline-badge clickable" onclick="openModal('clinicModal')">
+            <i class="fas fa-clinic-medical"></i>
             <span class="badge <?= strtolower($clinicStatus) ?>">
                 <?= $clinicStatus ?>
             </span>
         </div>
-    </div>
 
-    <div class="card status">
-        <i class="fas fa-user-nurse icon"></i>
-        <div>
-            <p>Nurse Status</p>
+        <!-- Nurse Status (CLICKABLE) -->
+        <div class="inline-badge clickable" onclick="openModal('nurseModal')">
+            <i class="fas fa-user-nurse"></i>
             <span class="badge <?= strtolower($nurseStatus) ?>">
                 <?= $nurseStatus ?>
             </span>
         </div>
+
+        <!-- Calendar -->
+        <div class="calendar-box" onclick="document.getElementById('calendarFilter').showPicker()">
+            <i class="fas fa-calendar-alt"></i>
+            <span id="calendarText"></span>
+            <input type="date" id="calendarFilter" hidden>
+        </div>
+
     </div>
-
-    <?php if ($role === 'admin'): ?>
-    <div class="card">
-        <h3>Clinic Control</h3>
-
-        <form method="POST">
-            <select name="nurse_status">
-                <option <?= $nurseStatus=='Available'?'selected':'' ?>>Available</option>
-                <option <?= $nurseStatus=='Lunch'?'selected':'' ?>>Lunch</option>
-                <option <?= $nurseStatus=='Offline'?'selected':'' ?>>Offline</option>
-            </select>
-
-            <select name="clinic_status">
-                <option <?= $clinicStatus=='Open'?'selected':'' ?>>Open</option>
-                <option <?= $clinicStatus=='Closed'?'selected':'' ?>>Closed</option>
-            </select>
-
-            <button type="submit" name="update_status" class="btn-primary">
-                Save
-            </button>
-        </form>
-    </div>
-    <?php endif; ?>
 
 </div>
 
@@ -319,5 +305,84 @@ if ($qty > 10) continue;
 </main>
 </div>
 
+<!-- CLINIC MODAL -->
+<div id="clinicModal" class="modal">
+    <div class="modal-content">
+        <h3>Update Clinic Status</h3>
+
+        <form method="POST">
+            <select name="clinic_status">
+                <option <?= $clinicStatus=='Open'?'selected':'' ?>>Open</option>
+                <option <?= $clinicStatus=='Closed'?'selected':'' ?>>Closed</option>
+            </select>
+
+            <input type="hidden" name="nurse_status" value="<?= $nurseStatus ?>">
+
+            <button type="submit" name="update_status" class="btn-primary">Save</button>
+        </form>
+
+        <span class="close" onclick="closeModal('clinicModal')">&times;</span>
+    </div>
+</div>
+
+<!-- NURSE MODAL -->
+<div id="nurseModal" class="modal">
+    <div class="modal-content">
+        <h3>Update Nurse Status</h3>
+
+        <form method="POST">
+            <select name="nurse_status">
+                <option <?= $nurseStatus=='Available'?'selected':'' ?>>Available</option>
+                <option <?= $nurseStatus=='Lunch'?'selected':'' ?>>Lunch</option>
+                <option <?= $nurseStatus=='Offline'?'selected':'' ?>>Offline</option>
+            </select>
+
+            <input type="hidden" name="clinic_status" value="<?= $clinicStatus ?>">
+
+            <button type="submit" name="update_status" class="btn-primary">Save</button>
+        </form>
+
+        <span class="close" onclick="closeModal('nurseModal')">&times;</span>
+    </div>
+</div>
+<script>
+function openModal(id) {
+    document.getElementById(id).style.display = "flex";
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = "none";
+}
+
+// close when clicking outside
+window.onclick = function(e) {
+    document.querySelectorAll('.modal').forEach(modal => {
+        if (e.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+}
+
+const calendarInput = document.getElementById('calendarFilter');
+const calendarText = document.getElementById('calendarText');
+
+const today = new Date();
+calendarInput.value = today.toISOString().split('T')[0];
+
+// format like "May 5, 2026"
+function formatDate(date) {
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
+calendarText.innerText = formatDate(today);
+
+calendarInput.addEventListener('change', function () {
+    calendarText.innerText = formatDate(new Date(this.value));
+});
+</script>
 </body>
 </html>
