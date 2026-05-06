@@ -61,7 +61,6 @@ $user = $_SESSION['user'];
 <link rel="stylesheet" href="Css/visits.css">
 
 <style>
-/* 🔥 CARD DESIGN */
 .visit-grid {
     display: flex;
     flex-direction: column;
@@ -184,7 +183,7 @@ $user = $_SESSION['user'];
 </div>
 </div>
 
-<!-- ADD VISIT MODAL (UNCHANGED) -->
+<!-- ADD VISIT MODAL -->
 <div id="visitModal" class="modal">
 <div class="modal-content">
 <span class="closeVisit">&times;</span>
@@ -249,7 +248,7 @@ window.onclick = (e) => {
     if (e.target === viewModal) viewModal.classList.remove("show");
 };
 
-// 🔥 OPEN VIEW MODAL
+// 🔥 UPDATED VIEW MODAL WITH PRINT
 function openViewModal(data) {
     document.getElementById("viewContent").innerHTML = `
         <p><strong>Patient:</strong> ${data.name}</p>
@@ -259,6 +258,13 @@ function openViewModal(data) {
         <p><strong>Complaint:</strong> ${data.complaint}</p>
         <p><strong>Treatment:</strong> ${data.medicines_used || 'None'}</p>
         <p><strong>Notes:</strong> ${data.notes || 'None'}</p>
+
+        <br>
+
+        <a href="print_visit.php?id=${data.visit_id}" target="_blank" 
+           style="display:inline-block;padding:8px 12px;background:#2563eb;color:white;border-radius:6px;text-decoration:none;">
+           🖨 Print Visit
+        </a>
     `;
 
     viewModal.classList.add("show");
