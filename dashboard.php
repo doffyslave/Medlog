@@ -160,10 +160,8 @@ if ($role === 'admin') {
         </div>
 
         <!-- Calendar -->
-        <div class="calendar-box" onclick="document.getElementById('calendarFilter').showPicker()">
-            <i class="fas fa-calendar-alt"></i>
-            <span id="calendarText"></span>
-            <input type="date" id="calendarFilter" hidden>
+        <div class="calendar-box">
+            <input type="date" id="calendarFilter">
         </div>
 
     </div>
@@ -383,6 +381,19 @@ calendarText.innerText = formatDate(today);
 calendarInput.addEventListener('change', function () {
     calendarText.innerText = formatDate(new Date(this.value));
 });
+
+function openCalendar() {
+    const input = document.getElementById('calendarFilter');
+
+    // focus is important for some browsers
+    input.focus();
+
+    if (input.showPicker) {
+        input.showPicker();
+    } else {
+        input.click(); // fallback
+    }
+}
 </script>
 </body>
 </html>

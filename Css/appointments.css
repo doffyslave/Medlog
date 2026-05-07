@@ -2,11 +2,63 @@
    APPOINTMENTS PAGE STYLES
 ================================ */
 
-/* FORM */
+
+/* ===============================
+   ALERTS
+================================ */
+
+.alert-error,
+.alert-success {
+    padding: 14px 18px;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    animation: fadeIn 0.3s ease;
+}
+
+.alert-error {
+    background: #fff1f1;
+    border-left: 5px solid #dc3545;
+    color: #842029;
+}
+
+.alert-success {
+    background: #eefbf0;
+    border-left: 5px solid #28a745;
+    color: #1e4620;
+}
+
+.alert-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.alert-content i {
+    font-size: 18px;
+    margin-top: 2px;
+}
+
+.alert-content strong {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 14px;
+}
+
+.alert-content p {
+    font-size: 13px;
+    margin: 0;
+    opacity: 0.9;
+}
+
+
+/* ===============================
+   FORM
+================================ */
+
 .appointment-form {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
 }
 
 .form-group {
@@ -17,32 +69,71 @@
 .form-group label {
     font-size: 13px;
     font-weight: 600;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
     color: #444;
 }
 
 .form-group input,
 .form-group textarea,
+.form-group select,
 .admin-actions input,
 .admin-actions select {
-    padding: 8px 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #d5dbe1;
     font-size: 13px;
-    transition: 0.2s ease;
+    transition: all 0.2s ease;
+    background: white;
 }
 
 .form-group input:focus,
 .form-group textarea:focus,
+.form-group select:focus,
 .admin-actions input:focus,
 .admin-actions select:focus {
     outline: none;
     border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
 }
 
 .form-group textarea {
     resize: none;
-    min-height: 70px;
+    min-height: 85px;
+}
+
+
+/* ===============================
+   BUTTONS
+================================ */
+
+.btn-primary,
+.btn-danger {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.btn-primary {
+    background: #22c55e;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #16a34a;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
 }
 
 
@@ -53,61 +144,71 @@
 .appointment-card {
     display: flex;
     justify-content: space-between;
-    gap: 20px;
-    padding: 15px;
-    border-radius: 10px;
-    background: #f9f9f9;
-    margin-bottom: 12px;
-    transition: 0.2s ease;
+    gap: 24px;
+    padding: 18px;
+    border-radius: 14px;
+    background: #fafafa;
+    margin-bottom: 14px;
+    transition: all 0.2s ease;
+    border: 1px solid #edf0f2;
 }
 
 .appointment-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
 }
 
 
 /* LEFT SIDE */
+
 .appointment-left {
     flex: 1;
 }
 
 .student-name {
     font-size: 15px;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     display: block;
+    color: #234;
 }
 
 .appointment-datetime {
     font-size: 13px;
-    color: #666;
+    color: #667085;
     display: flex;
-    gap: 15px;
-    margin-bottom: 6px;
+    gap: 16px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
 }
 
 .appointment-datetime i {
-    margin-right: 4px;
+    margin-right: 5px;
 }
 
 .appointment-reason {
     font-size: 14px;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     color: #333;
+    line-height: 1.5;
 }
 
 .appointment-note {
     font-size: 13px;
     color: #555;
+    background: #f5f7f8;
+    padding: 8px 10px;
+    border-radius: 8px;
+    display: inline-block;
 }
 
 
 /* RIGHT SIDE */
+
 .appointment-right {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 8px;
+    gap: 10px;
     min-width: 180px;
 }
 
@@ -117,25 +218,31 @@
 ================================ */
 
 .badge {
-    padding: 5px 10px;
-    border-radius: 20px;
+    padding: 6px 12px;
+    border-radius: 30px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: 0.2px;
 }
 
 .badge-pending {
-    background: #fff3cd;
-    color: #856404;
+    background: #fff4cc;
+    color: #946200;
 }
 
 .badge-approved {
-    background: #d4edda;
-    color: #155724;
+    background: #dff7e5;
+    color: #146c2e;
 }
 
 .badge-rejected {
-    background: #f8d7da;
-    color: #721c24;
+    background: #ffe2e5;
+    color: #b42318;
+}
+
+.badge-cancelled {
+    background: #e5e7eb;
+    color: #6b7280;
 }
 
 
@@ -146,7 +253,7 @@
 .admin-actions {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
     width: 100%;
 }
 
@@ -157,37 +264,113 @@
 
 
 /* ===============================
+   BULLETIN BOARD
+================================ */
+
+.bulletin-board {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.bulletin-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f9fafb;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #eef1f4;
+}
+
+.bulletin-left {
+    font-size: 14px;
+    color: #344054;
+}
+
+.bulletin-right {
+    display: flex;
+    align-items: center;
+}
+
+
+/* ===============================
    EMPTY STATE
 ================================ */
 
 .empty-state {
     text-align: center;
-    color: #777;
+    color: #888;
     font-size: 14px;
-    padding: 20px;
+    padding: 25px;
 }
 
-/* 🔥 CANCELLED (IMPROVED) */
+
+/* ===============================
+   CANCELLED APPOINTMENTS
+================================ */
+
 .cancelled-card {
-    opacity: 0.45;
+    opacity: 0.5;
     transform: scale(0.97);
-    background: #f1f1f1;
-    pointer-events: none; /* disables hover + clicks */
+    background: #f3f4f6;
+    border: 1px dashed #d1d5db;
 }
 
-/* remove hover effect */
 .cancelled-card:hover {
-    transform: none;
+    transform: scale(0.97);
     box-shadow: none;
 }
 
-/* badge */
-.badge-cancelled {
-    background: #d6d8db;
-    color: #495057;
-}
-
-/* make text smaller */
 .cancelled-card .appointment-left {
     font-size: 13px;
+}
+
+.cancelled-card .appointment-reason {
+    color: #777;
+}
+
+.cancelled-card .student-name {
+    color: #888;
+}
+
+
+/* ===============================
+   ANIMATIONS
+================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 768px) {
+
+    .appointment-card {
+        flex-direction: column;
+    }
+
+    .appointment-right {
+        width: 100%;
+        align-items: stretch;
+    }
+
+    .bulletin-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
 }

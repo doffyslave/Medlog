@@ -335,23 +335,4 @@ form:not(.inline-control) select {
 }
 
 /* CALENDAR */
-.calendar-box {
-    display: flex;
-    align-items: center;
-    gap: 8px;
 
-    padding: 6px 10px;
-    border-radius: 16px;
-
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-}
-
-.calendar-box input {
-    border: none;
-    outline: none;
-    font-size: 12px;
-    background: transparent;
-    cursor: pointer;
-}
