@@ -1,6 +1,9 @@
 <?php
 session_start();
 
+// ini_set('display_errors', 1);
+// error_reporting(E_ALL);
+
 $user = $_SESSION['user'] ?? null;
 
 if (!$user || $user['role'] !== 'admin') {
@@ -8,7 +11,7 @@ if (!$user || $user['role'] !== 'admin') {
     exit();
 }
 
-require 'database/connection.php';
+require 'Database/connection.php';
 
 // FETCH DATA WITH JOIN
 $stmt = $conn->query("
@@ -27,8 +30,8 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <meta charset="UTF-8">
 <title>Stocks Inventory</title>
 
-<link rel="stylesheet" href="css/layout.css">
-<link rel="stylesheet" href="css/stocks.css">
+<link rel="stylesheet" href="Css/layout.css">
+<link rel="stylesheet" href="Css/stocks.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 

@@ -42,8 +42,8 @@ $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <title>Patients</title>
 
 <!-- ✅ FIXED PATH -->
-<link rel="stylesheet" href="/Medlog/Css/layout.css">
-<link rel="stylesheet" href="/Medlog/Css/patients.css">
+<link rel="stylesheet" href="Css/layout.css">
+<link rel="stylesheet" href="Css/patients.css">
 
 </head>
 

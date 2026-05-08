@@ -116,8 +116,8 @@ if ($role === 'admin') {
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<link rel="stylesheet" href="/Medlog/Css/dashboard.css">
-<link rel="stylesheet" href="/Medlog/Css/layout.css">
+<link rel="stylesheet" href="Css/dashboard.css">
+<link rel="stylesheet" href="Css/layout.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 

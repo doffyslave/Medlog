@@ -1,5 +1,5 @@
 <?php
-require 'database/connection.php';
+require 'Database/connection.php';
 session_start();
 
 $user = $_SESSION['user'] ?? null;
@@ -16,8 +16,8 @@ $medicines = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <meta charset="UTF-8">
 <title>Medicines</title>
 
-<link rel="stylesheet" href="css/layout.css">
-<link rel="stylesheet" href="css/stocks.css">
+<link rel="stylesheet" href="Css/layout.css">
+<link rel="stylesheet" href="Css/stocks.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 

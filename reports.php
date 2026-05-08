@@ -96,9 +96,9 @@ $lowStockItems = $conn->query("
 <meta charset="UTF-8">
 <title>Reports</title>
 
-<link rel="stylesheet" href="/Medlog/Css/layout.css">
-<link rel="stylesheet" href="/Medlog/Css/dashboard.css">
-<link rel="stylesheet" href="/Medlog/Css/reports.css">
+<link rel="stylesheet" href="Css/layout.css">
+<link rel="stylesheet" href="Css/dashboard.css">
+<link rel="stylesheet" href="Css/reports.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

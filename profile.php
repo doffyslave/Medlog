@@ -41,9 +41,9 @@ $studentID = $studentNumber
 <meta charset="UTF-8">
 <title>Profile | MedLog</title>
 
-<link rel="stylesheet" href="CSS/layout.css">
-<link rel="stylesheet" href="CSS/dashboard.css">
-<link rel="stylesheet" href="CSS/profile.css"> <!-- 🔥 NEW -->
+<link rel="stylesheet" href="Css/layout.css">
+<link rel="stylesheet" href="Css/dashboard.css">
+<link rel="stylesheet" href="Css/profile.css"> <!-- 🔥 NEW -->
 
 </head>
 

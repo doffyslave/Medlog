@@ -189,9 +189,9 @@ if ($role === 'admin') {
 
     <title>Appointments</title>
 
-    <link rel="stylesheet" href="/MedLog/Css/layout.css">
-    <link rel="stylesheet" href="/MedLog/Css/dashboard.css">
-    <link rel="stylesheet" href="/MedLog/Css/appointments.css">
+    <link rel="stylesheet" href="Css/layout.css">
+    <link rel="stylesheet" href="Css/dashboard.css">
+    <link rel="stylesheet" href="Css/appointments.css">
 
     <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
