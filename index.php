@@ -3,190 +3,181 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>MedLog | Smart Clinic System</title>
+<title>MedLog | Smart School Clinic System</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
-
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      fontFamily: {
-        sans: ['Inter', 'system-ui']
-      },
-      colors: {
-        primary: '#0A1931',
-        secondary: '#1A3D63',
-        accent: '#4A7FA7',
-        soft: '#B3CFE5',
-        light: '#F6FAFD',
-      }
-    }
-  }
-}
-</script>
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
 <style>
-body { overflow-x:hidden; }
+body{font-family:'Inter',system-ui;overflow-x:hidden}
 
-/* BACKGROUND FLOATING ICONS */
-.floating-icons img {
-  position:absolute;
-  width:40px;
-  opacity:0.15;
-  animation: floatIcon 20s linear infinite;
+/* GRADIENT HERO */
+.hero{
+background:linear-gradient(-45deg,#0A1931,#1A3D63,#4A7FA7,#6EA8D9);
+background-size:400% 400%;
+animation:gradientMove 12s ease infinite;
 }
+@keyframes gradientMove{0%{background-position:0%}50%{background-position:100%}100%{background-position:0%}}
 
-@keyframes floatIcon {
-  0% { transform: translateY(100vh) rotate(0deg); }
-  100% { transform: translateY(-120vh) rotate(360deg); }
+/* FLOATING ICONS */
+.floating-icons img{
+position:absolute;width:50px;opacity:0.12;
+animation:floatIcon linear infinite;
 }
+@keyframes floatIcon{0%{transform:translateY(100vh) rotate(0)}100%{transform:translateY(-120vh) rotate(360deg)}}
 
-/* DIFFERENT POSITIONS */
-.floating-icons img:nth-child(1){ left:10%; animation-duration:18s; }
-.floating-icons img:nth-child(2){ left:25%; animation-duration:22s; }
-.floating-icons img:nth-child(3){ left:40%; animation-duration:20s; }
-.floating-icons img:nth-child(4){ left:60%; animation-duration:25s; }
-.floating-icons img:nth-child(5){ left:75%; animation-duration:19s; }
-.floating-icons img:nth-child(6){ left:90%; animation-duration:23s; }
+/* positions */
+.floating-icons img:nth-child(1){left:10%;animation-duration:18s}
+.floating-icons img:nth-child(2){left:25%;animation-duration:22s}
+.floating-icons img:nth-child(3){left:40%;animation-duration:20s}
+.floating-icons img:nth-child(4){left:60%;animation-duration:25s}
+.floating-icons img:nth-child(5){left:75%;animation-duration:19s}
+.floating-icons img:nth-child(6){left:90%;animation-duration:23s}
 
-/* HERO GRADIENT */
-.hero {
-  background: linear-gradient(-45deg,#0A1931,#1A3D63,#4A7FA7,#6EA8D9);
-  background-size:400% 400%;
-  animation: gradientMove 12s ease infinite;
-}
-
-@keyframes gradientMove {
-  0%{background-position:0%}
-  50%{background-position:100%}
-  100%{background-position:0%}
-}
-
-/* GLASS */
-.glass {
-  background: rgba(0,0,0,0.35);
-  backdrop-filter: blur(16px);
-  border-radius: 20px;
-}
-
-/* HOVER */
-.card:hover {
-  transform: translateY(-10px) scale(1.03);
-  transition:0.3s;
-}
+/* CARD */
+.card{transition:0.3s}
+.card:hover{transform:translateY(-12px) scale(1.04)}
 
 </style>
 </head>
 
-<body class="bg-light font-sans">
+<body class="bg-[#F6FAFD]">
 
 <!-- NAVBAR -->
-<nav class="bg-primary text-white sticky top-0 z-50 shadow">
-  <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-    <h1 class="font-bold text-xl">MedLog</h1>
-    <a href="auth/login.php" class="px-4 py-2 border border-soft rounded-lg hover:bg-secondary">Login</a>
-  </div>
+<nav class="bg-[#0A1931] text-white sticky top-0 z-50">
+<div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
+<h1 class="font-bold text-xl">MedLog</h1>
+<div class="hidden md:flex gap-6">
+<a href="#features">Features</a>
+<a href="#how">How it Works</a>
+<a href="#about">About</a>
+</div>
+<a href="auth/login.php" class="border px-4 py-2 rounded-lg">Login</a>
+</div>
 </nav>
 
 <!-- HERO -->
 <section class="hero text-white py-32 text-center relative overflow-hidden">
 
-<!-- FLOATING MEDICAL ICONS -->
 <div class="floating-icons">
-  <img src="https://cdn-icons-png.flaticon.com/512/2966/2966480.png">
-  <img src="https://cdn-icons-png.flaticon.com/512/4320/4320337.png">
-  <img src="https://cdn-icons-png.flaticon.com/512/3209/3209265.png">
-  <img src="https://cdn-icons-png.flaticon.com/512/3771/3771417.png">
-  <img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png">
-  <img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png">
+<img src="https://cdn-icons-png.flaticon.com/512/2966/2966480.png">
+<img src="https://cdn-icons-png.flaticon.com/512/3209/3209265.png">
+<img src="https://cdn-icons-png.flaticon.com/512/3771/3771417.png">
+<img src="https://cdn-icons-png.flaticon.com/512/4320/4320337.png">
+<img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png">
+<img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png">
 </div>
 
-<div class="max-w-5xl mx-auto glass p-12 relative z-10">
+<div class="max-w-6xl mx-auto px-6">
 
-<h1 class="text-6xl font-extrabold leading-tight">
-Smart School Clinic System
+<h1 class="text-6xl md:text-7xl font-extrabold leading-tight">
+School Clinic Management Made Simple
 </h1>
 
-<p class="mt-6 text-lg text-soft">
-Digitize records, monitor student health, track medicine inventory, and generate reports instantly.
+<p class="mt-6 text-xl text-[#B3CFE5] max-w-3xl mx-auto">
+MedLog helps school nurses manage student health records, monitor clinic visits, track medicine inventory, and generate reports — all in one powerful system.
 </p>
 
-<div class="mt-8">
-<a href="auth/login.php" class="px-8 py-4 bg-white text-primary rounded-xl font-semibold">
+<div class="mt-10">
+<a href="auth/login.php" class="bg-white text-[#0A1931] px-10 py-4 rounded-xl text-lg font-semibold">
 Get Started
 </a>
 </div>
 
-<!-- NEW MEDICAL LOTTIE -->
-<!-- BETTER SCHOOL NURSE / MEDICAL LOTTIE -->
+<!-- BEST MATCH ANIMATION (HEALTHCARE DASHBOARD STYLE) -->
 <lottie-player
-  src="https://assets9.lottiefiles.com/packages/lf20_j1adxtyb.json"
-  style="width:360px;height:360px;margin:auto;margin-top:40px;"
-  loop autoplay>
+src="https://assets1.lottiefiles.com/packages/lf20_iorpbol0.json"
+style="width:420px;height:420px;margin:auto;margin-top:50px"
+loop autoplay>
 </lottie-player>
 
 </div>
 </section>
 
+<!-- STATS SECTION -->
+<section class="py-20 text-center">
+<div class="max-w-6xl mx-auto grid md:grid-cols-4 gap-8">
+<div>
+<h3 class="text-4xl font-bold text-[#0A1931]">100%</h3>
+<p>Digital Records</p>
+</div>
+<div>
+<h3 class="text-4xl font-bold text-[#0A1931]">24/7</h3>
+<p>Access</p>
+</div>
+<div>
+<h3 class="text-4xl font-bold text-[#0A1931]">Real-Time</h3>
+<p>Inventory Tracking</p>
+</div>
+<div>
+<h3 class="text-4xl font-bold text-[#0A1931]">Secure</h3>
+<p>Data Protection</p>
+</div>
+</div>
+</section>
+
 <!-- FEATURES -->
-<section class="py-24 text-center">
-<h2 class="text-4xl font-bold text-primary mb-16">Core Features</h2>
+<section id="features" class="py-24 bg-white text-center">
+<h2 class="text-4xl font-bold mb-16">Everything You Need</h2>
 
 <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-10 px-6">
 
-<div class="bg-white p-8 rounded-2xl shadow card">
-<h3 class="font-bold text-xl mb-4">Student Health Records</h3>
-<p>Securely store and manage student medical histories, allergies, and clinic visits.</p>
+<div class="p-8 shadow rounded-2xl card">
+<h3 class="font-bold text-xl mb-4">Health Records</h3>
+<p>Track student illnesses, allergies, visits, and treatment history in one place.</p>
 </div>
 
-<div class="bg-white p-8 rounded-2xl shadow card">
-<h3 class="font-bold text-xl mb-4">Medicine Inventory</h3>
-<p>Track stock levels, expiration dates, and medicine usage in real-time.</p>
+<div class="p-8 shadow rounded-2xl card">
+<h3 class="font-bold text-xl mb-4">Inventory System</h3>
+<p>Monitor medicines, supplies, and expiration dates automatically.</p>
 </div>
 
-<div class="bg-white p-8 rounded-2xl shadow card">
-<h3 class="font-bold text-xl mb-4">Analytics & Reports</h3>
-<p>Generate insights and reports for better decision-making and compliance.</p>
-</div>
-
-</div>
-</section>
-
-<!-- EXTRA INFO SECTION -->
-<section class="bg-primary text-white py-24 text-center">
-<h2 class="text-4xl font-bold mb-8">Why MedLog?</h2>
-
-<div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-10 px-6">
-
-<div>
-<h3 class="font-bold text-xl mb-2">⚡ Fast & Efficient</h3>
-<p>Reduce paperwork and save time with digital workflows.</p>
-</div>
-
-<div>
-<h3 class="font-bold text-xl mb-2">🔒 Secure Data</h3>
-<p>Ensure student health information is protected and confidential.</p>
-</div>
-
-<div>
-<h3 class="font-bold text-xl mb-2">📊 Smart Insights</h3>
-<p>Understand trends in student health and clinic usage.</p>
-</div>
-
-<div>
-<h3 class="font-bold text-xl mb-2">🏫 Built for Schools</h3>
-<p>Designed specifically for school nurses and administrators.</p>
+<div class="p-8 shadow rounded-2xl card">
+<h3 class="font-bold text-xl mb-4">Reports & Analytics</h3>
+<p>Generate insights for school administrators and health planning.</p>
 </div>
 
 </div>
 </section>
 
-<footer class="bg-primary text-white text-center py-6 text-sm">
+<!-- HOW IT WORKS -->
+<section id="how" class="py-24 text-center">
+<h2 class="text-4xl font-bold mb-16">How MedLog Works</h2>
+
+<div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-10">
+<div>
+<h3 class="font-bold text-xl">1. Record</h3>
+<p>Input student health data during clinic visits.</p>
+</div>
+<div>
+<h3 class="font-bold text-xl">2. Track</h3>
+<p>Monitor medicine usage and student trends.</p>
+</div>
+<div>
+<h3 class="font-bold text-xl">3. Analyze</h3>
+<p>Generate reports and insights instantly.</p>
+</div>
+</div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="bg-[#0A1931] text-white py-24 text-center">
+<h2 class="text-4xl font-bold mb-6">Built for School Nurses</h2>
+<p class="max-w-3xl mx-auto text-[#B3CFE5]">
+MedLog is designed specifically for school clinics to reduce paperwork, improve efficiency, and ensure every student receives proper healthcare attention.
+</p>
+</section>
+
+<!-- CTA -->
+<section class="py-24 text-center">
+<h2 class="text-4xl font-bold mb-6">Start Managing Your Clinic Smarter</h2>
+<a href="auth/login.php" class="bg-[#0A1931] text-white px-10 py-4 rounded-xl text-lg">
+Launch MedLog
+</a>
+</section>
+
+<footer class="bg-[#0A1931] text-white text-center py-6">
 <p>© 2026 MedLog</p>
 </footer>
 
