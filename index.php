@@ -123,9 +123,10 @@ Get Started
 </div>
 
 <!-- NEW MEDICAL LOTTIE -->
+<!-- BETTER SCHOOL NURSE / MEDICAL LOTTIE -->
 <lottie-player
-  src="https://assets2.lottiefiles.com/packages/lf20_5tl1xxnz.json"
-  style="width:350px;height:350px;margin:auto;margin-top:40px;"
+  src="https://assets9.lottiefiles.com/packages/lf20_j1adxtyb.json"
+  style="width:360px;height:360px;margin:auto;margin-top:40px;"
   loop autoplay>
 </lottie-player>
 
