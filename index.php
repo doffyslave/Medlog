@@ -1,123 +1,89 @@
 <!DOCTYPE html>
-<html lang="en" class="transition-colors duration-500" data-theme="light">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MedLog | Smart School Clinic System</title>
 
-<!-- Tailwind CSS CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
-<!-- Lottie -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-<!-- AOS -->
-<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-<!-- GSAP for animations -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
-</head>
 
 <style>
-body {
-  font-family: 'Inter', system-ui;
-  overflow-x: hidden;
+body{font-family:'Inter',system-ui;overflow-x:hidden}
+
+/* GRADIENT HERO */
+.hero{
+background:linear-gradient(-45deg,#0A1931,#1A3D63,#4A7FA7,#6EA8D9);
+background-size:400% 400%;
+animation:gradientMove 12s ease infinite;
 }
-/* Gradient Hero */
-.hero {
-  background: linear-gradient(-45deg, #0A1931, #1A3D63, #4A7FA7, #6EA8D9);
-  background-size: 400% 400%;
-  animation: gradientMove 12s ease infinite;
+@keyframes gradientMove{0%{background-position:0%}50%{background-position:100%}100%{background-position:0%}}
+
+/* FLOATING ICONS */
+.floating-icons img{
+position:absolute;width:50px;opacity:0.12;
+animation:floatIcon linear infinite;
 }
-@keyframes gradientMove {
-  0% {background-position: 0%}
-  50% {background-position: 100%}
-  100% {background-position: 0%}
+@keyframes floatIcon{0%{transform:translateY(100vh) rotate(0)}100%{transform:translateY(-120vh) rotate(360deg)}}
+.floating-icons img:nth-child(1){left:10%;animation-duration:18s}
+.floating-icons img:nth-child(2){left:25%;animation-duration:22s}
+.floating-icons img:nth-child(3){left:40%;animation-duration:20s}
+.floating-icons img:nth-child(4){left:60%;animation-duration:25s}
+.floating-icons img:nth-child(5){left:75%;animation-duration:19s}
+.floating-icons img:nth-child(6){left:90%;animation-duration:23s}
+
+/* CARDS */
+.card{transition:0.35s}
+.card:hover{transform:translateY(-14px) scale(1.05);box-shadow:0 20px 40px rgba(0,0,0,0.15)}
+
+/* GLOW SECTION */
+.glow-section{
+background: radial-gradient(circle at top,#1A3D63,#0A1931);
 }
-/* Floating icons animation */
-.floating-icons img {
-  position: absolute;
-  width: 50px;
-  opacity: 0.12;
-  animation: floatIcon linear infinite;
+
+/* CTA BOX */
+.cta-box{
+background: linear-gradient(135deg,#4A7FA7,#6EA8D9);
+border-radius:20px;
+padding:40px;
+box-shadow:0 20px 50px rgba(0,0,0,0.2);
 }
-@keyframes floatIcon {
-  0% {transform: translateY(100vh) rotate(0)}
-  100% {transform: translateY(-120vh) rotate(360deg)}
-}
-.floating-icons img:nth-child(1) { left: 10%; animation-duration: 18s; }
-.floating-icons img:nth-child(2) { left: 25%; animation-duration: 22s; }
-.floating-icons img:nth-child(3) { left: 40%; animation-duration: 20s; }
-.floating-icons img:nth-child(4) { left: 60%; animation-duration: 25s; }
-.floating-icons img:nth-child(5) { left: 75%; animation-duration: 19s; }
-.floating-icons img:nth-child(6) { left: 90%; animation-duration: 23s; }
-.card {
-  transition: 0.35s;
-}
-.card:hover {
-  transform: translateY(-14px) scale(1.05);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-}
-/* Glow section */
-.glow-section {
-  background: radial-gradient(circle at top, #1A3D63, #0A1931);
-}
-/* CTA box */
-.cta-box {
-  background: linear-gradient(135deg, #4A7FA7, #6EA8D9);
-  border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-}
-/* Dark mode styles */
-[data-theme="dark"] body {
-  background-color: #111;
-  color: #eee;
-}
-[data-theme="dark"] nav {
-  background-color: #222;
-}
-[data-theme="dark"] section {
-  background-color: #222;
-  color: #eee;
-}
+
 </style>
+</head>
 
-<body class="bg-[#F6FAFD] transition-colors duration-500">
-
-<!-- Dark Mode Toggle Button -->
-<div class="fixed top-4 right-4 z-50">
-  <button id="theme-toggle" class="bg-white text-[#0A1931] px-4 py-2 rounded-lg shadow-lg hover:bg-gray-200 transition">
-    Toggle Dark Mode
-  </button>
-</div>
+<body class="bg-[#F6FAFD]">
 
 <!-- NAVBAR -->
-<nav class="bg-[#0A1931] text-white sticky top-0 z-50 shadow transition-colors duration-500" id="navbar">
-  <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-    <h1 class="font-bold text-xl">MedLog</h1>
-    <div class="hidden md:flex gap-6">
-      <a href="#features" class="hover:underline">Features</a>
-      <a href="#how" class="hover:underline">How it Works</a>
-      <a href="#about" class="hover:underline">About</a>
-    </div>
-    <a href="auth/login.php" class="border px-4 py-2 rounded-lg hover:bg-white hover:text-[#0A1931] transition">Login</a>
-  </div>
+<nav class="bg-[#0A1931] text-white sticky top-0 z-50 shadow">
+<div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
+<h1 class="font-bold text-xl">MedLog</h1>
+<div class="hidden md:flex gap-6">
+<a href="#features">Features</a>
+<a href="#how">How it Works</a>
+<a href="#about">About</a>
+</div>
+<a href="auth/login.php" class="border px-4 py-2 rounded-lg hover:bg-white hover:text-[#0A1931] transition">Login</a>
+</div>
 </nav>
 
 <!-- HERO -->
-<section class="hero text-white py-32 text-center relative overflow-hidden" id="hero">
+<section class="hero text-white py-32 text-center relative overflow-hidden">
 
 <div class="floating-icons">
-<img src="https://cdn-icons-png.flaticon.com/512/2966/2966480.png" />
-<img src="https://cdn-icons-png.flaticon.com/512/3209/3209265.png" />
-<img src="https://cdn-icons-png.flaticon.com/512/3771/3771417.png" />
-<img src="https://cdn-icons-png.flaticon.com/512/4320/4320337.png" />
-<img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png" />
-<img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png" />
+<img src="https://cdn-icons-png.flaticon.com/512/2966/2966480.png">
+<img src="https://cdn-icons-png.flaticon.com/512/3209/3209265.png">
+<img src="https://cdn-icons-png.flaticon.com/512/3771/3771417.png">
+<img src="https://cdn-icons-png.flaticon.com/512/4320/4320337.png">
+<img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png">
+<img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png">
 </div>
 
 <div class="max-w-6xl mx-auto px-6">
+
 <h1 class="text-6xl md:text-7xl font-extrabold leading-tight" data-aos="fade-up">
 School Clinic Management Made Simple
 </h1>
@@ -127,9 +93,9 @@ MedLog helps school nurses manage student health records, monitor clinic visits,
 </p>
 
 <div class="mt-10" data-aos="zoom-in" data-aos-delay="400">
-  <a href="auth/login.php" class="bg-white text-[#0A1931] px-10 py-4 rounded-xl text-lg font-semibold shadow-lg hover:scale-105 transition" style="display:inline-block;">
-    Get Started
-  </a>
+<a href="auth/login.php" class="bg-white text-[#0A1931] px-10 py-4 rounded-xl text-lg font-semibold shadow-lg hover:scale-105 transition">
+Get Started
+</a>
 </div>
 
 <!-- NURSE HELPING PATIENT ANIMATION -->
@@ -138,6 +104,7 @@ src="https://assets7.lottiefiles.com/packages/lf20_tutvdkg0.json"
 style="width:420px;height:420px;margin:auto;margin-top:50px"
 loop autoplay>
 </lottie-player>
+
 </div>
 </section>
 
@@ -186,6 +153,7 @@ loop autoplay>
 <p class="max-w-3xl mx-auto text-[#B3CFE5] mb-10" data-aos="fade-up" data-aos-delay="200">
 MedLog is designed to reduce paperwork, improve clinic efficiency, and ensure every student receives proper healthcare attention.
 </p>
+
 <div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-8">
 <div class="bg-white/10 p-6 rounded-xl backdrop-blur" data-aos="fade-up">⚡ Faster Workflow</div>
 <div class="bg-white/10 p-6 rounded-xl backdrop-blur" data-aos="fade-up" data-aos-delay="150">🔒 Secure Data</div>
@@ -197,43 +165,18 @@ MedLog is designed to reduce paperwork, improve clinic efficiency, and ensure ev
 <section class="py-24 text-center bg-[#F6FAFD]">
 <div class="max-w-4xl mx-auto cta-box" data-aos="zoom-in">
 <h2 class="text-4xl font-bold text-white mb-6">Start Managing Your Clinic Smarter</h2>
-<a href="auth/login.php" class="bg-white text-[#0A1931] px-10 py-4 rounded-xl text-lg font-semibold hover:scale-105 transition" style="display:inline-block;">
+<a href="auth/login.php" class="bg-white text-[#0A1931] px-10 py-4 rounded-xl text-lg font-semibold hover:scale-105 transition">
 Launch MedLog
 </a>
 </div>
 </section>
 
-<!-- Footer -->
 <footer class="bg-[#0A1931] text-white text-center py-6">
 <p>© 2026 MedLog</p>
 </footer>
 
-<!-- Scripts -->
 <script>
 AOS.init({duration:1000,once:true});
-
-// Theme toggle
-const themeButton = document.getElementById('theme-toggle');
-const htmlElement = document.documentElement;
-themeButton.addEventListener('click', () => {
-  const currentTheme = htmlElement.getAttribute('data-theme');
-  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-  htmlElement.setAttribute('data-theme', newTheme);
-});
-
-// GSAP animations example
-gsap.from("#hero h1", { y: -50, opacity: 0, duration: 1, ease: "power2.out" });
-gsap.from("#hero p", { y: 50, opacity: 0, duration: 1, delay: 0.5, ease: "power2.out" });
-
-// Optional: animate navbar on scroll for sticky effect
-window.addEventListener('scroll', () => {
-  const navbar = document.getElementById('navbar');
-  if (window.scrollY > 50) {
-    navbar.classList.add('bg-[#0A1931]/90');
-  } else {
-    navbar.classList.remove('bg-[#0A1931]/90');
-  }
-});
 </script>
 
 </body>
