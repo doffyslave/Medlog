@@ -167,8 +167,8 @@ if ($role === 'admin') {
                         </div>
 
                         <!-- Calendar -->
-                        <div class="calendar-box">
-                            <input type="date" id="calendarFilter">
+                        <div class="calendar-box" onclick="openCalendar()">
+                            <input class="badge" type="date" id="calendarFilter">
                         </div>
 
                     </div>
