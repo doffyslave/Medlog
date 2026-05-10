@@ -28,7 +28,8 @@ $nurseStatus = $statusData['nurse_status'] ?? 'Available';
 
 
 // ================= SAFE FUNCTION =================
-function getSingle($conn, $query) {
+function getSingle($conn, $query)
+{
     try {
         $result = $conn->query($query);
         return $result ? ($result->fetch()['total'] ?? 0) : 0;
@@ -76,7 +77,8 @@ if ($role === 'student') {
         $stmt->execute([$user_id]);
         $lastVisit = $stmt->fetch()['visit_date'] ?? null;
 
-    } catch (Exception $e) {}
+    } catch (Exception $e) {
+    }
 }
 
 
@@ -94,7 +96,8 @@ if ($role === 'admin') {
             LIMIT 5
         ");
         $recentVisits = $q ? $q->fetchAll() : [];
-    } catch (Exception $e) {}
+    } catch (Exception $e) {
+    }
 
     try {
         $q = $conn->query("
@@ -104,296 +107,302 @@ if ($role === 'admin') {
             LIMIT 5
         ");
         $lowStockItems = $q ? $q->fetchAll() : [];
-    } catch (Exception $e) {}
+    } catch (Exception $e) {
+    }
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>MedLog Dashboard</title>
+    <meta charset="UTF-8">
+    <title>MedLog Dashboard</title>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<link rel="stylesheet" href="Css/dashboard.css">
-<link rel="stylesheet" href="Css/layout.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="Css/dashboard.css">
+    <link rel="stylesheet" href="Css/layout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
 
-<div class="dashboard">
+    <div class="dashboard">
 
-<?php include 'includes/sidebar.php'; ?>
+        <?php include 'includes/sidebar.php'; ?>
 
-<main class="main-content">
+        <main class="main-content">
 
-<?php include 'includes/header.php'; ?>
+            <?php include 'includes/header.php'; ?>
 
-<section class="content">
+            <section class="content">
 
-<!-- 🔷 SHARED STATUS -->
-<div class="top-row">
+                <!-- 🔷 SHARED STATUS -->
+                <div class="top-row">
 
-    <div class="title-group">
-        <h1>Dashboard</h1>
-        <p class="subtitle">Welcome back! Here's your clinic overview.</p>
+                    <div class="title-group">
+                        <h1>Dashboard</h1>
+                        <p class="subtitle">Welcome back! Here's your clinic overview.</p>
+                    </div>
+
+                    <div class="status-inline">
+
+                        <!-- Clinic Status (CLICKABLE) -->
+                        <div class="inline-badge clickable <?= strtolower($clinicStatus) ?>"
+                            onclick="openModal('clinicModal')">
+                            <i class="fas fa-clinic-medical"></i>
+                            <span class="badge">
+                                <?= $clinicStatus ?>
+                            </span>
+                        </div>
+
+                        <!-- Nurse Status (CLICKABLE) -->
+                        <div class="inline-badge clickable <?= strtolower($nurseStatus) ?>"
+                            onclick="openModal('nurseModal')">
+                            <i class="fas fa-user-nurse"></i>
+                            <span class="badge">
+                                <?= $nurseStatus ?>
+                            </span>
+                        </div>
+
+                        <!-- Calendar -->
+                        <div class="calendar-box">
+                            <input type="date" id="calendarFilter">
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- 🔴 ADMIN DASHBOARD -->
+                <?php if ($role === 'admin'): ?>
+
+                    <div class="grid-4">
+
+                        <div class="card stat">
+                            <i class="fas fa-users"></i>
+                            <div>
+                                <h2><?= $totalPatients ?></h2>
+                                <p>Patients</p>
+                            </div>
+                        </div>
+
+                        <div class="card stat">
+                            <i class="fas fa-file-medical"></i>
+                            <div>
+                                <h2><?= $totalRecords ?></h2>
+                                <p>Records</p>
+                            </div>
+                        </div>
+
+                        <div class="card stat">
+                            <i class="fas fa-heartbeat"></i>
+                            <div>
+                                <h2><?= $totalVisits ?></h2>
+                                <p>Visits</p>
+                            </div>
+                        </div>
+
+                        <div class="card stat danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <h2><?= $totalLowStock ?></h2>
+                                <p>Low Stock</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="grid-2">
+
+                        <div class="card">
+                            <h3>Recent Visits</h3>
+
+                            <?php foreach ($recentVisits as $visit): ?>
+                                <div class="list-item">
+                                    <div>
+                                        <strong><?= $visit['name'] ?></strong>
+                                        <p><?= $visit['complaint'] ?></p>
+                                    </div>
+
+                                    <div class="visit-meta">
+                                        <div><?= date("M d, Y", strtotime($visit['visit_date'])) ?></div>
+                                        <div class="visit-time">
+                                            <?= date("h:i A", strtotime($visit['visit_date'])) ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+
+                        </div>
+
+                        <div class="card">
+                            <h3>Low Stock</h3>
+
+                            <?php foreach ($lowStockItems as $item):
+                                $qty = (int) $item['total_quantity'];
+                                if ($qty > 10)
+                                    continue;
+                                ?>
+
+                                <div class="list-item danger-bg">
+                                    <div>
+                                        <strong><?= $item['medicine_name'] ?></strong>
+                                    </div>
+                                    <div><?= $qty ?></div>
+                                </div>
+
+                            <?php endforeach; ?>
+
+                        </div>
+
+                    </div>
+
+                <?php endif; ?>
+
+
+                <!-- 🔵 STUDENT DASHBOARD -->
+                <?php if ($role === 'student'): ?>
+
+                    <div class="grid-2">
+
+                        <div class="card stat">
+                            <i class="fas fa-heartbeat"></i>
+                            <div>
+                                <h2><?= $myTotalVisits ?></h2>
+                                <p>My Visits</p>
+                            </div>
+                        </div>
+
+                        <div class="card stat">
+                            <i class="fas fa-calendar-check"></i>
+                            <div>
+                                <h2><?= $lastVisit ? date("M d", strtotime($lastVisit)) : 'N/A' ?></h2>
+                                <p>Last Visit</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="card">
+                        <h3>My Recent Visits</h3>
+
+                        <?php if ($myVisits): ?>
+                            <?php foreach ($myVisits as $visit): ?>
+                                <div class="list-item">
+                                    <div>
+                                        <p><?= $visit['complaint'] ?></p>
+                                    </div>
+                                    <div class="visit-meta">
+                                        <?= date("M d, Y h:i A", strtotime($visit['visit_date'])) ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p>No visit records yet.</p>
+                        <?php endif; ?>
+
+                    </div>
+
+                <?php endif; ?>
+
+            </section>
+        </main>
     </div>
 
-    <div class="status-inline">
+    <!-- CLINIC MODAL -->
+    <div id="clinicModal" class="modal">
+        <div class="modal-content">
+            <h3>Update Clinic Status</h3>
 
-        <!-- Clinic Status (CLICKABLE) -->
-        <div class="inline-badge clickable" onclick="openModal('clinicModal')">
-            <i class="fas fa-clinic-medical"></i>
-            <span class="badge <?= strtolower($clinicStatus) ?>">
-                <?= $clinicStatus ?>
-            </span>
+            <form method="POST">
+                <select name="clinic_status">
+                    <option <?= $clinicStatus == 'Open' ? 'selected' : '' ?>>Open</option>
+                    <option <?= $clinicStatus == 'Closed' ? 'selected' : '' ?>>Closed</option>
+                </select>
+
+                <input type="hidden" name="nurse_status" value="<?= $nurseStatus ?>">
+
+                <button type="submit" name="update_status" class="btn-primary">Save</button>
+            </form>
+
+            <span class="close" onclick="closeModal('clinicModal')">&times;</span>
         </div>
-
-        <!-- Nurse Status (CLICKABLE) -->
-        <div class="inline-badge clickable" onclick="openModal('nurseModal')">
-            <i class="fas fa-user-nurse"></i>
-            <span class="badge <?= strtolower($nurseStatus) ?>">
-                <?= $nurseStatus ?>
-            </span>
-        </div>
-
-        <!-- Calendar -->
-        <div class="calendar-box">
-            <input type="date" id="calendarFilter">
-        </div>
-
     </div>
 
-</div>
+    <!-- NURSE MODAL -->
+    <div id="nurseModal" class="modal">
+        <div class="modal-content">
+            <h3>Update Nurse Status</h3>
 
-<!-- 🔴 ADMIN DASHBOARD -->
-<?php if ($role === 'admin'): ?>
+            <form method="POST">
+                <select name="nurse_status">
+                    <option <?= $nurseStatus == 'Available' ? 'selected' : '' ?>>Available</option>
+                    <option <?= $nurseStatus == 'Lunch' ? 'selected' : '' ?>>Lunch</option>
+                    <option <?= $nurseStatus == 'Offline' ? 'selected' : '' ?>>Offline</option>
+                </select>
 
-<div class="grid-4">
+                <input type="hidden" name="clinic_status" value="<?= $clinicStatus ?>">
 
-    <div class="card stat">
-        <i class="fas fa-users"></i>
-        <div>
-            <h2><?= $totalPatients ?></h2>
-            <p>Patients</p>
+                <button type="submit" name="update_status" class="btn-primary">Save</button>
+            </form>
+
+            <span class="close" onclick="closeModal('nurseModal')">&times;</span>
         </div>
     </div>
-
-    <div class="card stat">
-        <i class="fas fa-file-medical"></i>
-        <div>
-            <h2><?= $totalRecords ?></h2>
-            <p>Records</p>
-        </div>
-    </div>
-
-    <div class="card stat">
-        <i class="fas fa-heartbeat"></i>
-        <div>
-            <h2><?= $totalVisits ?></h2>
-            <p>Visits</p>
-        </div>
-    </div>
-
-    <div class="card stat danger">
-        <i class="fas fa-exclamation-triangle"></i>
-        <div>
-            <h2><?= $totalLowStock ?></h2>
-            <p>Low Stock</p>
-        </div>
-    </div>
-
-</div>
-
-<div class="grid-2">
-
-<div class="card">
-<h3>Recent Visits</h3>
-
-<?php foreach ($recentVisits as $visit): ?>
-<div class="list-item">
-    <div>
-        <strong><?= $visit['name'] ?></strong>
-        <p><?= $visit['complaint'] ?></p>
-    </div>
-
-    <div class="visit-meta">
-        <div><?= date("M d, Y", strtotime($visit['visit_date'])) ?></div>
-        <div class="visit-time">
-            <?= date("h:i A", strtotime($visit['visit_date'])) ?>
-        </div>
-    </div>
-</div>
-<?php endforeach; ?>
-
-</div>
-
-<div class="card">
-<h3>Low Stock</h3>
-
-<?php foreach ($lowStockItems as $item): 
-$qty = (int) $item['total_quantity'];
-if ($qty > 10) continue;
-?>
-
-<div class="list-item danger-bg">
-    <div>
-        <strong><?= $item['medicine_name'] ?></strong>
-    </div>
-    <div><?= $qty ?></div>
-</div>
-
-<?php endforeach; ?>
-
-</div>
-
-</div>
-
-<?php endif; ?>
-
-
-<!-- 🔵 STUDENT DASHBOARD -->
-<?php if ($role === 'student'): ?>
-
-<div class="grid-2">
-
-<div class="card stat">
-    <i class="fas fa-heartbeat"></i>
-    <div>
-        <h2><?= $myTotalVisits ?></h2>
-        <p>My Visits</p>
-    </div>
-</div>
-
-<div class="card stat">
-    <i class="fas fa-calendar-check"></i>
-    <div>
-        <h2><?= $lastVisit ? date("M d", strtotime($lastVisit)) : 'N/A' ?></h2>
-        <p>Last Visit</p>
-    </div>
-</div>
-
-</div>
-
-<div class="card">
-<h3>My Recent Visits</h3>
-
-<?php if ($myVisits): ?>
-<?php foreach ($myVisits as $visit): ?>
-<div class="list-item">
-    <div>
-        <p><?= $visit['complaint'] ?></p>
-    </div>
-    <div class="visit-meta">
-        <?= date("M d, Y h:i A", strtotime($visit['visit_date'])) ?>
-    </div>
-</div>
-<?php endforeach; ?>
-<?php else: ?>
-<p>No visit records yet.</p>
-<?php endif; ?>
-
-</div>
-
-<?php endif; ?>
-
-</section>
-</main>
-</div>
-
-<!-- CLINIC MODAL -->
-<div id="clinicModal" class="modal">
-    <div class="modal-content">
-        <h3>Update Clinic Status</h3>
-
-        <form method="POST">
-            <select name="clinic_status">
-                <option <?= $clinicStatus=='Open'?'selected':'' ?>>Open</option>
-                <option <?= $clinicStatus=='Closed'?'selected':'' ?>>Closed</option>
-            </select>
-
-            <input type="hidden" name="nurse_status" value="<?= $nurseStatus ?>">
-
-            <button type="submit" name="update_status" class="btn-primary">Save</button>
-        </form>
-
-        <span class="close" onclick="closeModal('clinicModal')">&times;</span>
-    </div>
-</div>
-
-<!-- NURSE MODAL -->
-<div id="nurseModal" class="modal">
-    <div class="modal-content">
-        <h3>Update Nurse Status</h3>
-
-        <form method="POST">
-            <select name="nurse_status">
-                <option <?= $nurseStatus=='Available'?'selected':'' ?>>Available</option>
-                <option <?= $nurseStatus=='Lunch'?'selected':'' ?>>Lunch</option>
-                <option <?= $nurseStatus=='Offline'?'selected':'' ?>>Offline</option>
-            </select>
-
-            <input type="hidden" name="clinic_status" value="<?= $clinicStatus ?>">
-
-            <button type="submit" name="update_status" class="btn-primary">Save</button>
-        </form>
-
-        <span class="close" onclick="closeModal('nurseModal')">&times;</span>
-    </div>
-</div>
-<script>
-function openModal(id) {
-    document.getElementById(id).style.display = "flex";
-}
-
-function closeModal(id) {
-    document.getElementById(id).style.display = "none";
-}
-
-// close when clicking outside
-window.onclick = function(e) {
-    document.querySelectorAll('.modal').forEach(modal => {
-        if (e.target === modal) {
-            modal.style.display = "none";
+    <script>
+        function openModal(id) {
+            document.getElementById(id).style.display = "flex";
         }
-    });
-}
 
-const calendarInput = document.getElementById('calendarFilter');
-const calendarText = document.getElementById('calendarText');
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
 
-const today = new Date();
-calendarInput.value = today.toISOString().split('T')[0];
+        // close when clicking outside
+        window.onclick = function (e) {
+            document.querySelectorAll('.modal').forEach(modal => {
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+        }
 
-// format like "May 5, 2026"
-function formatDate(date) {
-    return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    });
-}
+        const calendarInput = document.getElementById('calendarFilter');
+        const calendarText = document.getElementById('calendarText');
 
-calendarText.innerText = formatDate(today);
+        const today = new Date();
+        calendarInput.value = today.toISOString().split('T')[0];
 
-calendarInput.addEventListener('change', function () {
-    calendarText.innerText = formatDate(new Date(this.value));
-});
+        // format like "May 5, 2026"
+        function formatDate(date) {
+            return date.toLocaleDateString('en-US',{
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
 
-function openCalendar() {
-    const input = document.getElementById('calendarFilter');
+        calendarText.innerText = formatDate(today);
 
-    // focus is important for some browsers
-    input.focus();
+        calendarInput.addEventListener('change',function () {
+            calendarText.innerText = formatDate(new Date(this.value));
+        });
 
-    if (input.showPicker) {
-        input.showPicker();
-    } else {
-        input.click(); // fallback
-    }
-}
-</script>
+        function openCalendar() {
+            const input = document.getElementById('calendarFilter');
+
+            // focus is important for some browsers
+            input.focus();
+
+            if (input.showPicker) {
+                input.showPicker();
+            } else {
+                input.click(); // fallback
+            }
+        }
+    </script>
 </body>
+
 </html>
