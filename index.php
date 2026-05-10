@@ -23,7 +23,6 @@ body {
   font-family: 'Inter', system-ui;
   overflow-x: hidden;
 }
-
 /* Gradient Hero */
 .hero {
   background: linear-gradient(-45deg, #0A1931, #1A3D63, #4A7FA7, #6EA8D9);
@@ -35,7 +34,6 @@ body {
   50% {background-position: 100%}
   100% {background-position: 0%}
 }
-
 /* Floating icons animation */
 .floating-icons img {
   position: absolute;
@@ -53,7 +51,6 @@ body {
 .floating-icons img:nth-child(4) { left: 60%; animation-duration: 25s; }
 .floating-icons img:nth-child(5) { left: 75%; animation-duration: 19s; }
 .floating-icons img:nth-child(6) { left: 90%; animation-duration: 23s; }
-
 .card {
   transition: 0.35s;
 }
@@ -61,12 +58,10 @@ body {
   transform: translateY(-14px) scale(1.05);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
-
 /* Glow section */
 .glow-section {
   background: radial-gradient(circle at top, #1A3D63, #0A1931);
 }
-
 /* CTA box */
 .cta-box {
   background: linear-gradient(135deg, #4A7FA7, #6EA8D9);
@@ -74,7 +69,6 @@ body {
   padding: 40px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
 }
-
 /* Dark mode styles */
 [data-theme="dark"] body {
   background-color: #111;
@@ -133,9 +127,9 @@ MedLog helps school nurses manage student health records, monitor clinic visits,
 </p>
 
 <div class="mt-10" data-aos="zoom-in" data-aos-delay="400">
-<a href="auth/login.php" class="bg-white text-[#0A1931] px-10 py-4 rounded-xl text-lg font-semibold shadow-lg hover:scale-105 transition">
-Get Started
-</a>
+  <a href="auth/login.php" class="bg-white text-[#0A1931] px-10 py-4 rounded-xl text-lg font-semibold shadow-lg hover:scale-105 transition" style="display:inline-block;">
+    Get Started
+  </a>
 </div>
 
 <!-- NURSE HELPING PATIENT ANIMATION -->
@@ -203,7 +197,7 @@ MedLog is designed to reduce paperwork, improve clinic efficiency, and ensure ev
 <section class="py-24 text-center bg-[#F6FAFD]">
 <div class="max-w-4xl mx-auto cta-box" data-aos="zoom-in">
 <h2 class="text-4xl font-bold text-white mb-6">Start Managing Your Clinic Smarter</h2>
-<a href="auth/login.php" class="bg-white text-[#0A1931] px-10 py-4 rounded-xl text-lg font-semibold hover:scale-105 transition">
+<a href="auth/login.php" class="bg-white text-[#0A1931] px-10 py-4 rounded-xl text-lg font-semibold hover:scale-105 transition" style="display:inline-block;">
 Launch MedLog
 </a>
 </div>
