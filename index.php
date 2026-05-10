@@ -89,7 +89,8 @@ School Clinic Management Made Simple
 </h1>
 
 <p class="mt-6 text-xl text-[#B3CFE5] max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="200">
-MedLog helps school nurses manage student health records, monitor clinic visits, track medicine inventory, and generate reports — all in one powerful system.
+MedLog helps school nurses manage student health records, monitor clinic visits, track medicine inventory, and generate reports.
+All in one powerful system.
 </p>
 
 <div class="mt-10" data-aos="zoom-in" data-aos-delay="400">
