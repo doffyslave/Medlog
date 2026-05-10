@@ -6,7 +6,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // 🔥 GET DATA
     $user_id = $_POST['user_id'] ?? '';
     $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
+    $email = strtolower(trim($_POST['email'] ?? ''));
     $role = $_POST['role'] ?? '';
     $course = $_POST['course'] ?? null;
     $year_level = $_POST['year_level'] ?? null;

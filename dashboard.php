@@ -148,22 +148,18 @@ if ($role === 'admin') {
 
                     <div class="status-inline">
 
-                        <!-- Clinic Status (CLICKABLE) -->
-                        <div class="inline-badge clickable <?= strtolower($clinicStatus) ?>"
-                            onclick="openModal('clinicModal')">
+                        <?php $isAdmin = ($role === 'admin'); ?>
+
+                        <div class="inline-badge <?= $isAdmin ? 'clickable' : '' ?> <?= strtolower($clinicStatus) ?>"
+                            <?= $isAdmin ? 'onclick="openModal(\'clinicModal\')"' : '' ?>>
                             <i class="fas fa-clinic-medical"></i>
-                            <span class="badge">
-                                <?= $clinicStatus ?>
-                            </span>
+                            <span class="badge"><?= htmlspecialchars($clinicStatus, ENT_QUOTES, 'UTF-8') ?></span>
                         </div>
 
-                        <!-- Nurse Status (CLICKABLE) -->
-                        <div class="inline-badge clickable <?= strtolower($nurseStatus) ?>"
-                            onclick="openModal('nurseModal')">
+                        <div class="inline-badge <?= $isAdmin ? 'clickable' : '' ?> <?= strtolower($nurseStatus) ?>"
+                            <?= $isAdmin ? 'onclick="openModal(\'nurseModal\')"' : '' ?>>
                             <i class="fas fa-user-nurse"></i>
-                            <span class="badge">
-                                <?= $nurseStatus ?>
-                            </span>
+                            <span class="badge"><?= htmlspecialchars($nurseStatus, ENT_QUOTES, 'UTF-8') ?></span>
                         </div>
 
                         <!-- Calendar -->
@@ -370,7 +366,7 @@ if ($role === 'admin') {
         }
 
         const calendarInput = document.getElementById('calendarFilter');
-        const calendarText = document.getElementById('calendarText');
+        //const calendarText = document.getElementById('calendarText');
 
         const today = new Date();
         calendarInput.value = today.toISOString().split('T')[0];
@@ -384,11 +380,11 @@ if ($role === 'admin') {
             });
         }
 
-        calendarText.innerText = formatDate(today);
+        //calendarText.innerText = formatDate(today);
 
-        calendarInput.addEventListener('change',function () {
-            calendarText.innerText = formatDate(new Date(this.value));
-        });
+        //calendarInput.addEventListener('change',function () {
+        //    calendarText.innerText = formatDate(new Date(this.value));
+        //});
 
         function openCalendar() {
             const input = document.getElementById('calendarFilter');

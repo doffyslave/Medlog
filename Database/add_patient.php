@@ -3,8 +3,8 @@ include("connection.php");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $name = $_POST['name'];
-    $email = $_POST['email'];
+    $name = trim($_POST['name'] ?? '');
+    $email = strtolower(trim($_POST['email'] ?? ''));
     $role = $_POST['role'];
     $course = $_POST['course'] ?? null;
     $year_level = $_POST['year_level'] ?? null;
