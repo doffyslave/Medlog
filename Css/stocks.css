@@ -1,12 +1,4 @@
-/* PAGE HEADER */
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-/* ADD BUTTON */
+/* ADD BUTTON (modals / tables; header primary actions use page-header.css) */
 .add-btn {
     background: #2563eb;
     color: white;

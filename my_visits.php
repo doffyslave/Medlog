@@ -24,6 +24,13 @@ $stmt = $conn->prepare("
 $stmt->execute([$user_id]);
 
 $visits = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$medlogPageHeader = [
+    'title' => 'My visits',
+    'subtitle' => 'Your personal clinic visit history.',
+    'icon' => 'my-visits',
+    'class' => 'medlog-page-header--my-visits',
+];
 ?>
 
 <!DOCTYPE html>
@@ -56,12 +63,7 @@ $visits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <section class="content">
 
-<div class="header-row">
-    <div>
-        <h1>My Visits</h1>
-        <p>Your clinic visit history</p>
-    </div>
-</div>
+<?php include 'includes/medlog-page-header.php'; ?>
 
 <!-- 🔥 CARD LIST -->
 <div class="visit-grid">

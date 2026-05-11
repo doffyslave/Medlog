@@ -8,6 +8,19 @@ $role = $user['role'] ?? 'guest';
 // FETCH MEDICINES
 $stmt = $conn->query("SELECT * FROM medicines ORDER BY medicine_name ASC");
 $medicines = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+ob_start();
+if ($role === 'admin') {
+    echo '<button class="add-btn" onclick="openModal()">+ Add Medicine</button>';
+}
+$__medsActions = ob_get_clean();
+$medlogPageHeader = [
+    'title' => 'Medicines',
+    'subtitle' => 'Clinic formulary — availability and quantities.',
+    'icon' => 'medicines',
+    'class' => 'medlog-page-header--medicines',
+    'actions' => $__medsActions,
+];
 ?>
 
 <!DOCTYPE html>
@@ -33,13 +46,7 @@ $medicines = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="content">
 
-<div class="page-header">
-    <h1>Medicines</h1>
-
-    <?php if ($role === 'admin'): ?>
-        <button class="add-btn" onclick="openModal()">+ Add Medicine</button>
-    <?php endif; ?>
-</div>
+<?php include 'includes/medlog-page-header.php'; ?>
 
 <table class="inventory-table">
     <thead>
