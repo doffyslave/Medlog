@@ -204,6 +204,14 @@
     border-collapse: separate;
     border-spacing: 0;
     font-size: 14px;
+    table-layout: fixed; /* prevents width recalculation per dataset */
+}
+
+.patients-table td,
+.patients-table th {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .patients-table thead th {

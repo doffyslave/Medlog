@@ -26,6 +26,18 @@ $statusData = $conn->query("SELECT * FROM clinic_status WHERE id=1")->fetch();
 $clinicStatus = $statusData['clinic_status'] ?? 'Open';
 $nurseStatus = $statusData['nurse_status'] ?? 'Available';
 
+// ================= DASHBOARD FILTER =================
+if (isset($_GET['date']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['date'])) {
+    $_SESSION['dashboard_selected_date'] = $_GET['date'];
+}
+
+$selectedDate = $_SESSION['dashboard_selected_date'] ?? date('Y-m-d');
+
+$activeTab = $_GET['tab'] ?? ($_SESSION['dashboard_active_tab'] ?? 'visits');
+if (!in_array($activeTab, ['visits', 'appointments'], true)) {
+    $activeTab = 'visits';
+}
+$_SESSION['dashboard_active_tab'] = $activeTab;
 
 // ================= SAFE FUNCTION =================
 function getSingle($conn, $query)
@@ -84,18 +96,36 @@ if ($role === 'student') {
 
 // ================= ADMIN DATA =================
 $recentVisits = [];
+$dayAppointments = [];
 $lowStockItems = [];
+$lowStockToShow = [];
 
 if ($role === 'admin') {
     try {
-        $q = $conn->query("
+        $q = $conn->prepare("
             SELECT v.complaint, v.visit_date, u.name 
             FROM visits v
             JOIN users u ON v.user_id = u.user_id
+            WHERE DATE(v.visit_date) = ?
             ORDER BY v.visit_date DESC
-            LIMIT 5
+            LIMIT 20
         ");
+        $q->execute([$selectedDate]);
         $recentVisits = $q ? $q->fetchAll() : [];
+    } catch (Exception $e) {
+    }
+
+    try {
+        $q = $conn->prepare("
+            SELECT a.appointment_time, a.reason, a.status, u.name
+            FROM appointments a
+            JOIN users u ON a.user_id = u.user_id
+            WHERE a.appointment_date = ?
+            ORDER BY STR_TO_DATE(a.appointment_time, '%h:%i %p') ASC
+            LIMIT 20
+        ");
+        $q->execute([$selectedDate]);
+        $dayAppointments = $q ? $q->fetchAll() : [];
     } catch (Exception $e) {
     }
 
@@ -108,6 +138,12 @@ if ($role === 'admin') {
         ");
         $lowStockItems = $q ? $q->fetchAll() : [];
     } catch (Exception $e) {
+    }
+    $lowStockToShow = [];
+    foreach ($lowStockItems as $item) {
+        if ((int) $item['total_quantity'] <= 10) {
+            $lowStockToShow[] = $item;
+        }
     }
 }
 ?>
@@ -164,7 +200,8 @@ if ($role === 'admin') {
 
                         <!-- Calendar -->
                         <div class="calendar-box" onclick="openCalendar()">
-                            <input class="badge" type="date" id="calendarFilter">
+                            <input class="badge" type="date" id="calendarFilter"
+                                value="<?= htmlspecialchars($selectedDate, ENT_QUOTES, 'UTF-8') ?>">
                         </div>
 
                     </div>
@@ -175,6 +212,24 @@ if ($role === 'admin') {
                 <?php if ($role === 'admin'): ?>
 
                     <div class="grid-4">
+
+                        <div class="card stat danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <h2><?= $totalLowStock ?></h2>
+                                <p>Low Stock</p>
+                            </div>
+                        </div>
+
+                        <div class="card stat">
+                            <i class="fas fa-heartbeat"></i>
+                            <div>
+                                <h2>
+                                    <?= $totalVisits ?>
+                                </h2>
+                                <p>Visits</p>
+                            </div>
+                        </div>
 
                         <div class="card stat">
                             <i class="fas fa-users"></i>
@@ -192,64 +247,102 @@ if ($role === 'admin') {
                             </div>
                         </div>
 
-                        <div class="card stat">
-                            <i class="fas fa-heartbeat"></i>
-                            <div>
-                                <h2><?= $totalVisits ?></h2>
-                                <p>Visits</p>
-                            </div>
-                        </div>
 
-                        <div class="card stat danger">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <div>
-                                <h2><?= $totalLowStock ?></h2>
-                                <p>Low Stock</p>
-                            </div>
-                        </div>
 
                     </div>
 
                     <div class="grid-2">
 
                         <div class="card">
-                            <h3>Recent Visits</h3>
-
-                            <?php foreach ($recentVisits as $visit): ?>
-                                <div class="list-item">
-                                    <div>
-                                        <strong><?= $visit['name'] ?></strong>
-                                        <p><?= $visit['complaint'] ?></p>
-                                    </div>
-
-                                    <div class="visit-meta">
-                                        <div><?= date("M d, Y", strtotime($visit['visit_date'])) ?></div>
-                                        <div class="visit-time">
-                                            <?= date("h:i A", strtotime($visit['visit_date'])) ?>
-                                        </div>
-                                    </div>
+                            <div class="tabs-header">
+                                <h3>Agenda</h3>
+                                <div class="tabs">
+                                    <a class="tab-btn <?= $activeTab === 'visits' ? 'active' : '' ?>" data-tab="visits"
+                                        href="?date=<?= urlencode($selectedDate) ?>&tab=visits">
+                                        Visits
+                                    </a>
+                                    <a class="tab-btn <?= $activeTab === 'appointments' ? 'active' : '' ?>"
+                                        data-tab="appointments"
+                                        href="?date=<?= urlencode($selectedDate) ?>&tab=appointments">
+                                        Appointments
+                                    </a>
                                 </div>
-                            <?php endforeach; ?>
+                            </div>
 
+                            <!-- VISITS PANEL -->
+                            <div id="panel-visits" class="agenda-panel <?= $activeTab === 'visits' ? 'active' : '' ?>">
+                                <?php if ($recentVisits): ?>
+                                    <?php foreach ($recentVisits as $visit): ?>
+                                        <div class="list-item">
+                                            <div>
+                                                <strong><?= htmlspecialchars($visit['name'], ENT_QUOTES, 'UTF-8') ?></strong>
+                                                <p><?= htmlspecialchars($visit['complaint'], ENT_QUOTES, 'UTF-8') ?></p>
+                                            </div>
+                                            <div class="visit-meta">
+                                                <div><?= date("M d, Y", strtotime($visit['visit_date'])) ?></div>
+                                                <div class="visit-time"><?= date("h:i A", strtotime($visit['visit_date'])) ?></div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <p class="empty-state">No visits on this day.</p>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- APPOINTMENTS PANEL -->
+                            <div id="panel-appointments"
+                                class="agenda-panel <?= $activeTab === 'appointments' ? 'active' : '' ?>">
+                                <?php if ($dayAppointments): ?>
+                                    <?php foreach ($dayAppointments as $appointment): ?>
+                                        <?php
+                                        $statusClass = 'pending';
+                                        if ($appointment['status'] === 'Approved')
+                                            $statusClass = 'approved';
+                                        elseif ($appointment['status'] === 'Rejected')
+                                            $statusClass = 'rejected';
+                                        elseif ($appointment['status'] === 'Cancelled')
+                                            $statusClass = 'cancelled';
+                                        ?>
+                                        <div class="list-item">
+                                            <div>
+                                                <strong><?= htmlspecialchars($appointment['name'], ENT_QUOTES, 'UTF-8') ?></strong>
+                                                <p><?= htmlspecialchars($appointment['reason'], ENT_QUOTES, 'UTF-8') ?></p>
+                                            </div>
+                                            <div class="visit-meta">
+                                                <div><?= htmlspecialchars($appointment['appointment_time'], ENT_QUOTES, 'UTF-8') ?>
+                                                </div>
+                                                <div class="status-pill <?= $statusClass ?>">
+                                                    <?= htmlspecialchars($appointment['status'], ENT_QUOTES, 'UTF-8') ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <p class="empty-state">No appointments on this day.</p>
+                                <?php endif; ?>
+                            </div>
                         </div>
 
                         <div class="card">
-                            <h3>Low Stock</h3>
+                            <div class="tabs-header">
+                                <h3>Low Stock</h3>
+                            </div>
+                            <?php if ($lowStockToShow): ?>
+                                <?php foreach ($lowStockToShow as $item):
+                                    $qty = (int) $item['total_quantity'];
+                                    ?>
 
-                            <?php foreach ($lowStockItems as $item):
-                                $qty = (int) $item['total_quantity'];
-                                if ($qty > 10)
-                                    continue;
-                                ?>
-
-                                <div class="list-item danger-bg">
-                                    <div>
-                                        <strong><?= $item['medicine_name'] ?></strong>
+                                    <div class="list-item danger-bg">
+                                        <div>
+                                            <strong><?= htmlspecialchars($item['medicine_name'], ENT_QUOTES, 'UTF-8') ?></strong>
+                                        </div>
+                                        <div><?= $qty ?></div>
                                     </div>
-                                    <div><?= $qty ?></div>
-                                </div>
 
-                            <?php endforeach; ?>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <p class="empty-state">No medicines are low on stock.</p>
+                            <?php endif; ?>
 
                         </div>
 
@@ -366,25 +459,14 @@ if ($role === 'admin') {
         }
 
         const calendarInput = document.getElementById('calendarFilter');
-        //const calendarText = document.getElementById('calendarText');
-
-        const today = new Date();
-        calendarInput.value = today.toISOString().split('T')[0];
-
-        // format like "May 5, 2026"
-        function formatDate(date) {
-            return date.toLocaleDateString('en-US',{
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
-        }
-
-        //calendarText.innerText = formatDate(today);
-
-        //calendarInput.addEventListener('change',function () {
-        //    calendarText.innerText = formatDate(new Date(this.value));
-        //});
+        calendarInput.addEventListener('change',function () {
+            const params = new URLSearchParams(window.location.search);
+            params.set('date',this.value);
+            if (!params.get('tab')) {
+                params.set('tab','visits');
+            }
+            window.location.search = params.toString();
+        });
 
         function openCalendar() {
             const input = document.getElementById('calendarFilter');
@@ -398,6 +480,36 @@ if ($role === 'admin') {
                 input.click(); // fallback
             }
         }
+        document.addEventListener('DOMContentLoaded',function () {
+            const tabButtons = document.querySelectorAll('.tabs .tab-btn[data-tab]');
+            const panelVisits = document.getElementById('panel-visits');
+            const panelAppointments = document.getElementById('panel-appointments');
+
+            if (!tabButtons.length || !panelVisits || !panelAppointments) return;
+
+            function setActiveTab(tab,updateUrl = true) {
+                tabButtons.forEach(btn => {
+                    btn.classList.toggle('active',btn.dataset.tab === tab);
+                });
+
+                panelVisits.classList.toggle('active',tab === 'visits');
+                panelAppointments.classList.toggle('active',tab === 'appointments');
+
+                if (updateUrl) {
+                    const params = new URLSearchParams(window.location.search);
+                    params.set('tab',tab);
+                    history.replaceState({},'',`${window.location.pathname}?${params.toString()}`);
+                }
+            }
+
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click',function (e) {
+                    e.preventDefault(); // stop full page reload
+                    setActiveTab(this.dataset.tab,true);
+                });
+            });
+        });
+
     </script>
 </body>
 
