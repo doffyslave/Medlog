@@ -163,7 +163,8 @@ ob_start();
     </div>
 
     <div class="calendar-box" onclick="openCalendar()">
-        <input class="badge" type="date" id="calendarFilter">
+        <input class="badge" type="date" id="calendarFilter"
+            value="<?= htmlspecialchars($selectedDate, ENT_QUOTES, 'UTF-8') ?>">
     </div>
 
 </div>
@@ -204,45 +205,7 @@ $medlogPageHeader = [
 
             <section class="content">
 
-                <!--?php include 'includes/medlog-page-header.php'; ?--?>
-
-                <!-- 🔷 SHARED STATUS -->
-                <div class="top-row">
-
-                    <div class="title-group">
-                        <h1>Dashboard</h1>
-                        <p class="subtitle">Welcome back! Here's your clinic overview.</p>
-                    </div>
-
-                    <div class="status-inline">
-
-                        <?php $isAdmin = ($role === 'admin'); ?>
-
-                        <div class="inline-badge <?= $isAdmin ? 'clickable' : '' ?> <?= strtolower($clinicStatus) ?>"
-                            <?= $isAdmin ? 'onclick="openModal(\'clinicModal\')"' : '' ?>>
-                            <i class="fas fa-clinic-medical"></i>
-                            <span class="badge">
-                                <?= htmlspecialchars($clinicStatus, ENT_QUOTES, 'UTF-8') ?>
-                            </span>
-                        </div>
-
-                        <div class="inline-badge <?= $isAdmin ? 'clickable' : '' ?> <?= strtolower($nurseStatus) ?>"
-                            <?= $isAdmin ? 'onclick="openModal(\'nurseModal\')"' : '' ?>>
-                            <i class="fas fa-user-nurse"></i>
-                            <span class="badge">
-                                <?= htmlspecialchars($nurseStatus, ENT_QUOTES, 'UTF-8') ?>
-                            </span>
-                        </div>
-
-                        <!-- Calendar -->
-                        <div class="calendar-box" onclick="openCalendar()">
-                            <input class="badge" type="date" id="calendarFilter"
-                                value="<?= htmlspecialchars($selectedDate, ENT_QUOTES, 'UTF-8') ?>">
-                        </div>
-
-                    </div>
-
-                </div>
+                <?php include 'includes/medlog-page-header.php'; ?>
 
                 <!-- 🔴 ADMIN DASHBOARD -->
                 <?php if ($role === 'admin'): ?>
