@@ -3,7 +3,7 @@
     margin-bottom: 25px;
 }
 
-/* TOP HEADER ROW */
+/* Legacy top row (kept for any inline uses); main modules use medlog-page-header */
 .top-row {
     display: flex;
     justify-content: space-between;
@@ -19,7 +19,8 @@
 
 .subtitle {
     font-size: 14px;
-    color: #64748b;
+    font-weight: 500;
+    color: #4A7FA7;
 }
 
 /* INLINE STATUS */

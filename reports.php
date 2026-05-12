@@ -88,6 +88,13 @@ $lowStockItems = $conn->query("
     ORDER BY total_quantity ASC
     LIMIT 5
 ")->fetchAll(PDO::FETCH_ASSOC);
+
+$medlogPageHeader = [
+    'title' => 'Reports',
+    'subtitle' => 'Analytics and trends — filter by date range below.',
+    'icon' => 'reports',
+    'class' => 'medlog-page-header--reports',
+];
 ?>
 
 <!DOCTYPE html>
@@ -115,8 +122,7 @@ $lowStockItems = $conn->query("
 
 <section class="content">
 
-<h1>Reports</h1>
-<p class="subtitle">Analytics & trends (filtered)</p>
+<?php include 'includes/medlog-page-header.php'; ?>
 
 <!-- FILTER -->
 <form method="GET" class="filter-bar">

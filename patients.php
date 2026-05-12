@@ -47,6 +47,13 @@ $statsQuery = "SELECT
 $statsStmt = $conn->prepare($statsQuery);
 $statsStmt->execute();
 $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
+
+$medlogPageHeader = [
+    'title' => 'Patients',
+    'subtitle' => 'Manage clinic patients — search, filter, and open profiles.',
+    'icon' => 'patients',
+    'class' => 'medlog-page-header--patients',
+];
 ?>
 
 <!DOCTYPE html>
@@ -67,12 +74,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
 
 <section class="content patients-page">
 
-    <div class="page-header">
-        <div>
-            <h1>Patients</h1>
-            <p>Manage clinic patients</p>
-        </div>
-    </div>
+    <?php include 'includes/medlog-page-header.php'; ?>
 
     <div class="patients-shell">
         <div class="stats-grid">

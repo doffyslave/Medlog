@@ -177,6 +177,13 @@ if ($role === 'admin') {
 
     $appointments = $stmt->fetchAll();
 }
+
+$medlogPageHeader = [
+    'title' => 'Appointments',
+    'subtitle' => 'Request and manage clinic appointments and schedules.',
+    'icon' => 'appointments',
+    'class' => 'medlog-page-header--appointments',
+];
 ?>
 
 <!DOCTYPE html>
@@ -210,8 +217,7 @@ if ($role === 'admin') {
 
         <section class="content">
 
-            <h1>Appointments</h1>
-
+            <?php include 'includes/medlog-page-header.php'; ?>
 
             <!-- ALERTS -->
             <?php if (isset($_SESSION['appointment_error'])): ?>

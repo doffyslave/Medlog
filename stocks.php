@@ -22,6 +22,19 @@ $stmt = $conn->query("
 ");
 
 $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+ob_start();
+?>
+<button class="add-btn" onclick="openModal()">+ Add / Adjust Stock</button>
+<?php
+$__stocksActions = ob_get_clean();
+$medlogPageHeader = [
+    'title' => 'Stocks inventory',
+    'subtitle' => 'Track stock movements, adjustments, and expiration dates.',
+    'icon' => 'stocks',
+    'class' => 'medlog-page-header--stocks',
+    'actions' => $__stocksActions,
+];
 ?>
 
 <!DOCTYPE html>
@@ -47,10 +60,7 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         <div class="content">
 
-            <div class="page-header">
-                <h1>Stocks Inventory</h1>
-                <button class="add-btn" onclick="openModal()">+ Add / Adjust Stock</button>
-            </div>
+            <?php include 'includes/medlog-page-header.php'; ?>
 
             <table class="inventory-table">
                 <thead>

@@ -9,12 +9,14 @@ if (!isset($_SESSION['user'])) {
 require 'Database/connection.php';
 
 $user_id = $_GET['user_id'] ?? null;
+$selectedUser = null;
 
 if ($user_id) {
     $stmt = $conn->prepare("
         SELECT 
             visits.*, 
             users.name,
+            users.role AS patient_role,
             GROUP_CONCAT(CONCAT(medicines.medicine_name, ' (', treatments.quantity, ')') SEPARATOR ', ') AS medicines_used
         FROM visits
         JOIN users ON visits.user_id = users.user_id
@@ -35,6 +37,7 @@ if ($user_id) {
         SELECT 
             visits.*, 
             users.name,
+            users.role AS patient_role,
             GROUP_CONCAT(CONCAT(medicines.medicine_name, ' (', treatments.quantity, ')') SEPARATOR ', ') AS medicines_used
         FROM visits
         JOIN users ON visits.user_id = users.user_id
@@ -48,6 +51,29 @@ if ($user_id) {
 
 $visits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $user = $_SESSION['user'];
+
+ob_start();
+?>
+<button type="button" id="openVisitModal" class="add-btn">+ Add Visit</button>
+<?php
+$__visitHeaderActions = ob_get_clean();
+
+$__visitBelow = '';
+if ($user_id && !empty($selectedUser)) {
+    $__visitBelow = '<div class="medlog-page-header__banner">'
+        . '<span>Showing visits for <strong>' . htmlspecialchars($selectedUser['name'], ENT_QUOTES, 'UTF-8') . '</strong></span>'
+        . '<a href="visits.php" class="filter-btn">← All visits</a>'
+        . '</div>';
+}
+
+$medlogPageHeader = [
+    'title' => 'Visits',
+    'subtitle' => 'Visit activity timeline — review and record clinic encounters.',
+    'icon' => 'visits',
+    'class' => 'medlog-page-header--visits',
+    'actions' => $__visitHeaderActions,
+    'below' => $__visitBelow,
+];
 ?>
 
 <!DOCTYPE html>
@@ -59,50 +85,6 @@ $user = $_SESSION['user'];
 <link rel="stylesheet" href="Css/layout.css">
 <link rel="stylesheet" href="Css/visits.css">
 
-<style>
-.visit-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.visit-card {
-    background: #fff;
-    padding: 18px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.visit-card:hover {
-    transform: translateY(-2px);
-}
-
-.visit-header {
-    display: flex;
-    justify-content: space-between;
-    font-weight: bold;
-}
-
-.visit-meta {
-    font-size: 13px;
-    color: #64748b;
-}
-
-.visit-body {
-    margin-top: 10px;
-}
-
-.badge {
-    background: #e2e8f0;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 12px;
-}
-</style>
-
 </head>
 
 <body>
@@ -113,58 +95,84 @@ $user = $_SESSION['user'];
 <main class="main-content">
 <?php include 'includes/header.php'; ?>
 
-<section class="content">
+<section class="content visits-page">
 
-<div class="header-row">
-    <div>
-        <h1>Visits</h1>
-        <p>Manage clinic visit records</p>
+<?php include 'includes/medlog-page-header.php'; ?>
 
-        <?php if ($user_id && $selectedUser): ?>
-            <p style="color:#2563eb;">
-                Viewing visits for: <strong><?= htmlspecialchars($selectedUser['name']) ?></strong>
-            </p>
-            <a href="visits.php" class="filter-btn">← Back</a>
-        <?php endif; ?>
+<div class="visits-shell">
+    <div class="visits-toolbar">
+        <div class="visits-toolbar-label">
+            <span class="visits-timeline-icon" aria-hidden="true"></span>
+            <div>
+                <span class="visits-section-kicker">Timeline</span>
+                <span class="visits-section-title">Recent activity</span>
+            </div>
+        </div>
+        <div class="visits-filter-chips" role="group" aria-label="Filter by patient role">
+            <button type="button" class="visit-filter-chip active" data-filter="all">All</button>
+            <button type="button" class="visit-filter-chip" data-filter="student">Students</button>
+            <button type="button" class="visit-filter-chip" data-filter="teacher">Teachers</button>
+        </div>
     </div>
 
-    <button id="openVisitModal" class="add-btn">+ Add Visit</button>
-</div>
-
-<!-- Card vis -->
-<div class="visit-grid">
-
+    <div class="visit-feed" id="visitFeed">
 <?php if (!empty($visits)): ?>
-<?php foreach ($visits as $visit): ?>
-
-<div class="visit-card" onclick='openViewModal(<?= json_encode($visit) ?>)'>
-
-    <div class="visit-header">
-        <span><?= htmlspecialchars($visit['name']) ?></span>
-        <span class="visit-meta">
-            <?= date("M d, Y h:i A", strtotime($visit['visit_date'])) ?>
-        </span>
-    </div>
-
-    <div class="visit-body">
-        <p><strong>Complaint:</strong> <?= htmlspecialchars($visit['complaint']) ?></p>
-
-        <p><strong>Treatment:</strong> 
-            <?= htmlspecialchars($visit['medicines_used'] ?? 'None') ?>
-        </p>
-
-        <span class="badge">
-            <?= htmlspecialchars($visit['recorded_by']) ?>
-        </span>
-    </div>
-
-</div>
-
+<?php foreach ($visits as $index => $visit): ?>
+<?php
+    $layoutClass = $index % 2 === 0 ? 'layout-left' : 'layout-right';
+    $roleSlug = strtolower((string) ($visit['patient_role'] ?? ''));
+    $roleLabel = $roleSlug !== '' ? ucfirst($roleSlug) : '';
+    $visitJson = htmlspecialchars(json_encode($visit), ENT_QUOTES, 'UTF-8');
+    $rowNum = str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT);
+?>
+        <article
+            class="visit-card <?= $layoutClass ?>"
+            style="--stagger-delay: <?= (($index % 12) * 70) ?>ms;"
+            data-patient-role="<?= htmlspecialchars($roleSlug) ?>"
+            role="button"
+            tabindex="0"
+            data-visit="<?= $visitJson ?>"
+        >
+            <div class="visit-accent" aria-hidden="true"></div>
+            <div class="visit-ribbon">
+                <span class="visit-index" aria-hidden="true"><?= $rowNum ?></span>
+                <div class="visit-ribbon-primary">
+                    <span class="visit-name"><?= htmlspecialchars($visit['name']) ?></span>
+                    <?php if ($roleLabel !== ''): ?>
+                        <span class="visit-role-pill"><?= htmlspecialchars($roleLabel) ?></span>
+                    <?php endif; ?>
+                </div>
+                <div class="visit-ribbon-col visit-ribbon-complaint">
+                    <span class="visit-kicker">Complaint</span>
+                    <span class="visit-line"><?= htmlspecialchars($visit['complaint']) ?></span>
+                </div>
+                <div class="visit-ribbon-col visit-ribbon-treatment">
+                    <span class="visit-kicker">Treatment</span>
+                    <span class="visit-line"><?= htmlspecialchars($visit['medicines_used'] ?? 'None') ?></span>
+                </div>
+                <div class="visit-ribbon-meta">
+                    <time class="visit-datetime" datetime="<?= htmlspecialchars(date('c', strtotime($visit['visit_date']))) ?>">
+                        <?= date('M j, Y', strtotime($visit['visit_date'])) ?>
+                        <span class="visit-time"><?= date('g:i A', strtotime($visit['visit_date'])) ?></span>
+                    </time>
+                    <span class="visit-recorded">
+                        <span class="visit-recorded-kicker">Recorded</span>
+                        <?= htmlspecialchars($visit['recorded_by']) ?>
+                    </span>
+                </div>
+                <button type="button" class="visit-details-btn">
+                    View details
+                </button>
+            </div>
+        </article>
 <?php endforeach; ?>
 <?php else: ?>
-<p>No visit records found.</p>
+        <div class="visit-empty">
+            <p>No visit records yet.</p>
+            <span class="visit-empty-hint">Add a visit to populate this timeline.</span>
+        </div>
 <?php endif; ?>
-
+    </div>
 </div>
 
 </section>
@@ -259,13 +267,75 @@ function openViewModal(data) {
 
         <br>
 
-        <a href="print_visit.php?id=${data.visit_id}" target="_blank" 
-           style="display:inline-block;padding:8px 12px;background:#2563eb;color:white;border-radius:6px;text-decoration:none;">
+        <a href="print_visit.php?id=${data.visit_id}" target="_blank" class="visit-print-link">
            🖨 Print Visit
         </a>
     `;
 
     viewModal.classList.add("show");
+}
+
+function parseVisitDataset(card) {
+    try {
+        return JSON.parse(card.dataset.visit);
+    } catch (e) {
+        return null;
+    }
+}
+
+document.querySelectorAll(".visit-card[data-visit]").forEach(card => {
+    card.addEventListener("click", () => {
+        const data = parseVisitDataset(card);
+        if (data) openViewModal(data);
+    });
+    card.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
+        const data = parseVisitDataset(card);
+        if (data) openViewModal(data);
+    });
+});
+
+document.querySelectorAll(".visit-details-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const card = btn.closest(".visit-card");
+        if (!card) return;
+        const data = parseVisitDataset(card);
+        if (data) openViewModal(data);
+    });
+});
+
+document.querySelectorAll(".visit-filter-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+        const filter = chip.dataset.filter || "all";
+        document.querySelectorAll(".visit-filter-chip").forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        document.querySelectorAll(".visit-card[data-visit]").forEach(card => {
+            const role = (card.dataset.patientRole || "").toLowerCase();
+            const show = filter === "all" || role === filter;
+            card.hidden = !show;
+        });
+    });
+});
+
+const visitCards = document.querySelectorAll(".visit-card");
+
+if ("IntersectionObserver" in window) {
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+        });
+    }, {
+        threshold: 0.12,
+        rootMargin: "0px 0px -24px 0px"
+    });
+
+    visitCards.forEach(card => revealObserver.observe(card));
+} else {
+    visitCards.forEach(card => card.classList.add("is-visible"));
 }
 </script>
 
