@@ -47,9 +47,9 @@
     transition: transform 0.2s, background-color 0.2s;
 }
 
-.calendar-box:hover {
+/*.calendar-box:hover {
     transform: translateY(-2px);
-}
+}*/
 
 .calendar-box input[type="date"] {
     border: none;

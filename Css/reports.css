@@ -6,21 +6,11 @@
     --success: #22c55e;
 }
 
-/* ===================== */
-/* PAGE SPACING */
-/* ===================== */
-.content {
-    padding: 10px;
-}
-
 .subtitle {
     color: var(--text-muted);
     margin-bottom: 20px;
 }
 
-/* ===================== */
-/* FILTER BAR */
-/* ===================== */
 .filter-bar {
     display: flex;
     gap: 10px;
@@ -46,37 +36,26 @@
     background: #16a34a;
 }
 
-/* ===================== */
-/* KPI ROW (uses dashboard card style) */
-/* ===================== */
 .kpi-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
 }
 
-/* ===================== */
-/* CHART SECTION */
-/* ===================== */
+/* Legacy: do not fix height on a whole card — Chart.js parents use .reports-chart-canvas-wrap */
 .chart {
-    height: 280px;   /* controls chart size */
     position: relative;
+    min-height: 240px;
 }
 
 .chart h3 {
     margin-bottom: 10px;
 }
 
-/* ===================== */
-/* GRID OVERRIDES (reports only spacing control) */
-/* ===================== */
 .grid-2 {
     align-items: stretch;
 }
 
-/* ===================== */
-/* LIST ITEMS (reuse dashboard feel) */
-/* ===================== */
 .list-item {
     display: flex;
     justify-content: space-between;
@@ -92,17 +71,11 @@
     color: var(--text-muted);
 }
 
-/* ===================== */
-/* LOW STOCK */
-/* ===================== */
 .danger-bg {
     background: #fee2e2;
     border-left: 4px solid var(--danger);
 }
 
-/* ===================== */
-/* TABLE CLEANUP (if still used anywhere) */
-/* ===================== */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -119,4 +92,409 @@ table td {
     padding: 10px 0;
     border-top: 1px solid var(--border);
     font-size: 14px;
+}
+
+.reports-lead {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #64748b;
+    margin-bottom: 20px;
+    max-width: 72ch;
+}
+
+.reports-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #4A7FA7;
+    margin: 28px 0 14px;
+}
+
+.stat-hint {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: #94a3b8;
+    margin-top: 4px;
+    line-height: 1.35;
+}
+
+.reports-chart-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px 16px;
+    margin-bottom: 12px;
+}
+
+.reports-chart-head h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #0A1931;
+}
+
+.reports-chart-note {
+    font-size: 12px;
+    font-weight: 600;
+    color: #94a3b8;
+}
+
+.reports-doughnut-wrap {
+    position: relative;
+    height: 260px;
+    max-width: 320px;
+    margin: 0 auto;
+}
+
+.reports-empty {
+    color: #94a3b8;
+    font-size: 14px;
+    padding: 24px 8px;
+    text-align: center;
+}
+
+.reports-empty--inline {
+    padding: 12px 0;
+    text-align: left;
+}
+
+.reports-card-sub {
+    font-size: 12px;
+    color: #94a3b8;
+    margin: -6px 0 12px;
+}
+
+.reports-role-pill {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 999px;
+    background: #e8f0f7;
+    color: #1A3D63;
+    vertical-align: middle;
+}
+
+.reports-qty {
+    font-weight: 800;
+    color: #0A1931;
+}
+
+/* Scoped UI/UX */
+.reports-page .reports-jump {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    margin-bottom: 18px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(179, 207, 229, 0.65);
+    box-shadow: 0 6px 18px rgba(10, 25, 49, 0.06);
+}
+
+.reports-page .reports-jump-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1A3D63;
+    margin-right: 4px;
+}
+
+.reports-page .reports-jump a {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4A7FA7;
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 10px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.reports-page .reports-jump a:hover {
+    background: rgba(74, 127, 167, 0.12);
+    color: #0A1931;
+}
+
+.reports-page .reports-jump a:focus-visible {
+    outline: 2px solid #4A7FA7;
+    outline-offset: 2px;
+}
+
+.reports-anchor-target {
+    scroll-margin-top: 88px;
+}
+
+.reports-page .reports-filter-panel {
+    margin-bottom: 20px;
+    padding: 16px 18px;
+    border-radius: 16px;
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.95), rgba(246, 250, 253, 0.9));
+    border: 1px solid rgba(179, 207, 229, 0.7);
+    box-shadow: 0 10px 28px rgba(10, 25, 49, 0.07);
+}
+
+.reports-page .reports-filter-panel-header {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #4A7FA7;
+    margin-bottom: 12px;
+}
+
+.reports-page .reports-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 14px 16px;
+}
+
+.reports-page .reports-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.reports-page .reports-field label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #456b80;
+}
+
+.reports-page .reports-field input[type="date"] {
+    border: none;
+    background: transparent;
+    font-size: 12px;
+    color: inherit;
+    outline: none;
+    padding: 5px 12px;
+    width: 92px
+}
+
+/*.reports-page .reports-field input[type="date"]:focus {
+    outline: none;
+    border-color: #4A7FA7;
+    box-shadow: 0 0 0 3px rgba(74, 127, 167, 0.2);
+}*/
+
+.reports-page .reports-filter-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.reports-page .reports-filter-apply {
+    border: 0;
+    border-radius: 12px;
+    height: 44px;
+    padding: 0 20px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 13px;
+    color: #F6FAFD;
+    background: linear-gradient(135deg, #0A1931, #1A3D63 48%, #4A7FA7);
+    box-shadow: 0 10px 22px rgba(10, 25, 49, 0.22);
+    transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
+}
+
+.reports-page .reports-filter-apply:hover:not(:disabled) {
+    filter: brightness(1.06);
+    transform: translateY(-1px);
+}
+
+.reports-page .reports-filter-apply:focus-visible {
+    outline: 2px solid #4A7FA7;
+    outline-offset: 3px;
+}
+
+.reports-page .reports-filter-apply:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}
+
+.reports-page .reports-presets {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(179, 207, 229, 0.45);
+}
+
+.reports-page .reports-presets > span {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    margin-right: 4px;
+}
+
+.reports-page .reports-preset-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #1A3D63;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(246, 250, 253, 0.95);
+    border: 1px solid rgba(179, 207, 229, 0.85);
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.reports-page .reports-preset-link:hover {
+    background: #fff;
+    border-color: #4A7FA7;
+}
+
+.reports-page .reports-preset-link:focus-visible {
+    outline: 2px solid #4A7FA7;
+    outline-offset: 2px;
+}
+
+.reports-page .reports-kpi-scroll {
+    overflow-x: auto;
+    margin-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+}
+
+.reports-page .reports-kpi-scroll .grid-4 {
+    min-width: min(1100px, 100%);
+}
+
+.reports-page .reports-list-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.reports-page .reports-list-stack .list-item {
+    margin-top: 0;
+}
+
+.reports-page .reports-empty-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 10px;
+    padding: 28px 16px;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.reports-page .reports-empty-card .reports-empty-icon {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    background: rgba(74, 127, 167, 0.12);
+    color: #1A3D63;
+    font-size: 20px;
+}
+
+.reports-page .reports-empty-card.reports-empty--inline {
+    align-items: flex-start;
+    text-align: left;
+}
+
+.reports-page .reports-widen-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #F6FAFD;
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1A3D63, #4A7FA7);
+    box-shadow: 0 8px 18px rgba(10, 25, 49, 0.18);
+}
+
+.reports-page .reports-widen-link:hover {
+    filter: brightness(1.05);
+}
+
+.reports-page .reports-widen-link:focus-visible {
+    outline: 2px solid #4A7FA7;
+    outline-offset: 2px;
+}
+
+.reports-page .reports-chart-canvas-wrap {
+    position: relative;
+    width: 100%;
+    height: 260px;
+    min-height: 260px;
+    flex: 0 0 auto;
+}
+
+.reports-page .reports-chart-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.reports-page .reports-chart-card .reports-chart-canvas-wrap {
+    height: 260px;
+    min-height: 260px;
+}
+
+.reports-page .reports-chart-card--wide .reports-chart-canvas-wrap {
+    height: 300px;
+    min-height: 300px;
+}
+
+.reports-page .reports-doughnut-wrap.reports-chart-canvas-wrap {
+    height: 260px;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 640px) {
+    .reports-page .reports-filter-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .reports-page .reports-field input[type="date"] {
+        width: 100%;
+    }
+
+    .reports-page .reports-filter-actions {
+        width: 100%;
+    }
+
+    .reports-page .reports-filter-apply {
+        width: 100%;
+    }
+}
+
+.card-reports {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 16px; /* stronger shadow */
+    border: 1px solid #e5e7eb;              /* subtle separation */
+
+    width: 100%;
+    min-width: 0;
+    height: fit-content;
+}
+
+html {
+    scroll-behavior: smooth;
 }
