@@ -8,9 +8,10 @@ if (!isset($_SESSION['user'])) {
 
 $user = $_SESSION['user'];
 $role = $user['role'];
-$user_id = $user['user_id'];
 
 require 'Database/connection.php';
+
+$user_id = $user['user_id'];
 
 
 // ================= STATUS =================
