@@ -37,62 +37,109 @@ ORDER BY visit_date DESC
 
 $visitsStmt->execute([$user_id]);
 $visits = $visitsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+$appointmentCount = null;
+try {
+    $appointmentStmt = $conn->prepare("SELECT COUNT(*) FROM appointments WHERE user_id = ?");
+    $appointmentStmt->execute([$user_id]);
+    $appointmentCount = (int) $appointmentStmt->fetchColumn();
+} catch (Exception $e) {
+    $appointmentCount = null;
+}
+
+$displayName = htmlspecialchars($user['name']);
+$displayRole = ucfirst($user['role']);
+$displayStatus = ucfirst($user['status']);
+$displayEmail = htmlspecialchars($user['email']);
+$displayStudentId = htmlspecialchars($user['student_id'] ?? 'N/A');
+$displayCourse = htmlspecialchars($user['course'] ?: 'N/A');
+$displayYear = htmlspecialchars($user['year_level'] ?: 'N/A');
+$totalVisits = (int) ($user['total_visits'] ?? 0);
+$lastVisitDisplay = $user['last_visit'] ? date("M d, Y", strtotime($user['last_visit'])) : "No visits yet";
+$avatar = strtoupper(substr(trim($user['name']), 0, 1));
 ?>
 
-<div class="profile-wrapper">
-
-    <!-- HEADER -->
-    <div class="profile-header">
-        <h2><?= htmlspecialchars($user['name']) ?></h2>
-        <span class="profile-role"><?= ucfirst($user['role']) ?></span>
+<aside class="patient-drawer">
+    <div class="drawer-head">
+        <div class="drawer-identity">
+            <div class="drawer-avatar"><?= $avatar ?></div>
+            <div class="drawer-identity-meta">
+                <h2><?= $displayName ?></h2>
+                <div class="drawer-badges">
+                    <span class="drawer-badge role"><?= $displayRole ?></span>
+                    <span class="drawer-badge status <?= strtolower($displayStatus) ?>"><?= $displayStatus ?></span>
+                </div>
+            </div>
+        </div>
+        <button onclick="closeProfile()" class="close-profile" title="Close panel" aria-label="Close panel">✕</button>
     </div>
 
-    <!-- BASIC INFO -->
-    <div class="profile-section">
-        <h4>General Information</h4>
-        <p><strong>Email:</strong> <?= htmlspecialchars($user['email']) ?></p>
-        
+    <section class="drawer-section">
+        <h3>Profile Information</h3>
+        <div class="drawer-info-grid">
+            <article class="drawer-info-item">
+                <span>Email</span>
+                <strong><?= $displayEmail ?></strong>
+            </article>
+            <article class="drawer-info-item">
+                <span>Student ID</span>
+                <strong><?= $displayStudentId ?></strong>
+            </article>
+            <article class="drawer-info-item">
+                <span>Course</span>
+                <strong><?= $displayCourse ?></strong>
+            </article>
+            <article class="drawer-info-item">
+                <span>Year Level</span>
+                <strong><?= $displayYear ?></strong>
+            </article>
+        </div>
+    </section>
 
-        <!-- 🔥 ADD THIS HERE -->
-        <p><strong>Student ID:</strong> <?= $user['student_id'] ?? 'N/A' ?></p>
+    <section class="drawer-section">
+        <h3>Visit Analytics</h3>
+        <div class="drawer-metrics">
+            <article class="metric-card">
+                <span>Total Visits</span>
+                <strong><?= $totalVisits ?></strong>
+            </article>
+            <article class="metric-card">
+                <span>Last Visit</span>
+                <strong><?= htmlspecialchars($lastVisitDisplay) ?></strong>
+            </article>
+            <article class="metric-card">
+                <span>Appointments</span>
+                <strong><?= $appointmentCount !== null ? $appointmentCount : 'N/A' ?></strong>
+            </article>
+        </div>
+    </section>
 
-        <p><strong>Course:</strong> <?= $user['course'] ?: 'N/A' ?></p>
-        <p><strong>Year Level:</strong> <?= $user['year_level'] ?: 'N/A' ?></p>
-        <p><strong>Status:</strong> <?= ucfirst($user['status']) ?></p>
-    </div>
-
-    <!-- VISIT STATS -->
-    <div class="profile-section">
-        <h4>Visit Summary</h4>
-        <p><strong>Total Visits:</strong> <?= $user['total_visits'] ?></p>
-        <p><strong>Last Visit:</strong> 
-            <?= $user['last_visit'] ? date("M d, Y", strtotime($user['last_visit'])) : 'No visits yet' ?>
-        </p>
-    </div>
-
-    <!-- VISIT HISTORY -->
-    <div class="profile-section">
-        <h4>Visit History</h4>
-
+    <section class="drawer-section">
+        <h3>Recent Activity</h3>
         <?php if (count($visits) > 0): ?>
-            <div class="visit-list">
-                <?php foreach($visits as $visit): ?>
-                    <div class="visit-item">
-                        <div class="visit-date">
-                            <?= date("M d, Y", strtotime($visit['visit_date'])) ?>
-                        </div>
-
-                        <div class="visit-info">
-                            <strong><?= htmlspecialchars($visit['complaint']) ?></strong><br>
+            <div class="activity-list">
+                <?php foreach (array_slice($visits, 0, 6) as $visit): ?>
+                    <div class="activity-item">
+                        <div class="activity-dot"></div>
+                        <div class="activity-body">
+                            <strong><?= date("M d, Y", strtotime($visit['visit_date'])) ?></strong>
+                            <p><?= htmlspecialchars($visit['complaint']) ?></p>
                             <small><?= htmlspecialchars($visit['treatment']) ?></small>
                         </div>
                     </div>
                 <?php endforeach; ?>
             </div>
         <?php else: ?>
-            <p>No visit records.</p>
+            <p class="empty-activity">No visit records yet.</p>
         <?php endif; ?>
+    </section>
 
+    <div class="drawer-actions">
+        <a href="visits.php?user_id=<?= (int) $user_id ?>" class="drawer-action primary">
+            View Full Visits
+        </a>
+        <button type="button" class="drawer-action secondary" onclick="closeProfile()">
+            Close
+        </button>
     </div>
-
-</div>
+</aside>
