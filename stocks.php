@@ -117,7 +117,7 @@ $medlogPageHeader = [
 
 <?php include 'includes/medlog-page-header.php'; ?>
 
-<div class="stocks-shell">
+<div class="stocks-shell" id="stocksShell">
     <div class="stocks-stats">
         <article class="stocks-stat">
             <span class="stocks-stat__label">Total transactions</span>
@@ -219,15 +219,15 @@ $medlogPageHeader = [
 
 <div class="stock-overlay" id="stockOverlay" aria-hidden="true"></div>
 
-<aside class="stock-drawer" id="stockDrawer" aria-hidden="true">
+<aside class="stock-drawer" id="stockDrawer" aria-hidden="true" aria-modal="true" role="dialog" aria-label="Stock transaction details">
     <button type="button" class="stock-drawer__close" id="stockDrawerClose" aria-label="Close">&times;</button>
     <div class="stock-drawer__scroll" id="stockDrawerInner"></div>
 </aside>
 
-<div class="stock-modal" id="stockMovementModal" aria-hidden="true">
+<div class="stock-modal" id="stockMovementModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="stockMovementTitle">
     <div class="stock-modal__card">
         <button type="button" class="stock-modal__close" data-stock-close-modal aria-label="Close">&times;</button>
-        <h2>Record stock movement</h2>
+        <h2 id="stockMovementTitle">Record stock movement</h2>
         <p class="stock-modal__subtitle">Log inbound supply or corrective adjustments. Historical quantities stay immutable after save.</p>
 
         <form method="POST" action="Database/add_stocks.php" class="stock-form" id="stockMovementForm">
@@ -281,12 +281,41 @@ $medlogPageHeader = [
     const drawer = document.getElementById('stockDrawer');
     const drawerInner = document.getElementById('stockDrawerInner');
     const movementModal = document.getElementById('stockMovementModal');
+    const stocksShell = document.getElementById('stocksShell');
     const searchInput = document.getElementById('stockSearchInput');
     const filterChips = document.querySelectorAll('[data-stock-filter]');
-    const cards = document.querySelectorAll('.stock-card');
+    const stockFeed = document.getElementById('stockFeed');
+
+    function getStockCards() {
+        return stockFeed ? stockFeed.querySelectorAll('.stock-card') : document.querySelectorAll('.stock-card');
+    }
+
+    let cards = getStockCards();
     const emptyFiltered = document.getElementById('stockEmptyFiltered');
 
     let activeFilter = 'all';
+    let returnFocusAfterDrawer = null;
+    let returnFocusAfterModal = null;
+
+    function moveFocusOutOf(el) {
+        if (!el || !(el instanceof HTMLElement)) return;
+        const active = document.activeElement;
+        if (active && el.contains(active)) {
+            active.blur();
+        }
+    }
+
+    function restoreFocus(target) {
+        if (target && document.body.contains(target) && typeof target.focus === 'function') {
+            try {
+                target.focus({ preventScroll: true });
+            } catch (e) {
+                target.focus();
+            }
+            return;
+        }
+        document.getElementById('openStockMovementModal')?.focus({ preventScroll: true });
+    }
 
     function esc(value) {
         return String(value ?? '')
@@ -331,7 +360,7 @@ $medlogPageHeader = [
         const expValue = entry.expiration_date ? esc(entry.expiration_date) : '';
 
         drawerInner.innerHTML = `
-            <div class="stock-drawer__title">${esc(entry.medicine_name)}</div>
+            <div class="stock-drawer__title" id="stockDrawerHeading">${esc(entry.medicine_name)}</div>
             <div class="stock-drawer__grid">
                 <div class="stock-drawer__row"><span>Transaction</span><strong>${esc(entry.label)}</strong></div>
                 <div class="stock-drawer__row"><span>Quantity change</span><strong>${esc(qtyLabel)}</strong></div>
@@ -352,33 +381,60 @@ $medlogPageHeader = [
 
         drawer.classList.add('show');
         drawer.setAttribute('aria-hidden', 'false');
+        drawer.setAttribute('aria-labelledby', 'stockDrawerHeading');
         setOverlay(true);
+        requestAnimationFrame(() => {
+            const closeBtn = document.getElementById('stockDrawerClose');
+            if (closeBtn && typeof closeBtn.focus === 'function') {
+                closeBtn.focus();
+            }
+        });
     }
 
     function closeDrawer() {
         if (!drawer) return;
+        const backTo = returnFocusAfterDrawer;
+        returnFocusAfterDrawer = null;
+        moveFocusOutOf(drawer);
+        restoreFocus(backTo);
         drawer.classList.remove('show');
         drawer.setAttribute('aria-hidden', 'true');
-        if (!movementModal.classList.contains('show')) {
+        drawer.removeAttribute('aria-labelledby');
+        if (!movementModal?.classList.contains('show')) {
             setOverlay(false);
         }
     }
 
     function openMovementModal() {
+        if (!movementModal) return;
         movementModal.classList.add('show');
         movementModal.setAttribute('aria-hidden', 'false');
         setOverlay(true);
+        requestAnimationFrame(() => {
+            const firstField = document.getElementById('movementType');
+            if (firstField && typeof firstField.focus === 'function') {
+                firstField.focus();
+            }
+        });
     }
 
     function closeMovementModal() {
+        if (!movementModal) return;
+        const backTo = returnFocusAfterModal;
+        returnFocusAfterModal = null;
+        moveFocusOutOf(movementModal);
+        restoreFocus(backTo);
         movementModal.classList.remove('show');
         movementModal.setAttribute('aria-hidden', 'true');
-        if (!drawer.classList.contains('show')) {
+        if (!drawer?.classList.contains('show')) {
             setOverlay(false);
         }
     }
 
-    document.getElementById('openStockMovementModal')?.addEventListener('click', openMovementModal);
+    document.getElementById('openStockMovementModal')?.addEventListener('click', (e) => {
+        returnFocusAfterModal = e.currentTarget;
+        openMovementModal();
+    });
 
     document.querySelectorAll('[data-stock-close-modal]').forEach((btn) => {
         btn.addEventListener('click', closeMovementModal);
@@ -387,8 +443,24 @@ $medlogPageHeader = [
     document.getElementById('stockDrawerClose')?.addEventListener('click', closeDrawer);
 
     overlay?.addEventListener('click', () => {
-        closeDrawer();
-        closeMovementModal();
+        if (movementModal?.classList.contains('show')) {
+            closeMovementModal();
+        } else if (drawer?.classList.contains('show')) {
+            closeDrawer();
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        if (movementModal?.classList.contains('show')) {
+            e.preventDefault();
+            closeMovementModal();
+            return;
+        }
+        if (drawer?.classList.contains('show')) {
+            e.preventDefault();
+            closeDrawer();
+        }
     });
 
     const movementType = document.getElementById('movementType');
@@ -403,20 +475,20 @@ $medlogPageHeader = [
     syncMovementHints();
 
     function applyFilters() {
+        cards = getStockCards();
         const q = (searchInput?.value || '').toLowerCase().trim();
         let visible = 0;
 
         cards.forEach((card) => {
-            const entry = parseStock(card);
-            const blob = card.dataset.search || '';
-            const type = card.dataset.type || '';
+            const blob = (card.getAttribute('data-search') || '').toLowerCase();
+            const type = card.getAttribute('data-type') || '';
 
             const chipOk =
                 activeFilter === 'all' ||
                 (activeFilter === 'stock_in' && type === 'stock_in') ||
                 (activeFilter === 'adjustment' && type === 'adjustment') ||
-                (activeFilter === 'today' && card.dataset.today === '1') ||
-                (activeFilter === 'week' && card.dataset.week === '1');
+                (activeFilter === 'today' && card.getAttribute('data-today') === '1') ||
+                (activeFilter === 'week' && card.getAttribute('data-week') === '1');
 
             const searchOk = !q || blob.includes(q);
             const show = chipOk && searchOk;
@@ -425,48 +497,69 @@ $medlogPageHeader = [
         });
 
         if (emptyFiltered) {
-            emptyFiltered.hidden = visible !== 0 || cards.length === 0;
+            const hasCards = cards.length > 0;
+            emptyFiltered.hidden = visible > 0 || !hasCards;
         }
     }
 
-    searchInput?.addEventListener('input', applyFilters);
+    function onSearchChange() {
+        applyFilters();
+    }
 
-    filterChips.forEach((chip) => {
-        chip.addEventListener('click', () => {
-            activeFilter = chip.dataset.stockFilter || 'all';
-            filterChips.forEach((c) => c.classList.remove('active'));
-            chip.classList.add('active');
-            applyFilters();
-        });
+    searchInput?.addEventListener('input', onSearchChange);
+    searchInput?.addEventListener('search', onSearchChange);
+
+    stocksShell?.addEventListener('click', (e) => {
+        const chip = e.target.closest('[data-stock-filter]');
+        if (!chip || !stocksShell.contains(chip)) return;
+        e.preventDefault();
+        activeFilter = chip.getAttribute('data-stock-filter') || 'all';
+        filterChips.forEach((c) => c.classList.remove('active'));
+        chip.classList.add('active');
+        applyFilters();
     });
 
     cards.forEach((card) => {
         card.addEventListener('click', () => {
+            returnFocusAfterDrawer = card;
             const entry = parseStock(card);
             if (entry) openDrawer(entry);
         });
         card.addEventListener('keydown', (e) => {
             if (e.key !== 'Enter' && e.key !== ' ') return;
             e.preventDefault();
+            returnFocusAfterDrawer = card;
             const entry = parseStock(card);
             if (entry) openDrawer(entry);
         });
     });
 
-    if ('IntersectionObserver' in window) {
-        const obs = new IntersectionObserver((entries, observer) => {
-            entries.forEach((entry) => {
-                if (!entry.isIntersecting) return;
-                entry.target.classList.add('is-visible');
-                observer.unobserve(entry.target);
-            });
-        }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+    function revealCards() {
+        cards = getStockCards();
+        if ('IntersectionObserver' in window) {
+            const obs = new IntersectionObserver((entries, observer) => {
+                entries.forEach((entry) => {
+                    if (!entry.isIntersecting) return;
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                });
+            }, { threshold: 0, rootMargin: '0px 0px 48px 0px' });
 
-        cards.forEach((c) => obs.observe(c));
-    } else {
-        cards.forEach((c) => c.classList.add('is-visible'));
+            cards.forEach((c) => obs.observe(c));
+        } else {
+            cards.forEach((c) => c.classList.add('is-visible'));
+        }
+
+        window.setTimeout(() => {
+            getStockCards().forEach((c) => {
+                if (!c.classList.contains('is-visible')) {
+                    c.classList.add('is-visible');
+                }
+            });
+        }, 2000);
     }
 
+    revealCards();
     applyFilters();
 })();
 </script>

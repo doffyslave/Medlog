@@ -53,6 +53,8 @@
 }
 
 .stocks-controls {
+    position: relative;
+    z-index: 3;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -124,6 +126,8 @@
 }
 
 .stocks-feed {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -151,9 +155,19 @@
         transform 0.22s ease;
 }
 
+/* Opacity 0 cards still receive clicks by default — block until revealed */
+.stock-card:not(.is-visible) {
+    pointer-events: none;
+}
+
 .stock-card.is-visible {
+    pointer-events: auto;
     animation: stockCardIn 0.55s cubic-bezier(0.22, 0.82, 0.22, 1) forwards;
     animation-delay: var(--stagger-delay, 0ms);
+}
+
+.stock-card[hidden] {
+    display: none !important;
 }
 
 .stock-card:focus-visible {
@@ -259,13 +273,17 @@
     z-index: 9000;
     background: rgba(10, 25, 49, 0.42);
     opacity: 0;
-    transition: opacity 0.2s ease;
-    pointer-events: none;
+    visibility: hidden;
+    transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease;
+    pointer-events: none !important;
 }
 
 .stock-overlay.show {
     opacity: 1;
-    pointer-events: auto;
+    visibility: visible;
+    pointer-events: auto !important;
 }
 
 .stock-drawer {
@@ -287,8 +305,16 @@
     flex-direction: column;
 }
 
+/* Avoid intercepting clicks / focus when visually off-screen; pairs with a11y focus management */
+.stock-drawer:not(.show) {
+    pointer-events: none !important;
+    visibility: hidden;
+}
+
 .stock-drawer.show {
     transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
 }
 
 .stock-drawer__close {
@@ -403,6 +429,10 @@
 
 .stock-modal.show {
     display: flex;
+}
+
+.stock-modal:not(.show) {
+    pointer-events: none;
 }
 
 .stock-modal__card {

@@ -40,7 +40,7 @@ $current = basename($_SERVER['PHP_SELF']);
                 </a>
             </li>
 
-            <!-- ================= STUDENT VIEW ================= -->
+            <!-- ================= STUDENT / TEACHER VIEW ================= -->
             <?php if ($role === 'student'): ?>
 
                 <li class="<?= $current == 'profile.php' ? 'active' : '' ?>">
@@ -56,6 +56,22 @@ $current = basename($_SERVER['PHP_SELF']);
                         <span class="menuText">My Visits</span>
                     </a>
                 </li>
+
+                <li class="<?= $current == 'appointments.php' ? 'active' : '' ?>">
+                    <a href="appointments.php">
+                        <span class="menu-icon"><i class="fa-solid fa-calendar-check"></i></span>
+                        <span class="menuText">Appointments</span>
+                    </a>
+                </li>
+
+                <li class="<?= $current == 'medicines.php' ? 'active' : '' ?>">
+                    <a href="medicines.php">
+                        <span class="menu-icon"><i class="fa-solid fa-pills"></i></span>
+                        <span class="menuText">Medicines</span>
+                    </a>
+                </li>
+
+            <?php elseif ($role === 'teacher'): ?>
 
                 <li class="<?= $current == 'appointments.php' ? 'active' : '' ?>">
                     <a href="appointments.php">

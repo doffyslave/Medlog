@@ -296,12 +296,19 @@ $medlogPageHeader = [
                                     <?php foreach ($dayAppointments as $appointment): ?>
                                         <?php
                                         $statusClass = 'pending';
-                                        if ($appointment['status'] === 'Approved')
+                                        $apSt = $appointment['status'] ?? '';
+                                        if ($apSt === 'Approved')
                                             $statusClass = 'approved';
-                                        elseif ($appointment['status'] === 'Rejected')
+                                        elseif ($apSt === 'Rejected')
                                             $statusClass = 'rejected';
-                                        elseif ($appointment['status'] === 'Cancelled')
+                                        elseif ($apSt === 'Cancelled')
                                             $statusClass = 'cancelled';
+                                        elseif ($apSt === 'Completed')
+                                            $statusClass = 'completed';
+                                        elseif ($apSt === 'Missed')
+                                            $statusClass = 'missed';
+                                        elseif ($apSt === 'Rescheduled')
+                                            $statusClass = 'rescheduled';
                                         ?>
                                         <div class="list-item">
                                             <div>

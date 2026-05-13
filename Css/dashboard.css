@@ -183,6 +183,21 @@
     color: #374151;
 }
 
+.status-pill.completed {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.status-pill.missed {
+    background: #ffedd5;
+    color: #9a3412;
+}
+
+.status-pill.rescheduled {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
 /* ===================== */
 /* GRID SYSTEM (FIXED) */
 /* ===================== */
