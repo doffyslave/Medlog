@@ -5,29 +5,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     session_start();
 
-    $user_id = $_POST['user_id'];
-    $complaint = $_POST['complaint'];
+    $user_id = trim((string) ($_POST['user_id'] ?? ''));
+    $complaint = trim((string) ($_POST['complaint'] ?? ''));
 
-    $notes = isset($_POST['notes']) && trim($_POST['notes']) !== '' 
-        ? trim($_POST['notes']) 
+    $notes = isset($_POST['notes']) && trim($_POST['notes']) !== ''
+        ? trim($_POST['notes'])
         : null;
 
-    $recorded_by = $_SESSION['user']['name'];
+    $recorded_by = $_SESSION['user']['name'] ?? '';
 
-    $med_id = $_POST['med_id'];
-    $quantity = $_POST['quantity'];
+    $medRaw = isset($_POST['med_id']) ? trim((string) $_POST['med_id']) : '';
+    $hasMedicine = $medRaw !== '';
+    $med_id = $hasMedicine ? (int) $medRaw : 0;
+    $quantity = isset($_POST['quantity']) ? (int) $_POST['quantity'] : 0;
+
+    if ($user_id === '' || $complaint === '') {
+        echo "Error: Patient and complaint are required.";
+        exit();
+    }
 
     try {
         $conn->beginTransaction();
 
-        $stmt = $conn->prepare("
-            SELECT total_quantity FROM medicines WHERE med_id = ?
-        ");
-        $stmt->execute([$med_id]);
-        $medicine = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($hasMedicine) {
+            if ($med_id < 1 || $quantity < 1) {
+                throw new Exception("Select a valid medicine and quantity.");
+            }
 
-        if (!$medicine || $medicine['total_quantity'] < $quantity) {
-            throw new Exception("Not enough stock!");
+            $stmt = $conn->prepare("
+                SELECT total_quantity FROM medicines WHERE med_id = ?
+            ");
+            $stmt->execute([$med_id]);
+            $medicine = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$medicine || (int) $medicine['total_quantity'] < $quantity) {
+                throw new Exception("Not enough stock!");
+            }
         }
 
         $stmt = $conn->prepare("
@@ -38,18 +51,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $visit_id = $conn->lastInsertId();
 
-        $stmt = $conn->prepare("
-            INSERT INTO treatments (visit_id, med_id, quantity)
-            VALUES (?, ?, ?)
-        ");
-        $stmt->execute([$visit_id, $med_id, $quantity]);
+        if ($hasMedicine) {
+            $stmt = $conn->prepare("
+                INSERT INTO treatments (visit_id, med_id, quantity)
+                VALUES (?, ?, ?)
+            ");
+            $stmt->execute([$visit_id, $med_id, $quantity]);
 
-        $stmt = $conn->prepare("
-            UPDATE medicines 
-            SET total_quantity = total_quantity - ? 
-            WHERE med_id = ?
-        ");
-        $stmt->execute([$quantity, $med_id]);
+            $stmt = $conn->prepare("
+                UPDATE medicines
+                SET total_quantity = total_quantity - ?
+                WHERE med_id = ?
+            ");
+            $stmt->execute([$quantity, $med_id]);
+        }
 
         $conn->commit();
 

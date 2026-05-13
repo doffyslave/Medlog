@@ -48,6 +48,50 @@ $medlogPageHeader = [
     margin-top: 20px;
     color: gray;
 }
+
+.visit-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.visit-card {
+    opacity: 1 !important;
+    transform: none !important;
+    width: 100% !important;
+    cursor: pointer;
+    padding: 14px;
+}
+
+.visit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.visit-meta {
+    font-size: 12px;
+    color: #4A7FA7;
+    font-weight: 700;
+}
+
+.visit-body p {
+    margin: 0 0 8px;
+}
+
+.badge {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(179, 207, 229, 0.45);
+    color: #1A3D63;
+    font-size: 12px;
+    font-weight: 700;
+}
+
 </style>
 </head>
 
@@ -66,47 +110,72 @@ $medlogPageHeader = [
 <?php include 'includes/medlog-page-header.php'; ?>
 
 <!-- 🔥 CARD LIST -->
-<div class="visit-grid">
-
-<?php if (!empty($visits)): ?>
-<?php foreach ($visits as $visit): ?>
-
-<div class="visit-card" onclick='openViewModal(<?= json_encode($visit) ?>)'>
-
-    <div class="visit-header">
-        <span>Visit Record</span>
-        <span class="visit-meta">
-            <?= date("M d, Y h:i A", strtotime($visit['visit_date'])) ?>
-        </span>
+<div class="visits-shell">
+    <div class="visits-toolbar">
+        <div class="visits-toolbar-label">
+            <span class="visits-timeline-icon" aria-hidden="true"></span>
+            <div>
+                <span class="visits-section-kicker">Timeline</span>
+                <span class="visits-section-title">My visit activity</span>
+            </div>
+        </div>
     </div>
 
-    <div class="visit-body">
-        <p><strong>Complaint:</strong> <?= htmlspecialchars($visit['complaint']) ?></p>
+    <div class="visit-feed" id="visitFeed">
+    <?php if (!empty($visits)): ?>
+        <?php foreach ($visits as $index => $visit): ?>
+            <?php
+                $layoutClass = $index % 2 === 0 ? 'layout-left' : 'layout-right';
+                $rowNum = str_pad((string)($index + 1), 2, '0', STR_PAD_LEFT);
+                $visitJson = htmlspecialchars(json_encode($visit), ENT_QUOTES, 'UTF-8');
+            ?>
+            <article
+                class="visit-card <?= $layoutClass ?>"
+                style="--stagger-delay: <?= (($index % 12) * 70) ?>ms;"
+                role="button"
+                tabindex="0"
+                data-visit="<?= $visitJson ?>"
+            >
+                <div class="visit-accent" aria-hidden="true"></div>
+                <div class="visit-ribbon">
+                    <span class="visit-index" aria-hidden="true"><?= $rowNum ?></span>
 
-        <p><strong>Treatment:</strong> 
-            <?= htmlspecialchars($visit['medicines_used'] ?? 'None') ?>
-        </p>
+                    <div class="visit-ribbon-primary">
+                        <span class="visit-name">My Visit</span>
+                    </div>
 
-        <p><strong>Notes:</strong> 
-            <?= htmlspecialchars($visit['notes'] ?? 'None') ?>
-        </p>
+                    <div class="visit-ribbon-col visit-ribbon-complaint">
+                        <span class="visit-kicker">Complaint</span>
+                        <span class="visit-line"><?= htmlspecialchars($visit['complaint']) ?></span>
+                    </div>
 
-        <span class="badge">
-            <?= htmlspecialchars($visit['recorded_by']) ?>
-        </span>
+                    <div class="visit-ribbon-col visit-ribbon-treatment">
+                        <span class="visit-kicker">Treatment</span>
+                        <span class="visit-line"><?= htmlspecialchars($visit['medicines_used'] ?? 'None') ?></span>
+                    </div>
+
+                    <div class="visit-ribbon-meta">
+                        <time class="visit-datetime" datetime="<?= htmlspecialchars(date('c', strtotime($visit['visit_date']))) ?>">
+                            <?= date('M j, Y', strtotime($visit['visit_date'])) ?>
+                            <span class="visit-time"><?= date('g:i A', strtotime($visit['visit_date'])) ?></span>
+                        </time>
+                        <span class="visit-recorded">
+                            <span class="visit-recorded-kicker">Recorded</span>
+                            <?= htmlspecialchars($visit['recorded_by']) ?>
+                        </span>
+                    </div>
+
+                    <button type="button" class="visit-details-btn">View details</button>
+                </div>
+            </article>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <div class="visit-empty">
+            <p>No visit records yet.</p>
+            <span class="visit-empty-hint">Your clinic visits will appear here.</span>
+        </div>
+    <?php endif; ?>
     </div>
-
-</div>
-
-<?php endforeach; ?>
-<?php else: ?>
-<p class="no-data">No visit records found.</p>
-<?php endif; ?>
-
-</div>
-
-</section>
-</main>
 </div>
 
 <!-- 🔥 VIEW MODAL -->
@@ -126,19 +195,79 @@ document.querySelector(".closeView").onclick = () => {
 };
 
 window.onclick = (e) => {
-    if (e.target === viewModal) viewModal.classList.remove("show");
+    if (e.target === viewModal) viewModal.classList.remove("show"); 
 };
+
+function esc(v) {
+    const s = v === undefined || v === null ? "" : String(v);
+    return s
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
 
 function openViewModal(data) {
     document.getElementById("viewContent").innerHTML = `
-        <p><strong>Date:</strong> ${data.visit_date}</p>
-        <p><strong>Recorded By:</strong> ${data.recorded_by}</p>
+        <p><strong>Date:</strong> ${esc(data.visit_date)}</p>
+        <p><strong>Recorded By:</strong> ${esc(data.recorded_by)}</p>
         <hr>
-        <p><strong>Complaint:</strong> ${data.complaint}</p>
-        <p><strong>Treatment:</strong> ${data.medicines_used || 'None'}</p>
-        <p><strong>Notes:</strong> ${data.notes || 'None'}</p>
+        <p><strong>Complaint:</strong> ${esc(data.complaint)}</p>
+        <p><strong>Treatment:</strong> ${esc(data.medicines_used || 'None')}</p>
+        <p><strong>Notes:</strong> ${esc(data.notes || 'None')}</p>
     `;
     viewModal.classList.add("show");
+}
+
+function parseVisitDataset(card) {
+    try {
+        return JSON.parse(card.dataset.visit);
+    } catch (e) {
+        return null;
+    }
+}
+
+document.querySelectorAll(".visit-card[data-visit]").forEach(card => {
+    card.addEventListener("click", () => {
+        const data = parseVisitDataset(card);
+        if (data) openViewModal(data);
+    });
+
+    card.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
+        const data = parseVisitDataset(card);
+        if (data) openViewModal(data);
+    });
+});
+
+document.querySelectorAll(".visit-details-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const card = btn.closest(".visit-card");
+        if (!card) return;
+        const data = parseVisitDataset(card);
+        if (data) openViewModal(data);
+    });
+});
+
+const visitCards = document.querySelectorAll(".visit-card");
+
+if ("IntersectionObserver" in window) {
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+        });
+    }, {
+        threshold: 0.12,
+        rootMargin: "0px 0px -24px 0px"
+    });
+
+    visitCards.forEach(card => revealObserver.observe(card));
+} else {
+    visitCards.forEach(card => card.classList.add("is-visible"));
 }
 </script>
 

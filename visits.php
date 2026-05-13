@@ -52,6 +52,43 @@ if ($user_id) {
 $visits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $user = $_SESSION['user'];
 
+$patientPickerRows = $conn->query("
+    SELECT user_id, name
+    FROM users
+    WHERE LOWER(TRIM(COALESCE(role, ''))) <> 'admin'
+      AND status = 'active'
+    ORDER BY name ASC
+")->fetchAll(PDO::FETCH_ASSOC);
+
+$patientPickerOptions = [];
+foreach ($patientPickerRows as $pr) {
+    $patientPickerOptions[] = [
+        'id' => (string) $pr['user_id'],
+        'label' => (string) $pr['name'],
+    ];
+}
+
+$medicinePickerRows = $conn->query("
+    SELECT med_id, medicine_name FROM medicines ORDER BY medicine_name ASC
+")->fetchAll(PDO::FETCH_ASSOC);
+
+$medicinePickerOptions = [];
+foreach ($medicinePickerRows as $mr) {
+    $medicinePickerOptions[] = [
+        'id' => (string) $mr['med_id'],
+        'label' => (string) $mr['medicine_name'],
+    ];
+}
+
+$patientPickerJson = json_encode(
+    $patientPickerOptions,
+    JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+);
+$medicinePickerJson = json_encode(
+    $medicinePickerOptions,
+    JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+);
+
 ob_start();
 ?>
 <button type="button" id="openVisitModal" class="add-btn">+ Add Visit</button>
@@ -120,7 +157,7 @@ $medlogPageHeader = [
 <?php foreach ($visits as $index => $visit): ?>
 <?php
     $layoutClass = $index % 2 === 0 ? 'layout-left' : 'layout-right';
-    $roleSlug = strtolower((string) ($visit['patient_role'] ?? ''));
+    $roleSlug = strtolower(trim((string) ($visit['patient_role'] ?? '')));
     $roleLabel = $roleSlug !== '' ? ucfirst($roleSlug) : '';
     $visitJson = htmlspecialchars(json_encode($visit), ENT_QUOTES, 'UTF-8');
     $rowNum = str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT);
@@ -191,152 +228,389 @@ $medlogPageHeader = [
 </div>
 
 <!-- ADD VISIT MODAL -->
-<div id="visitModal" class="modal">
-<div class="modal-content">
-<span class="closeVisit">&times;</span>
-<h2>Add Visit</h2>
-
-<form action="Database/add_visit.php" method="POST">
-
-<select name="user_id" required>
-<option value="">Select Patient</option>
-<?php
-$users = $conn->query("SELECT user_id, name FROM users")->fetchAll(PDO::FETCH_ASSOC);
-foreach ($users as $u):
-?>
-<option value="<?= $u['user_id'] ?>">
-<?= htmlspecialchars($u['name']) ?>
-</option>
-<?php endforeach; ?>
-</select>
-
-<input type="text" name="complaint" placeholder="Complaint" required>
-
-<textarea name="notes" placeholder="Notes (optional)..."></textarea>
-
-<select name="med_id" required>
-<option value="">Select Medicine</option>
-<?php
-$meds = $conn->query("SELECT med_id, medicine_name FROM medicines")->fetchAll(PDO::FETCH_ASSOC);
-foreach ($meds as $m):
-?>
-<option value="<?= $m['med_id'] ?>">
-<?= htmlspecialchars($m['medicine_name']) ?>
-</option>
-<?php endforeach; ?>
-</select>
-
-<input type="number" name="quantity" placeholder="Quantity" required>
-
-<button type="submit">Save Visit</button>
-
-</form>
-</div>
+<div id="visitModal" class="modal visit-add-modal" aria-hidden="true">
+    <div class="modal-content visit-add-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="visitAddTitle">
+        <div class="visit-add-modal__hero">
+            <button type="button" class="visit-add-modal__close closeVisit" aria-label="Close">&times;</button>
+            <span class="visit-add-modal__eyebrow">Clinical record</span>
+            <h2 id="visitAddTitle" class="visit-add-modal__title">Add visit</h2>
+            <p class="visit-add-modal__subtitle">Log an encounter, complaint, and optional medication. Medicine is only required when dispensing from stock.</p>
+        </div>
+        <form id="addVisitForm" class="visit-add-modal__form" action="Database/add_visit.php" method="POST">
+            <div class="visit-add-modal__body">
+                <div class="visit-add-modal__section">
+                    <div class="visit-add-modal__section-head">
+                        <h3 class="visit-add-modal__section-title">Patient &amp; visit</h3>
+                    </div>
+                    <div class="visit-add-modal__field">
+                        <label class="visit-add-modal__label" for="visitPatientSearch">Patient <span class="req">*</span></label>
+                        <div class="medlog-search-select" id="visitPatientSelect" data-medlog-search-select data-placeholder="Search patient by name…">
+                            <div class="medlog-search-select__control">
+                                <input type="text" id="visitPatientSearch" class="medlog-search-select__input" autocomplete="off" placeholder="Search patient by name…" aria-autocomplete="list" aria-controls="visitPatientList" aria-expanded="false" role="combobox">
+                                <span class="medlog-search-select__chevron" aria-hidden="true"></span>
+                                <input type="hidden" name="user_id" id="visitPatientValue" value="" required>
+                                <ul class="medlog-search-select__dropdown" id="visitPatientList" role="listbox" hidden></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="visit-add-modal__field">
+                        <label class="visit-add-modal__label" for="visitComplaint">Chief complaint <span class="req">*</span></label>
+                        <input class="visit-add-modal__input" type="text" name="complaint" id="visitComplaint" placeholder="e.g. Headache, minor cut, wellness check" required maxlength="500">
+                    </div>
+                    <div class="visit-add-modal__field">
+                        <label class="visit-add-modal__label" for="visitNotes">Clinical notes</label>
+                        <textarea class="visit-add-modal__textarea" name="notes" id="visitNotes" placeholder="Observations, vitals, follow-up (optional)…" maxlength="4000"></textarea>
+                    </div>
+                </div>
+                <div class="visit-add-modal__section">
+                    <div class="visit-add-modal__section-head">
+                        <h3 class="visit-add-modal__section-title">Medication</h3>
+                        <span class="visit-add-modal__section-hint">Optional</span>
+                    </div>
+                    <div class="visit-add-modal__field">
+                        <label class="visit-add-modal__label" for="visitMedicineSearch">Medicine</label>
+                        <div class="medlog-search-select" id="visitMedicineSelect" data-medlog-search-select data-allow-clear="1" data-placeholder="Search medicine or leave blank…">
+                            <div class="medlog-search-select__control">
+                                <input type="text" id="visitMedicineSearch" class="medlog-search-select__input" autocomplete="off" placeholder="Search medicine or leave blank…" aria-autocomplete="list" aria-controls="visitMedicineList" aria-expanded="false" role="combobox">
+                                <span class="medlog-search-select__chevron" aria-hidden="true"></span>
+                                <input type="hidden" name="med_id" id="visitMedicineValue" value="">
+                                <ul class="medlog-search-select__dropdown" id="visitMedicineList" role="listbox" hidden></ul>
+                            </div>
+                            <div class="medlog-search-select__actions">
+                                <button type="button" class="medlog-search-select__clear" id="visitMedicineClear" hidden>Clear medicine</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="visit-add-modal__field visit-add-modal__quantity-wrap is-disabled" id="visitQuantityWrap">
+                        <label class="visit-add-modal__label" for="visitQuantity">Quantity dispensed</label>
+                        <input class="visit-add-modal__input" type="number" name="quantity" id="visitQuantity" min="1" step="1" value="" placeholder="—" disabled>
+                    </div>
+                </div>
+            </div>
+            <div class="visit-add-modal__footer">
+                <button type="submit" class="visit-add-modal__submit">Save visit</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script>
-const visitModal = document.getElementById("visitModal");
-const viewModal = document.getElementById("viewModal");
+(function () {
+    const MEDLOG_PATIENT_ITEMS = <?= $patientPickerJson ?: '[]' ?>;
+    const MEDLOG_MEDICINE_ITEMS = <?= $medicinePickerJson ?: '[]' ?>;
 
-document.getElementById("openVisitModal").onclick = () => {
-    visitModal.classList.add("show");
-};
+    const visitModal = document.getElementById("visitModal");
+    const viewModal = document.getElementById("viewModal");
+    const addVisitForm = document.getElementById("addVisitForm");
+    const medHidden = document.getElementById("visitMedicineValue");
+    const qtyInput = document.getElementById("visitQuantity");
+    const qtyWrap = document.getElementById("visitQuantityWrap");
+    const medClearBtn = document.getElementById("visitMedicineClear");
 
-document.querySelector(".closeVisit").onclick = () => {
-    visitModal.classList.remove("show");
-};
+    function setModalOpen(modal, open) {
+        if (!modal) return;
+        modal.classList.toggle("show", open);
+        modal.setAttribute("aria-hidden", open ? "false" : "true");
+    }
 
-document.querySelector(".closeView").onclick = () => {
-    viewModal.classList.remove("show");
-};
+    document.getElementById("openVisitModal").onclick = () => setModalOpen(visitModal, true);
 
-window.onclick = (e) => {
-    if (e.target === visitModal) visitModal.classList.remove("show");
-    if (e.target === viewModal) viewModal.classList.remove("show");
-};
+    document.querySelectorAll(".closeVisit").forEach((btn) => {
+        btn.addEventListener("click", () => setModalOpen(visitModal, false));
+    });
 
-function openViewModal(data) {
-    document.getElementById("viewContent").innerHTML = `
-        <p><strong>Patient:</strong> ${data.name}</p>
-        <p><strong>Date:</strong> ${data.visit_date}</p>
-        <p><strong>Recorded By:</strong> ${data.recorded_by}</p>
+    document.querySelectorAll(".closeView").forEach((btn) => {
+        btn.addEventListener("click", () => setModalOpen(viewModal, false));
+    });
+
+    window.addEventListener("click", (e) => {
+        if (e.target === visitModal) setModalOpen(visitModal, false);
+        if (e.target === viewModal) setModalOpen(viewModal, false);
+    });
+
+    function syncMedicineQuantityUi() {
+        const hasMed = !!(medHidden && medHidden.value.trim());
+        if (qtyWrap && qtyInput) {
+            qtyWrap.classList.toggle("is-disabled", !hasMed);
+            qtyInput.disabled = !hasMed;
+            if (!hasMed) {
+                qtyInput.value = "";
+                qtyInput.removeAttribute("required");
+            } else {
+                qtyInput.setAttribute("required", "required");
+                qtyInput.setAttribute("min", "1");
+            }
+        }
+        if (medClearBtn) {
+            medClearBtn.hidden = !hasMed;
+        }
+    }
+
+    if (medHidden) {
+        medHidden.addEventListener("change", syncMedicineQuantityUi);
+    }
+    if (medClearBtn) {
+        medClearBtn.addEventListener("click", () => {
+            const root = document.getElementById("visitMedicineSelect");
+            const input = root && root.querySelector(".medlog-search-select__input");
+            if (medHidden) medHidden.value = "";
+            if (input) input.value = "";
+            medHidden && medHidden.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+    }
+
+    if (addVisitForm) {
+        addVisitForm.addEventListener("submit", (e) => {
+            const hasMed = !!(medHidden && medHidden.value.trim());
+            if (hasMed) {
+                const q = parseInt(String(qtyInput && qtyInput.value), 10);
+                if (!q || q < 1) {
+                    e.preventDefault();
+                    qtyInput && qtyInput.focus();
+                    return;
+                }
+            }
+        });
+    }
+
+    function norm(s) {
+        return String(s || "")
+            .toLowerCase()
+            .trim();
+    }
+
+    function mountSearchSelect(root, items) {
+        if (!root || !items) return;
+        const placeholder = root.getAttribute("data-placeholder") || "Search…";
+        const hidden = root.querySelector('input[type="hidden"][name]');
+        const input = root.querySelector(".medlog-search-select__input");
+        const list = root.querySelector(".medlog-search-select__dropdown");
+        if (!hidden || !input || !list) return;
+
+        let filtered = items.slice();
+        let activeIndex = -1;
+
+        function setOpen(open) {
+            root.classList.toggle("is-open", open);
+            list.hidden = !open;
+            input.setAttribute("aria-expanded", open ? "true" : "false");
+        }
+
+        function filterItems(q) {
+            const n = norm(q);
+            if (!n) return items.slice();
+            return items.filter((it) => norm(it.label).includes(n));
+        }
+
+        function renderList() {
+            list.innerHTML = "";
+            const slice = filtered.slice(0, 200);
+            slice.forEach((it, i) => {
+                const li = document.createElement("li");
+                li.setAttribute("role", "option");
+                li.className = "medlog-search-select__option";
+                li.textContent = it.label;
+                li.dataset.id = it.id;
+                if (i === activeIndex) li.classList.add("is-active");
+                li.addEventListener("mousedown", (ev) => {
+                    ev.preventDefault();
+                    pick(it);
+                });
+                list.appendChild(li);
+            });
+            if (!slice.length) {
+                const li = document.createElement("li");
+                li.className = "medlog-search-select__empty";
+                li.textContent = "No matches";
+                list.appendChild(li);
+            }
+        }
+
+        function pick(it) {
+            if (it) {
+                hidden.value = it.id;
+                input.value = it.label;
+            } else {
+                hidden.value = "";
+                input.value = "";
+            }
+            hidden.dispatchEvent(new Event("change", { bubbles: true }));
+            setOpen(false);
+            activeIndex = -1;
+        }
+
+        function openList() {
+            const selected = items.find((x) => String(x.id) === String(hidden.value));
+            if (selected && !norm(input.value)) {
+                input.value = selected.label;
+            }
+            filtered = filterItems(input.value);
+            activeIndex = filtered.length ? 0 : -1;
+            renderList();
+            setOpen(true);
+        }
+
+        input.setAttribute("placeholder", placeholder);
+
+        input.addEventListener("focus", () => {
+            openList();
+        });
+
+        input.addEventListener("input", () => {
+            const selected = items.find((x) => String(x.id) === String(hidden.value));
+            if (!selected || input.value !== selected.label) {
+                hidden.value = "";
+                hidden.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+            filtered = filterItems(input.value);
+            activeIndex = filtered.length ? 0 : -1;
+            renderList();
+            setOpen(true);
+        });
+
+        input.addEventListener("keydown", (ev) => {
+            if (ev.key === "Escape") {
+                ev.stopPropagation();
+                setOpen(false);
+                input.blur();
+                return;
+            }
+            if (ev.key === "ArrowDown") {
+                ev.preventDefault();
+                if (list.hidden) openList();
+                if (filtered.length) {
+                    activeIndex = Math.min(activeIndex + 1, filtered.length - 1);
+                    renderList();
+                    scrollActiveIntoView();
+                }
+                return;
+            }
+            if (ev.key === "ArrowUp") {
+                ev.preventDefault();
+                if (filtered.length) {
+                    activeIndex = Math.max(activeIndex - 1, 0);
+                    renderList();
+                    scrollActiveIntoView();
+                }
+                return;
+            }
+            if (ev.key === "Enter") {
+                if (!list.hidden && filtered[activeIndex]) {
+                    ev.preventDefault();
+                    pick(filtered[activeIndex]);
+                }
+            }
+        });
+
+        function scrollActiveIntoView() {
+            const el = list.querySelector(".medlog-search-select__option.is-active");
+            if (el) el.scrollIntoView({ block: "nearest" });
+        }
+
+        document.addEventListener("click", (ev) => {
+            if (!root.contains(ev.target)) setOpen(false);
+        });
+    }
+
+    mountSearchSelect(document.getElementById("visitPatientSelect"), MEDLOG_PATIENT_ITEMS);
+    mountSearchSelect(document.getElementById("visitMedicineSelect"), MEDLOG_MEDICINE_ITEMS);
+
+    syncMedicineQuantityUi();
+
+    function openViewModal(data) {
+        const esc = (v) => {
+            const s = v === undefined || v === null ? "" : String(v);
+            return s
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+        };
+        document.getElementById("viewContent").innerHTML = `
+        <p><strong>Patient:</strong> ${esc(data.name)}</p>
+        <p><strong>Date:</strong> ${esc(data.visit_date)}</p>
+        <p><strong>Recorded By:</strong> ${esc(data.recorded_by)}</p>
         <hr>
-        <p><strong>Complaint:</strong> ${data.complaint}</p>
-        <p><strong>Treatment:</strong> ${data.medicines_used || 'None'}</p>
-        <p><strong>Notes:</strong> ${data.notes || 'None'}</p>
+        <p><strong>Complaint:</strong> ${esc(data.complaint)}</p>
+        <p><strong>Treatment:</strong> ${esc(data.medicines_used || "None")}</p>
+        <p><strong>Notes:</strong> ${esc(data.notes || "None")}</p>
 
         <br>
 
-        <a href="print_visit.php?id=${data.visit_id}" target="_blank" class="visit-print-link">
+        <a href="print_visit.php?id=${encodeURIComponent(String(data.visit_id))}" target="_blank" class="visit-print-link">
            🖨 Print Visit
         </a>
     `;
 
-    viewModal.classList.add("show");
-}
-
-function parseVisitDataset(card) {
-    try {
-        return JSON.parse(card.dataset.visit);
-    } catch (e) {
-        return null;
+        setModalOpen(viewModal, true);
     }
-}
 
-document.querySelectorAll(".visit-card[data-visit]").forEach(card => {
-    card.addEventListener("click", () => {
-        const data = parseVisitDataset(card);
-        if (data) openViewModal(data);
-    });
-    card.addEventListener("keydown", (e) => {
-        if (e.key !== "Enter" && e.key !== " ") return;
-        e.preventDefault();
-        const data = parseVisitDataset(card);
-        if (data) openViewModal(data);
-    });
-});
+    function parseVisitDataset(card) {
+        try {
+            return JSON.parse(card.dataset.visit);
+        } catch (e) {
+            return null;
+        }
+    }
 
-document.querySelectorAll(".visit-details-btn").forEach(btn => {
-    btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const card = btn.closest(".visit-card");
-        if (!card) return;
-        const data = parseVisitDataset(card);
-        if (data) openViewModal(data);
-    });
-});
-
-document.querySelectorAll(".visit-filter-chip").forEach(chip => {
-    chip.addEventListener("click", () => {
-        const filter = chip.dataset.filter || "all";
-        document.querySelectorAll(".visit-filter-chip").forEach(c => c.classList.remove("active"));
-        chip.classList.add("active");
-        document.querySelectorAll(".visit-card[data-visit]").forEach(card => {
-            const role = (card.dataset.patientRole || "").toLowerCase();
-            const show = filter === "all" || role === filter;
-            card.hidden = !show;
+    document.querySelectorAll(".visit-card[data-visit]").forEach((card) => {
+        card.addEventListener("click", () => {
+            const data = parseVisitDataset(card);
+            if (data) openViewModal(data);
+        });
+        card.addEventListener("keydown", (e) => {
+            if (e.key !== "Enter" && e.key !== " ") return;
+            e.preventDefault();
+            const data = parseVisitDataset(card);
+            if (data) openViewModal(data);
         });
     });
-});
 
-const visitCards = document.querySelectorAll(".visit-card");
-
-if ("IntersectionObserver" in window) {
-    const revealObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (!entry.isIntersecting) return;
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
+    document.querySelectorAll(".visit-details-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const card = btn.closest(".visit-card");
+            if (!card) return;
+            const data = parseVisitDataset(card);
+            if (data) openViewModal(data);
         });
-    }, {
-        threshold: 0.12,
-        rootMargin: "0px 0px -24px 0px"
     });
 
-    visitCards.forEach(card => revealObserver.observe(card));
-} else {
-    visitCards.forEach(card => card.classList.add("is-visible"));
-}
+    document.querySelectorAll(".visit-filter-chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+            const filter = chip.dataset.filter || "all";
+            document.querySelectorAll(".visit-filter-chip").forEach((c) => c.classList.remove("active"));
+            chip.classList.add("active");
+            document.querySelectorAll(".visit-card[data-visit]").forEach((card) => {
+                const role = norm(card.dataset.patientRole);
+                const show = filter === "all" || role === norm(filter);
+                card.hidden = !show;
+            });
+        });
+    });
+
+    const visitCards = document.querySelectorAll(".visit-card");
+
+    if ("IntersectionObserver" in window) {
+        const revealObserver = new IntersectionObserver(
+            (entries, observer) => {
+                entries.forEach((entry) => {
+                    if (!entry.isIntersecting) return;
+                    entry.target.classList.add("is-visible");
+                    observer.unobserve(entry.target);
+                });
+            },
+            {
+                threshold: 0.12,
+                rootMargin: "0px 0px -24px 0px",
+            }
+        );
+
+        visitCards.forEach((card) => revealObserver.observe(card));
+    } else {
+        visitCards.forEach((card) => card.classList.add("is-visible"));
+    }
+})();
 </script>
 
 </body>

@@ -1,36 +1,95 @@
 <?php
 session_start();
 
-// ini_set('display_errors', 1);
-// error_reporting(E_ALL);
-
 $user = $_SESSION['user'] ?? null;
 
 if (!$user || $user['role'] !== 'admin') {
-    header("Location: dashboard.php");
+    header('Location: dashboard.php');
     exit();
 }
 
 require 'Database/connection.php';
 
-// FETCH DATA WITH JOIN
+$colStmt = $conn->query('SHOW COLUMNS FROM stocks');
+$stockColumns = $colStmt ? $colStmt->fetchAll(PDO::FETCH_COLUMN) : [];
+$hasCreatedAt = is_array($stockColumns) && in_array('created_at', $stockColumns, true);
+
 $stmt = $conn->query("
-    SELECT stocks.*, medicines.medicine_name 
-    FROM stocks 
+    SELECT stocks.*, medicines.medicine_name
+    FROM stocks
     LEFT JOIN medicines ON stocks.med_id = medicines.med_id
     ORDER BY stocks.stock_id DESC
 ");
+$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$today = date('Y-m-d');
+$weekStart = date('Y-m-d', strtotime('monday this week'));
+$weekEnd = date('Y-m-d', strtotime('sunday this week'));
+
+$feedItems = [];
+$totalTx = count($rows);
+$adjustmentTx = 0;
+$stockInToday = 0;
+
+foreach ($rows as $row) {
+    $qty = (int) ($row['quantity'] ?? 0);
+    $type = $qty < 0 ? 'adjustment' : 'stock_in';
+    $createdRaw = isset($row['created_at']) ? (string) $row['created_at'] : '';
+    $createdDate = $createdRaw !== '' ? substr($createdRaw, 0, 10) : '';
+    $exp = isset($row['expiration_date']) && $row['expiration_date'] !== '' && $row['expiration_date'] !== null
+        ? (string) $row['expiration_date']
+        : '';
+
+    if ($qty < 0) {
+        $adjustmentTx++;
+    }
+
+    if ($qty > 0) {
+        if ($hasCreatedAt && $createdDate === $today) {
+            $stockInToday++;
+        } elseif (!$hasCreatedAt && $exp === $today) {
+            $stockInToday++;
+        }
+    }
+
+    $inWeek = false;
+    if ($hasCreatedAt && $createdDate !== '') {
+        $inWeek = ($createdDate >= $weekStart && $createdDate <= $weekEnd);
+    } elseif (!$hasCreatedAt && $exp !== '') {
+        $inWeek = ($exp >= $weekStart && $exp <= $weekEnd);
+    }
+
+    $isTodayChip = ($hasCreatedAt && $createdDate === $today)
+        || (!$hasCreatedAt && $exp === $today && $qty > 0);
+
+    $feedItems[] = [
+        'stock_id' => (int) ($row['stock_id'] ?? 0),
+        'med_id' => (int) ($row['med_id'] ?? 0),
+        'medicine_name' => (string) ($row['medicine_name'] ?? 'Unknown'),
+        'quantity' => $qty,
+        'expiration_date' => $exp,
+        'created_at' => $createdRaw !== '' ? $createdRaw : null,
+        'type' => $type,
+        'label' => $type === 'adjustment' ? 'Adjustment' : 'Stock In',
+        'in_week' => $inWeek,
+        'date_for_day_filter' => $hasCreatedAt ? $createdDate : $exp,
+        'is_today' => $isTodayChip,
+    ];
+}
+
+$itemsJson = json_encode($feedItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+
+$medsStmt = $conn->query('SELECT med_id, medicine_name FROM medicines ORDER BY medicine_name ASC');
+$medicinesList = $medsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 ob_start();
 ?>
-<button class="add-btn" onclick="openModal()">+ Add / Adjust Stock</button>
+<button type="button" id="openStockMovementModal" class="add-btn">+ Record movement</button>
 <?php
 $__stocksActions = ob_get_clean();
 $medlogPageHeader = [
     'title' => 'Stocks inventory',
-    'subtitle' => 'Track stock movements, adjustments, and expiration dates.',
+    'subtitle' => 'Audit trail for inbound supply and inventory corrections.',
     'icon' => 'stocks',
     'class' => 'medlog-page-header--stocks',
     'actions' => $__stocksActions,
@@ -42,136 +101,374 @@ $medlogPageHeader = [
 <head>
 <meta charset="UTF-8">
 <title>Stocks Inventory</title>
-
 <link rel="stylesheet" href="Css/layout.css">
-<link rel="stylesheet" href="Css/stocks.css">
+<link rel="stylesheet" href="Css/stocks-page.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
-
 <body>
 
 <div class="dashboard">
+<?php include 'includes/sidebar.php'; ?>
 
-    <?php include 'includes/sidebar.php'; ?>
+<main class="main-content">
+<?php include 'includes/header.php'; ?>
 
-    <div class="main-content">
+<section class="content stocks-page">
 
-        <?php include 'includes/header.php'; ?>
+<?php include 'includes/medlog-page-header.php'; ?>
 
-        <div class="content">
+<div class="stocks-shell">
+    <div class="stocks-stats">
+        <article class="stocks-stat">
+            <span class="stocks-stat__label">Total transactions</span>
+            <strong class="stocks-stat__value"><?= (int) $totalTx ?></strong>
+        </article>
+        <article class="stocks-stat">
+            <span class="stocks-stat__label">Stock in today</span>
+            <strong class="stocks-stat__value"><?= (int) $stockInToday ?></strong>
+            <?php if (!$hasCreatedAt): ?>
+                <span class="stocks-stat__hint">Uses expiry date as proxy until <code>created_at</code> exists on <code>stocks</code>.</span>
+            <?php endif; ?>
+        </article>
+        <article class="stocks-stat">
+            <span class="stocks-stat__label">Adjustments</span>
+            <strong class="stocks-stat__value"><?= (int) $adjustmentTx ?></strong>
+            <span class="stocks-stat__hint">Historical deductions / corrections.</span>
+        </article>
+    </div>
 
-            <?php include 'includes/medlog-page-header.php'; ?>
+    <section class="stocks-controls" aria-label="Search and filters">
+        <label class="stocks-search">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input type="search" id="stockSearchInput" placeholder="Search medicine, type, date, quantity…" autocomplete="off">
+        </label>
+        <div class="stocks-filters" role="group" aria-label="Filter activity">
+            <button type="button" class="stocks-filter-chip active" data-stock-filter="all">All activity</button>
+            <button type="button" class="stocks-filter-chip" data-stock-filter="stock_in">Stock In</button>
+            <button type="button" class="stocks-filter-chip" data-stock-filter="adjustment">Adjustments</button>
+            <button type="button" class="stocks-filter-chip" data-stock-filter="today">Today</button>
+            <button type="button" class="stocks-filter-chip" data-stock-filter="week">This week</button>
+        </div>
+    </section>
 
-            <table class="inventory-table">
-                <thead>
-                    <tr>
-                        <th>Medicine</th>
-                        <th>Quantity</th>
-                        <th>Expiration</th>
-                        <th>Type</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                <?php foreach($items as $row): 
-                    $type = ($row['quantity'] < 0) ? 'Adjustment' : 'Stock In';
-                ?>
-                    <tr>
-                        <td><?= htmlspecialchars($row['medicine_name'] ?? 'N/A') ?></td>
-
-                        <td style="color: <?= $row['quantity'] < 0 ? 'red' : 'green' ?>">
-                            <?= $row['quantity'] > 0 ? '+' : '' ?><?= $row['quantity'] ?>
-                        </td>
-
-                        <td><?= $row['expiration_date'] ?: '-' ?></td>
-
-                        <td>
-                            <span class="<?= $row['quantity'] < 0 ? 'badge-low' : 'badge-ok' ?>">
-                                <?= $type ?>
-                            </span>
-                        </td>
-
-                        <td>
-                            <button class="edit-btn" onclick='editItem(<?= json_encode($row) ?>)'>Edit</button>
-                        </td>
-                    </tr>
+    <div class="stocks-layout">
+        <div class="stocks-feed" id="stockFeed">
+            <?php if (!empty($feedItems)): ?>
+                <?php foreach ($feedItems as $index => $entry): ?>
+                    <?php
+                        $isOut = $entry['type'] === 'adjustment';
+                        $cardClass = $isOut ? 'stock-card--out' : 'stock-card--in';
+                        $badgeClass = $isOut ? 'stock-card__badge--out' : 'stock-card__badge--in';
+                        $qtyClass = $isOut ? 'stock-card__qty--out' : 'stock-card__qty--in';
+                        $qtyPrefix = $entry['quantity'] > 0 ? '+' : '';
+                        $expDisplay = $entry['expiration_date'] !== '' ? $entry['expiration_date'] : '—';
+                        $tsDisplay = $entry['created_at']
+                            ? date('g:i A · M j, Y', strtotime($entry['created_at']))
+                            : ($hasCreatedAt ? '—' : 'Not tracked');
+                        $searchBlob = strtolower(
+                            $entry['medicine_name'] . ' ' .
+                            $entry['label'] . ' ' .
+                            $entry['expiration_date'] . ' ' .
+                            $entry['quantity'] . ' ' .
+                            ($entry['created_at'] ?? '')
+                        );
+                        $payload = htmlspecialchars(json_encode($entry), ENT_QUOTES, 'UTF-8');
+                    ?>
+                    <article
+                        class="stock-card <?= $cardClass ?>"
+                        style="--stagger-delay: <?= (($index % 14) * 45) ?>ms;"
+                        tabindex="0"
+                        role="button"
+                        data-stock="<?= $payload ?>"
+                        data-type="<?= htmlspecialchars($entry['type'], ENT_QUOTES, 'UTF-8') ?>"
+                        data-search="<?= htmlspecialchars($searchBlob, ENT_QUOTES, 'UTF-8') ?>"
+                        data-today="<?= !empty($entry['is_today']) ? '1' : '0' ?>"
+                        data-week="<?= !empty($entry['in_week']) ? '1' : '0' ?>"
+                    >
+                        <div class="stock-card__rail" aria-hidden="true"></div>
+                        <div class="stock-card__body">
+                            <div class="stock-card__top">
+                                <span class="stock-card__med"><?= htmlspecialchars($entry['medicine_name'], ENT_QUOTES, 'UTF-8') ?></span>
+                                <span class="stock-card__badge <?= $badgeClass ?>"><?= htmlspecialchars($entry['label'], ENT_QUOTES, 'UTF-8') ?></span>
+                            </div>
+                            <div class="stock-card__qty <?= $qtyClass ?>"><?= $qtyPrefix ?><?= (int) $entry['quantity'] ?> units</div>
+                            <div class="stock-card__meta">
+                                <span><i class="fa-regular fa-calendar"></i> Expires <?= htmlspecialchars($expDisplay, ENT_QUOTES, 'UTF-8') ?></span>
+                                <span><i class="fa-regular fa-clock"></i> <?= htmlspecialchars($tsDisplay, ENT_QUOTES, 'UTF-8') ?></span>
+                                <span>#<?= (int) $entry['stock_id'] ?></span>
+                            </div>
+                        </div>
+                        <div class="stock-card__chev" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+                    </article>
                 <?php endforeach; ?>
-                </tbody>
-            </table>
-
+            <?php else: ?>
+                <div class="stock-empty" id="stockEmptyDefault">
+                    <p>No stock movements recorded yet.</p>
+                </div>
+            <?php endif; ?>
+            <div class="stock-empty" id="stockEmptyFiltered" hidden>
+                <p>No transactions match your search or filters.</p>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- ADD / ADJUST MODAL -->
-<div class="modal" id="addModal">
-    <div class="modal-content">
-        <h3>Add / Adjust Stock</h3>
-
-        <form method="POST" action="Database/add_stocks.php">
-
-            <select name="med_id" required>
-                <option value="">Select Medicine</option>
-                <?php
-                $meds = $conn->query("SELECT * FROM medicines");
-                foreach ($meds as $med):
-                ?>
-                    <option value="<?= $med['med_id'] ?>">
-                        <?= htmlspecialchars($med['medicine_name']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-
-            <input type="number" name="quantity" placeholder="(+ add, - adjust)" required>
-            <small style="color:gray;">Use negative values to correct mistakes</small>
-
-            <input type="date" name="expiration_date">
-
-            <button type="submit" class="save-btn">Save</button>
-            <button type="button" onclick="closeModal()" class="cancel-btn">Cancel</button>
-        </form>
-    </div>
+</section>
+</main>
 </div>
 
-<!-- EDIT MODAL -->
-<div class="modal" id="editModal">
-    <div class="modal-content">
-        <h3>Edit Stock Record</h3>
-        <p id="edit_name" style="font-size: 14px; color: gray;"></p>
+<div class="stock-overlay" id="stockOverlay" aria-hidden="true"></div>
 
-        <form method="POST" action="Database/edit_stocks.php">
-            <input type="hidden" name="id" id="edit_id">
+<aside class="stock-drawer" id="stockDrawer" aria-hidden="true">
+    <button type="button" class="stock-drawer__close" id="stockDrawerClose" aria-label="Close">&times;</button>
+    <div class="stock-drawer__scroll" id="stockDrawerInner"></div>
+</aside>
 
-            <input type="date" name="expiration_date" id="edit_expiration">
+<div class="stock-modal" id="stockMovementModal" aria-hidden="true">
+    <div class="stock-modal__card">
+        <button type="button" class="stock-modal__close" data-stock-close-modal aria-label="Close">&times;</button>
+        <h2>Record stock movement</h2>
+        <p class="stock-modal__subtitle">Log inbound supply or corrective adjustments. Historical quantities stay immutable after save.</p>
 
-            <button type="submit" class="save-btn">Update</button>
-            <button type="button" onclick="closeEdit()" class="cancel-btn">Cancel</button>
+        <form method="POST" action="Database/add_stocks.php" class="stock-form" id="stockMovementForm">
+            <div>
+                <label for="movementType">Transaction type</label>
+                <select name="transaction_type" id="movementType" required>
+                    <option value="stock_in">Stock In</option>
+                    <option value="adjustment">Adjustment</option>
+                </select>
+                <p class="stock-form__hint stock-form__hint--warn" id="adjustmentHint">
+                    Use adjustments for corrections or stock deductions. Quantity will be saved as a negative movement.
+                </p>
+            </div>
+
+            <div>
+                <label for="movementMedicine">Medicine</label>
+                <select name="med_id" id="movementMedicine" required>
+                    <option value="">Select medicine</option>
+                    <?php foreach ($medicinesList as $med): ?>
+                        <option value="<?= (int) $med['med_id'] ?>"><?= htmlspecialchars($med['medicine_name'], ENT_QUOTES, 'UTF-8') ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div>
+                <label for="movementQty">Quantity</label>
+                <input type="number" name="quantity" id="movementQty" min="1" step="1" required placeholder="Enter units">
+                <p class="stock-form__hint" id="qtyHint">Positive numbers only — type chooses inbound vs adjustment.</p>
+            </div>
+
+            <div>
+                <label for="movementExpiry">Expiration date</label>
+                <input type="date" name="expiration_date" id="movementExpiry">
+                <p class="stock-form__hint">Optional; recommended for new batches.</p>
+            </div>
+
+            <div>
+                <label for="movementNotes">Notes / reason</label>
+                <textarea name="movement_notes" id="movementNotes" rows="3" placeholder="Internal note (not stored until DB supports it)"></textarea>
+                <p class="stock-notes-hint">Optional. Add a <code>notes</code> column to <code>stocks</code> if you want this persisted.</p>
+            </div>
+
+            <button type="submit" class="stock-form__submit">Save movement</button>
         </form>
     </div>
 </div>
 
 <script>
-function openModal() {
-    document.getElementById("addModal").style.display = "flex";
-}
-function closeModal() {
-    document.getElementById("addModal").style.display = "none";
-}
+(function () {
+    const overlay = document.getElementById('stockOverlay');
+    const drawer = document.getElementById('stockDrawer');
+    const drawerInner = document.getElementById('stockDrawerInner');
+    const movementModal = document.getElementById('stockMovementModal');
+    const searchInput = document.getElementById('stockSearchInput');
+    const filterChips = document.querySelectorAll('[data-stock-filter]');
+    const cards = document.querySelectorAll('.stock-card');
+    const emptyFiltered = document.getElementById('stockEmptyFiltered');
 
-function editItem(data) {
-    document.getElementById("editModal").style.display = "flex";
+    let activeFilter = 'all';
 
-    document.getElementById("edit_id").value = data.stock_id;
-    document.getElementById("edit_expiration").value = data.expiration_date;
+    function esc(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
 
-    document.getElementById("edit_name").innerText = 
-        "Medicine: " + (data.medicine_name ?? "Unknown");
-}
+    function parseStock(card) {
+        try {
+            return JSON.parse(card.dataset.stock);
+        } catch (e) {
+            return null;
+        }
+    }
 
-function closeEdit() {
-    document.getElementById("editModal").style.display = "none";
-}
+    function setOverlay(open) {
+        if (!overlay) return;
+        overlay.classList.toggle('show', open);
+        overlay.setAttribute('aria-hidden', open ? 'false' : 'true');
+    }
+
+    function openDrawer(entry) {
+        if (!drawer || !drawerInner || !entry) return;
+
+        const qtyLabel = (entry.quantity > 0 ? '+' : '') + entry.quantity + ' units';
+        let recorded = '';
+        if (entry.created_at) {
+            const parsed = new Date(String(entry.created_at).replace(' ', 'T'));
+            recorded = Number.isNaN(parsed.getTime())
+                ? esc(entry.created_at)
+                : esc(parsed.toLocaleString());
+        } else {
+            recorded = 'Not tracked — add <code>created_at</code> on <code>stocks</code> for precise timestamps.';
+        }
+        const summary = entry.type === 'adjustment'
+            ? 'Inventory correction / deduction recorded against formulary levels.'
+            : 'Inbound supply recorded toward formulary totals.';
+
+        const expValue = entry.expiration_date ? esc(entry.expiration_date) : '';
+
+        drawerInner.innerHTML = `
+            <div class="stock-drawer__title">${esc(entry.medicine_name)}</div>
+            <div class="stock-drawer__grid">
+                <div class="stock-drawer__row"><span>Transaction</span><strong>${esc(entry.label)}</strong></div>
+                <div class="stock-drawer__row"><span>Quantity change</span><strong>${esc(qtyLabel)}</strong></div>
+                <div class="stock-drawer__row"><span>Expiration</span><strong>${entry.expiration_date ? esc(entry.expiration_date) : '—'}</strong></div>
+                <div class="stock-drawer__row"><span>Recorded</span><strong>${recorded}</strong></div>
+                <div class="stock-drawer__row"><span>Stock ID</span><strong>#${esc(entry.stock_id)}</strong></div>
+                <div class="stock-drawer__row"><span>Summary</span><strong>${esc(summary)}</strong></div>
+            </div>
+            <form class="stock-drawer__form" method="POST" action="Database/edit_stocks.php">
+                <h4>Correct expiry only</h4>
+                <input type="hidden" name="id" value="${esc(entry.stock_id)}">
+                <label for="drawerExpiry">Expiration date</label>
+                <input type="date" name="expiration_date" id="drawerExpiry" value="${expValue}">
+                <button type="submit" class="stock-drawer__submit">Update expiration</button>
+                <p class="stock-notes-hint">Medicine, quantity, and transaction type remain frozen for audit integrity.</p>
+            </form>
+        `;
+
+        drawer.classList.add('show');
+        drawer.setAttribute('aria-hidden', 'false');
+        setOverlay(true);
+    }
+
+    function closeDrawer() {
+        if (!drawer) return;
+        drawer.classList.remove('show');
+        drawer.setAttribute('aria-hidden', 'true');
+        if (!movementModal.classList.contains('show')) {
+            setOverlay(false);
+        }
+    }
+
+    function openMovementModal() {
+        movementModal.classList.add('show');
+        movementModal.setAttribute('aria-hidden', 'false');
+        setOverlay(true);
+    }
+
+    function closeMovementModal() {
+        movementModal.classList.remove('show');
+        movementModal.setAttribute('aria-hidden', 'true');
+        if (!drawer.classList.contains('show')) {
+            setOverlay(false);
+        }
+    }
+
+    document.getElementById('openStockMovementModal')?.addEventListener('click', openMovementModal);
+
+    document.querySelectorAll('[data-stock-close-modal]').forEach((btn) => {
+        btn.addEventListener('click', closeMovementModal);
+    });
+
+    document.getElementById('stockDrawerClose')?.addEventListener('click', closeDrawer);
+
+    overlay?.addEventListener('click', () => {
+        closeDrawer();
+        closeMovementModal();
+    });
+
+    const movementType = document.getElementById('movementType');
+    const adjustmentHint = document.getElementById('adjustmentHint');
+
+    function syncMovementHints() {
+        const isAdj = movementType && movementType.value === 'adjustment';
+        adjustmentHint?.classList.toggle('is-visible', Boolean(isAdj));
+    }
+
+    movementType?.addEventListener('change', syncMovementHints);
+    syncMovementHints();
+
+    function applyFilters() {
+        const q = (searchInput?.value || '').toLowerCase().trim();
+        let visible = 0;
+
+        cards.forEach((card) => {
+            const entry = parseStock(card);
+            const blob = card.dataset.search || '';
+            const type = card.dataset.type || '';
+
+            const chipOk =
+                activeFilter === 'all' ||
+                (activeFilter === 'stock_in' && type === 'stock_in') ||
+                (activeFilter === 'adjustment' && type === 'adjustment') ||
+                (activeFilter === 'today' && card.dataset.today === '1') ||
+                (activeFilter === 'week' && card.dataset.week === '1');
+
+            const searchOk = !q || blob.includes(q);
+            const show = chipOk && searchOk;
+            card.hidden = !show;
+            if (show) visible++;
+        });
+
+        if (emptyFiltered) {
+            emptyFiltered.hidden = visible !== 0 || cards.length === 0;
+        }
+    }
+
+    searchInput?.addEventListener('input', applyFilters);
+
+    filterChips.forEach((chip) => {
+        chip.addEventListener('click', () => {
+            activeFilter = chip.dataset.stockFilter || 'all';
+            filterChips.forEach((c) => c.classList.remove('active'));
+            chip.classList.add('active');
+            applyFilters();
+        });
+    });
+
+    cards.forEach((card) => {
+        card.addEventListener('click', () => {
+            const entry = parseStock(card);
+            if (entry) openDrawer(entry);
+        });
+        card.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            e.preventDefault();
+            const entry = parseStock(card);
+            if (entry) openDrawer(entry);
+        });
+    });
+
+    if ('IntersectionObserver' in window) {
+        const obs = new IntersectionObserver((entries, observer) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+
+        cards.forEach((c) => obs.observe(c));
+    } else {
+        cards.forEach((c) => c.classList.add('is-visible'));
+    }
+
+    applyFilters();
+})();
 </script>
 
 </body>

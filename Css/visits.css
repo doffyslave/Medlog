@@ -206,6 +206,11 @@
     transition: border-color 0.22s ease, box-shadow 0.22s ease;
 }
 
+/* Native `hidden` loses to author `display:flex` above; keep filters working */
+.visit-card[hidden] {
+    display: none !important;
+}
+
 .visit-card:focus-visible {
     box-shadow:
         0 10px 26px rgba(10, 25, 49, 0.09),
@@ -528,6 +533,381 @@
 
 .modal-content button:hover {
     filter: brightness(1.04);
+}
+
+/* Add Visit — premium dashboard modal ------------------------------------ */
+
+.visit-add-modal.modal {
+    padding: 20px 16px;
+    align-items: flex-start;
+    justify-content: center;
+    overflow-y: auto;
+}
+
+.visit-add-modal .visit-add-modal__dialog {
+    width: min(520px, 100%);
+    max-height: min(92vh, 860px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    border-radius: 20px;
+    background: linear-gradient(165deg, #f6fafd 0%, #eef5fb 48%, #e4eef8 100%);
+    border: 1px solid rgba(179, 207, 229, 0.75);
+    box-shadow:
+        0 28px 56px rgba(10, 25, 49, 0.28),
+        0 0 0 1px rgba(255, 255, 255, 0.55) inset;
+    animation: visitModalIn 0.38s cubic-bezier(0.22, 0.82, 0.22, 1) both;
+}
+
+@keyframes visitModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.visit-add-modal__hero {
+    padding: 22px 22px 18px;
+    background: linear-gradient(135deg, #0a1931 0%, #1a3d63 52%, #274f78 100%);
+    color: #f6fafd;
+    position: relative;
+}
+
+.visit-add-modal__hero::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 48px;
+    background: linear-gradient(180deg, transparent, rgba(10, 25, 49, 0.12));
+    pointer-events: none;
+}
+
+.visit-add-modal__eyebrow {
+    display: block;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(179, 207, 229, 0.95);
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 1;
+}
+
+.visit-add-modal__title {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    position: relative;
+    z-index: 1;
+}
+
+.visit-add-modal__subtitle {
+    margin: 8px 0 0;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(246, 250, 253, 0.82);
+    line-height: 1.45;
+    max-width: 36em;
+    position: relative;
+    z-index: 1;
+}
+
+.visit-add-modal__close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 2;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    border: 1px solid rgba(179, 207, 229, 0.35);
+    background: rgba(10, 25, 49, 0.35);
+    color: #f6fafd;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        transform 0.18s ease;
+}
+
+.visit-add-modal__close:hover {
+    background: rgba(246, 250, 253, 0.12);
+    border-color: rgba(179, 207, 229, 0.55);
+    transform: scale(1.04);
+}
+
+.visit-add-modal__body {
+    padding: 18px 22px 22px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+.visit-add-modal__form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.visit-add-modal__section {
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(179, 207, 229, 0.55);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+
+.visit-add-modal__section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.visit-add-modal__section-title {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #1a3d63;
+}
+
+.visit-add-modal__section-hint {
+    font-size: 11px;
+    font-weight: 600;
+    color: #4a7fa7;
+}
+
+.visit-add-modal__field {
+    margin-bottom: 12px;
+}
+
+.visit-add-modal__field:last-child {
+    margin-bottom: 0;
+}
+
+.visit-add-modal__label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #1a3d63;
+    margin-bottom: 6px;
+}
+
+.visit-add-modal__label .req {
+    color: #4a7fa7;
+    font-weight: 800;
+}
+
+.visit-add-modal__input,
+.visit-add-modal__textarea {
+    width: 100%;
+    padding: 11px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(179, 207, 229, 0.95);
+    background: #fff;
+    color: #0a1931;
+    font-size: 14px;
+    outline: none;
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.visit-add-modal__textarea {
+    min-height: 88px;
+    resize: vertical;
+    line-height: 1.45;
+}
+
+.visit-add-modal__input:focus,
+.visit-add-modal__textarea:focus {
+    border-color: #4a7fa7;
+    box-shadow: 0 0 0 3px rgba(74, 127, 167, 0.16);
+}
+
+.visit-add-modal__input::placeholder,
+.visit-add-modal__textarea::placeholder {
+    color: rgba(26, 61, 99, 0.45);
+}
+
+.visit-add-modal__quantity-wrap {
+    transition:
+        opacity 0.22s ease,
+        transform 0.22s ease;
+}
+
+.visit-add-modal__quantity-wrap.is-disabled {
+    opacity: 0.42;
+    pointer-events: none;
+    transform: translateY(4px);
+}
+
+.visit-add-modal__footer {
+    padding: 16px 22px 20px;
+    border-top: 1px solid rgba(179, 207, 229, 0.55);
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+}
+
+.visit-add-modal__submit {
+    width: 100%;
+    padding: 13px 16px;
+    border: 0;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: #f6fafd;
+    background: linear-gradient(135deg, #0a1931, #1a3d63 55%, #2c5282);
+    box-shadow: 0 12px 28px rgba(10, 25, 49, 0.28);
+    transition:
+        filter 0.2s ease,
+        transform 0.18s ease,
+        box-shadow 0.2s ease;
+}
+
+.visit-add-modal__submit:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+    box-shadow: 0 16px 32px rgba(10, 25, 49, 0.32);
+}
+
+.visit-add-modal__submit:active {
+    transform: translateY(0);
+}
+
+/* Searchable selects (vanilla) -------------------------------------------- */
+
+.medlog-search-select {
+    position: relative;
+}
+
+.medlog-search-select__control {
+    position: relative;
+}
+
+.medlog-search-select__input {
+    width: 100%;
+    padding: 11px 36px 11px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(179, 207, 229, 0.95);
+    background: #fff;
+    color: #0a1931;
+    font-size: 14px;
+    outline: none;
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.medlog-search-select__input:focus {
+    border-color: #4a7fa7;
+    box-shadow: 0 0 0 3px rgba(74, 127, 167, 0.16);
+}
+
+.medlog-search-select.is-open .medlog-search-select__input {
+    border-color: #4a7fa7;
+    border-radius: 12px 12px 0 0;
+}
+
+.medlog-search-select__chevron {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    margin-top: -5px;
+    border-right: 2px solid #4a7fa7;
+    border-bottom: 2px solid #4a7fa7;
+    transform: rotate(45deg);
+    opacity: 0.55;
+    pointer-events: none;
+    transition: transform 0.2s ease;
+}
+
+.medlog-search-select.is-open .medlog-search-select__chevron {
+    transform: rotate(225deg);
+    margin-top: -2px;
+}
+
+.medlog-search-select__dropdown {
+    position: absolute;
+    z-index: 40;
+    left: 0;
+    right: 0;
+    top: 100%;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    max-height: 220px;
+    overflow-y: auto;
+    border-radius: 0 0 12px 12px;
+    border: 1px solid #4a7fa7;
+    border-top: 0;
+    background: #fff;
+    box-shadow: 0 14px 28px rgba(10, 25, 49, 0.12);
+}
+
+.medlog-search-select__option {
+    padding: 9px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0a1931;
+    transition: background 0.14s ease;
+}
+
+.medlog-search-select__option:hover,
+.medlog-search-select__option.is-active {
+    background: rgba(179, 207, 229, 0.45);
+}
+
+.medlog-search-select__empty {
+    padding: 10px;
+    font-size: 13px;
+    color: #4a7fa7;
+    text-align: center;
+}
+
+.medlog-search-select__actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+.medlog-search-select__clear {
+    border: 0;
+    background: transparent;
+    color: #4a7fa7;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 4px 2px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.medlog-search-select__clear:hover {
+    color: #1a3d63;
 }
 
 .closeVisit,
