@@ -471,22 +471,16 @@ if ($isAdmin) {
 
 function appt_badge_class(string $status): string
 {
-    switch ($status) {
-        case 'Approved':
-            return 'badge-approved';
-        case 'Rejected':
-            return 'badge-rejected';
-        case 'Cancelled':
-            return 'badge-cancelled';
-        case 'Completed':
-            return 'badge-completed';
-        case 'Missed':
-            return 'badge-missed';
-        case 'Rescheduled':
-            return 'badge-rescheduled';
-        default:
-            return 'badge-pending';
-    }
+    return match ($status) {
+        'Approved' => 'badge-approved',
+        'Rejected' => 'badge-rejected',
+        'Cancelled' => 'badge-cancelled',
+        'Completed' => 'badge-completed',
+        'Missed' => 'badge-missed',
+        'Rescheduled' => 'badge-rescheduled',
+        default => 'badge-pending',
+    };
+
 }
 
 /**
@@ -514,32 +508,17 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
             . ' ' . $st
         )
     );
-    switch ($st) {
-        case 'Pending':
-            $statusBar = 'appt-v2-card__bar--pending';
-            break;
-        case 'Approved':
-            $statusBar = 'appt-v2-card__bar--approved';
-            break;
-        case 'Rescheduled':
-            $statusBar = 'appt-v2-card__bar--rescheduled';
-            break;
-        case 'Completed':
-            $statusBar = 'appt-v2-card__bar--completed';
-            break;
-        case 'Missed':
-            $statusBar = 'appt-v2-card__bar--missed';
-            break;
-        case 'Rejected':
-            $statusBar = 'appt-v2-card__bar--rejected';
-            break;
-        case 'Cancelled':
-            $statusBar = 'appt-v2-card__bar--cancelled';
-            break;
-        default:
-            $statusBar = 'appt-v2-card__bar--pending';
-            break;
-    }
+    $statusBar = match ($st) {
+        'Pending' => 'appt-v2-card__bar--pending',
+        'Approved' => 'appt-v2-card__bar--approved',
+        'Rescheduled' => 'appt-v2-card__bar--rescheduled',
+        'Completed' => 'appt-v2-card__bar--completed',
+        'Missed' => 'appt-v2-card__bar--missed',
+        'Rejected' => 'appt-v2-card__bar--rejected',
+        'Cancelled' => 'appt-v2-card__bar--cancelled',
+        default => 'appt-v2-card__bar--pending',
+    };
+
     ?>
     <article
         class="appt-v2-card <?= in_array($st, ['Cancelled', 'Rejected'], true) ? 'appt-v2-card--muted' : '' ?> <?= $readonly ? 'appt-readonly' : '' ?>"
@@ -695,7 +674,8 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
 
                 <?php if (!empty($_SESSION['appointment_success'])): ?>
                     <div class="alert-success">
-                        <?= htmlspecialchars($_SESSION['appointment_success'], ENT_QUOTES, 'UTF-8') ?></div>
+                        <?= htmlspecialchars($_SESSION['appointment_success'], ENT_QUOTES, 'UTF-8') ?>
+                    </div>
                     <?php unset($_SESSION['appointment_success']); ?>
                 <?php endif; ?>
 
@@ -724,7 +704,8 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                             <div>
                                 <h2 class="appt-today-hero__title">Today's schedule</h2>
                                 <p class="appt-today-hero__date">
-                                    <?= htmlspecialchars(date('l — F j, Y'), ENT_QUOTES, 'UTF-8') ?></p>
+                                    <?= htmlspecialchars(date('l — F j, Y'), ENT_QUOTES, 'UTF-8') ?>
+                                </p>
                             </div>
                             <div class="appt-today-hero__pulse" aria-hidden="true">
                                 <span class="appt-today-hero__pulse-dot"></span>
@@ -755,7 +736,8 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                                                 class="appt-v2-badge <?= htmlspecialchars(appt_badge_class($taSt), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($taSt, ENT_QUOTES, 'UTF-8') ?></span>
                                             <?php if (!empty($ta['reason'])): ?>
                                                 <p class="appt-today-timeline__reason">
-                                                    <?= htmlspecialchars((string) $ta['reason'], ENT_QUOTES, 'UTF-8') ?></p>
+                                                    <?= htmlspecialchars((string) $ta['reason'], ENT_QUOTES, 'UTF-8') ?>
+                                                </p>
                                             <?php endif; ?>
                                         </div>
                                     </li>
@@ -848,7 +830,8 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                                 data-appt-section="<?= htmlspecialchars($sec['key'], ENT_QUOTES, 'UTF-8') ?>">
                                 <header class="appt-desk-section__head">
                                     <h3 class="appt-desk-section__title">
-                                        <?= htmlspecialchars($sec['title'], ENT_QUOTES, 'UTF-8') ?></h3>
+                                        <?= htmlspecialchars($sec['title'], ENT_QUOTES, 'UTF-8') ?>
+                                    </h3>
                                     <span class="appt-desk-section__count"><?= count($items) ?></span>
                                 </header>
                                 <p class="appt-desk-section__hint"><?= htmlspecialchars($sec['hint'], ENT_QUOTES, 'UTF-8') ?>
@@ -1011,7 +994,8 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                     <option value="">Select time</option>
                     <?php foreach ($timeSlots as $slot): ?>
                         <option value="<?= htmlspecialchars($slot, ENT_QUOTES, 'UTF-8') ?>">
-                            <?= htmlspecialchars($slot, ENT_QUOTES, 'UTF-8') ?></option>
+                            <?= htmlspecialchars($slot, ENT_QUOTES, 'UTF-8') ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
                 <label for="adminApptReason">Reason / notes</label>
@@ -1041,7 +1025,8 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                         <option value="">Select time</option>
                         <?php foreach ($timeSlots as $slot): ?>
                             <option value="<?= htmlspecialchars($slot, ENT_QUOTES, 'UTF-8') ?>">
-                                <?= htmlspecialchars($slot, ENT_QUOTES, 'UTF-8') ?></option>
+                                <?= htmlspecialchars($slot, ENT_QUOTES, 'UTF-8') ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                     <label for="rescheduleNote">Reschedule note (optional)</label>
