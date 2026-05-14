@@ -10,6 +10,8 @@ header('Content-Type: application/json; charset=UTF-8');
 
 session_start();
 
+require_once __DIR__ . '/includes/ml_session.php';
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Method not allowed.']);
@@ -29,8 +31,8 @@ if (strtolower(trim((string) ($user['role'] ?? ''))) !== 'student') {
     exit;
 }
 
-$userId = (int) ($user['user_id'] ?? 0);
-if ($userId <= 0) {
+$userId = ml_session_user_id($user);
+if ($userId === '') {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Invalid session.']);
     exit;
@@ -98,7 +100,7 @@ if ($errors !== []) {
 }
 
 try {
-    $exists = $conn->prepare('SELECT 1 FROM users WHERE user_id = ? AND role = \'student\' LIMIT 1');
+    $exists = $conn->prepare("SELECT 1 FROM users WHERE user_id = ? AND LOWER(TRIM(COALESCE(role, ''))) = 'student' LIMIT 1");
     $exists->execute([$userId]);
     if (!$exists->fetchColumn()) {
         http_response_code(403);
@@ -106,7 +108,7 @@ try {
         exit;
     }
 
-    $stmt = $conn->prepare('
+    $stmt = $conn->prepare("
         UPDATE users SET
             course = :course,
             year_level = :year_level,
@@ -114,8 +116,8 @@ try {
             emergency_contact_name = :emergency_contact_name,
             emergency_contact_number = :emergency_contact_number,
             allergies = :allergies
-        WHERE user_id = :user_id AND role = \'student\'
-    ');
+        WHERE user_id = :user_id AND LOWER(TRIM(COALESCE(role, ''))) = 'student'
+    ");
     $stmt->execute([
         ':course' => $course,
         ':year_level' => $yearLevel,

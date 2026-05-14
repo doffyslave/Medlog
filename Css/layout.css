@@ -386,23 +386,26 @@ body::before {
     .main-content {
         margin-left: 0;
     }
+}
 
-    /* Students: single nav — sidebar markup becomes a fixed bottom app bar */
+/* Students: one nav component — sidebar becomes bottom app bar (tablets & phones) */
+@media (max-width: 1024px) {
     body.medlog-student-shell .sidebar {
-        inset: auto 0 0 0;
-        top: auto;
+        position: fixed !important;
+        inset: auto 0 0 0 !important;
+        top: auto !important;
         right: 0;
         bottom: 0;
         left: 0;
-        width: 100%;
-        min-width: 100%;
-        max-width: none;
-        min-height: 0;
-        height: auto;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: none !important;
+        min-height: 0 !important;
+        height: auto !important;
         flex-direction: column;
         align-items: stretch;
-        padding: 10px 10px calc(12px + env(safe-area-inset-bottom, 0px));
-        border-radius: 22px 22px 0 0;
+        padding: 10px 10px calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+        border-radius: 22px 22px 0 0 !important;
         gap: 0;
         z-index: 40;
         box-shadow:
@@ -417,7 +420,7 @@ body::before {
     }
 
     body.medlog-student-shell .sidebar.collapsed {
-        transform: none;
+        transform: none !important;
     }
 
     body.medlog-student-shell .main-content {
@@ -428,14 +431,16 @@ body::before {
     }
 
     body.medlog-student-shell .toggle-btn {
-        visibility: hidden;
-        width: 0;
-        height: 0;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        pointer-events: none;
-        border: 0;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        pointer-events: none !important;
+        border: 0 !important;
     }
 
     body.medlog-student-shell .sidebar .menu {

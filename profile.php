@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'Database/connection.php';
+require_once __DIR__ . '/includes/ml_session.php';
 
 if (!isset($_SESSION['user'])) {
     header('Location: index.php');
@@ -8,51 +9,64 @@ if (!isset($_SESSION['user'])) {
 }
 
 $user = $_SESSION['user'];
-$user_id = (int) $user['user_id'];
+$user_id = ml_session_user_id($user);
 
 if (strtolower(trim((string) ($user['role'] ?? ''))) !== 'student') {
     header('Location: dashboard.php');
     exit();
 }
 
-$stmt = $conn->prepare('SELECT * FROM users WHERE user_id = ?');
-$stmt->execute([$user_id]);
-$userData = $stmt->fetch(PDO::FETCH_ASSOC);
-$profileLoadWarning = null;
-
-if (!$userData) {
-    // Session is still valid; missing DB row can be transient or a data issue — do not destroy the session.
-    $userData = [
-        'user_id' => $user_id,
-        'name' => (string) ($user['name'] ?? 'User'),
-        'email' => (string) ($user['email'] ?? ''),
-        'role' => (string) ($user['role'] ?? 'student'),
-        'course' => '',
-        'year_level' => '',
-        'phone_number' => '',
-        'emergency_contact_name' => '',
-        'emergency_contact_number' => '',
-        'allergies' => '',
-        'last_login' => null,
-        'status' => 'active',
-    ];
-    $profileLoadWarning = 'Your profile could not be loaded from the database. Showing account details from your session; try again later or contact support if this continues.';
+if ($user_id === '') {
+    header('Location: dashboard.php');
+    exit();
 }
 
-$stmt = $conn->prepare('
-    SELECT COUNT(*) as total_visits, MAX(visit_date) as last_visit
-    FROM visits
-    WHERE user_id = ?
-');
+$userData = null;
+$stmt = $conn->prepare('SELECT * FROM users WHERE user_id = ? LIMIT 1');
 $stmt->execute([$user_id]);
-$visit = $stmt->fetch(PDO::FETCH_ASSOC) ?: ['total_visits' => 0, 'last_visit' => null];
+$userData = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
 
-$email = (string) $userData['email'];
-preg_match('/\.(\d+)@/', $email, $matches);
-$studentNumber = $matches[1] ?? null;
-$studentID = $studentNumber
-    ? '02-000' . substr($studentNumber, 0, 1) . '-' . substr($studentNumber, 1)
-    : 'N/A';
+if (!$userData && !empty($user['email'])) {
+    $stmt = $conn->prepare("SELECT * FROM users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) AND LOWER(TRIM(role)) = 'student' LIMIT 1");
+    $stmt->execute([(string) $user['email']]);
+    $userData = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    if ($userData && !empty($userData['user_id'])) {
+        $_SESSION['user']['user_id'] = $userData['user_id'];
+        $user_id = ml_session_user_id($_SESSION['user']);
+    }
+}
+
+$profileLoadError = null;
+if (!$userData) {
+    $profileLoadError = 'We could not load your profile from the database. Your session is still active. Please try again later or contact the clinic if this continues.';
+}
+
+$visit = ['total_visits' => 0, 'last_visit' => null];
+if ($userData) {
+    $stmt = $conn->prepare('
+        SELECT COUNT(*) as total_visits, MAX(visit_date) as last_visit
+        FROM visits
+        WHERE user_id = ?
+    ');
+    $stmt->execute([$user_id]);
+    $visit = $stmt->fetch(PDO::FETCH_ASSOC) ?: ['total_visits' => 0, 'last_visit' => null];
+}
+
+$email = (string) ($userData ? ($userData['email'] ?? '') : ($user['email'] ?? ''));
+$studentID = 'N/A';
+if ($userData && isset($userData['student_id'])) {
+    $sid = trim((string) $userData['student_id']);
+    if ($sid !== '') {
+        $studentID = $sid;
+    }
+}
+if ($studentID === 'N/A' && $email !== '') {
+    preg_match('/\.(\d+)@/', $email, $matches);
+    $studentNumber = $matches[1] ?? null;
+    if ($studentNumber) {
+        $studentID = '02-000' . substr($studentNumber, 0, 1) . '-' . substr($studentNumber, 1);
+    }
+}
 
 if (empty($_SESSION['profile_csrf']) || !is_string($_SESSION['profile_csrf'])) {
     $_SESSION['profile_csrf'] = bin2hex(random_bytes(32));
@@ -61,14 +75,19 @@ $profileCsrf = $_SESSION['profile_csrf'];
 
 function ml_profile_initials(string $name): string
 {
+    $name = preg_replace('/\s*\([^)]*\)/u', '', $name);
     $name = trim(preg_replace('/\s+/u', ' ', $name));
     if ($name === '') {
         return '?';
     }
     $parts = preg_split('/\s+/u', $name, -1, PREG_SPLIT_NO_EMPTY) ?: [];
     if (count($parts) >= 2) {
-        $a = function_exists('mb_substr') ? mb_substr($parts[0], 0, 1, 'UTF-8') : substr($parts[0], 0, 1);
+        $first = rtrim($parts[0], ',');
         $last = $parts[count($parts) - 1];
+        if ($last !== '' && ($last[0] ?? '') === '(') {
+            $last = count($parts) >= 2 ? $parts[count($parts) - 2] : $last;
+        }
+        $a = function_exists('mb_substr') ? mb_substr($first, 0, 1, 'UTF-8') : substr($first, 0, 1);
         $b = function_exists('mb_substr') ? mb_substr($last, 0, 1, 'UTF-8') : substr($last, 0, 1);
         return strtoupper($a . $b);
     }
@@ -76,11 +95,11 @@ function ml_profile_initials(string $name): string
     return strtoupper($two);
 }
 
-$initials = ml_profile_initials((string) ($userData['name'] ?? ''));
-$lastLoginRaw = $userData['last_login'] ?? null;
+$initials = ml_profile_initials((string) ($userData ? ($userData['name'] ?? '') : ($user['name'] ?? '')));
+$lastLoginRaw = $userData ? ($userData['last_login'] ?? null) : null;
 $lastLoginFmt = $lastLoginRaw ? date('M j, Y g:i A', strtotime((string) $lastLoginRaw)) : '—';
 $accountStatus = 'Active';
-if (!empty($userData['status'])) {
+if ($userData && !empty($userData['status'])) {
     $st = strtolower((string) $userData['status']);
     if ($st !== 'active') {
         $accountStatus = ucfirst((string) $userData['status']);
@@ -118,16 +137,23 @@ $medlogPageHeader = [
 
             <?php include 'includes/medlog-page-header.php'; ?>
 
-            <?php if (!empty($profileLoadWarning)): ?>
-                <div class="profile-fetch-banner" role="alert"><?= htmlspecialchars($profileLoadWarning, ENT_QUOTES, 'UTF-8') ?></div>
+            <?php if (!empty($profileLoadError)): ?>
+                <div class="profile-fetch-banner profile-fetch-banner--error" role="alert"><?= htmlspecialchars($profileLoadError, ENT_QUOTES, 'UTF-8') ?></div>
             <?php endif; ?>
 
             <div id="profileToast" class="profile-toast" role="status" aria-live="polite" hidden></div>
 
-            <div class="profile-layout">
+            <?php if (!$userData): ?>
+                <div class="profile-layout">
+                    <p class="profile-error-hint">You can return to the dashboard or try refreshing this page.</p>
+                    <p class="profile-error-hint"><a class="profile-error-link" href="dashboard.php">Back to dashboard</a></p>
+                </div>
+            <?php else: ?>
+
+            <div class="profile-layout profile-body-grid">
 
                 <!-- Hero -->
-                <article class="profile-hero medlog-card-elevated">
+                <article class="profile-hero medlog-card-elevated profile-body-grid__hero">
                     <div class="profile-hero__cover" role="img" aria-label="Profile cover"></div>
                     <div class="profile-hero__body">
                         <div class="profile-hero__avatar-wrap">
@@ -175,12 +201,8 @@ $medlogPageHeader = [
                     </div>
                 </article>
 
-                <div class="profile-grid">
-
-                    <div class="profile-grid__col profile-grid__col--wide">
-
                         <!-- Medical readiness -->
-                        <article class="profile-panel profile-panel--alert medlog-card-elevated">
+                        <article class="profile-panel profile-panel--alert medlog-card-elevated profile-body-grid__med">
                             <header class="profile-panel__head">
                                 <span class="profile-panel__icon"><i class="fa-solid fa-heart-pulse" aria-hidden="true"></i></span>
                                 <div>
@@ -210,45 +232,7 @@ $medlogPageHeader = [
                             </div>
                         </article>
 
-                        <!-- Quick actions -->
-                        <article class="profile-panel medlog-card-elevated">
-                            <header class="profile-panel__head">
-                                <span class="profile-panel__icon profile-panel__icon--neutral"><i class="fa-solid fa-bolt" aria-hidden="true"></i></span>
-                                <div>
-                                    <h3 class="profile-panel__title">Quick actions</h3>
-                                    <p class="profile-panel__sub">Jump to common clinic tasks.</p>
-                                </div>
-                            </header>
-                            <div class="profile-actions">
-                                <a class="profile-action-card" href="my_visits.php">
-                                    <span class="profile-action-card__icon"><i class="fa-solid fa-file-waveform" aria-hidden="true"></i></span>
-                                    <span class="profile-action-card__text">
-                                        <strong>Medical records</strong>
-                                        <small>Visit history &amp; details</small>
-                                    </span>
-                                    <i class="fa-solid fa-chevron-right profile-action-card__chev" aria-hidden="true"></i>
-                                </a>
-                                <a class="profile-action-card" href="appointments.php">
-                                    <span class="profile-action-card__icon"><i class="fa-solid fa-calendar-plus" aria-hidden="true"></i></span>
-                                    <span class="profile-action-card__text">
-                                        <strong>Book appointment</strong>
-                                        <small>Schedule with the clinic</small>
-                                    </span>
-                                    <i class="fa-solid fa-chevron-right profile-action-card__chev" aria-hidden="true"></i>
-                                </a>
-                                <a class="profile-action-card" href="medicines.php">
-                                    <span class="profile-action-card__icon"><i class="fa-solid fa-pills" aria-hidden="true"></i></span>
-                                    <span class="profile-action-card__text">
-                                        <strong>Medicines</strong>
-                                        <small>Formulary &amp; availability</small>
-                                    </span>
-                                    <i class="fa-solid fa-chevron-right profile-action-card__chev" aria-hidden="true"></i>
-                                </a>
-                            </div>
-                        </article>
-                    </div>
-
-                    <div class="profile-grid__col profile-grid__col--side">
+                <div class="profile-body-grid__aside">
 
                         <!-- Account -->
                         <article class="profile-panel medlog-card-elevated">
@@ -324,14 +308,55 @@ $medlogPageHeader = [
                                 </div>
                             </dl>
                         </article>
-                    </div>
                 </div>
+
+                        <!-- Quick actions (full width on desktop, early on mobile) -->
+                        <article class="profile-panel medlog-card-elevated profile-body-grid__quick">
+                            <header class="profile-panel__head">
+                                <span class="profile-panel__icon profile-panel__icon--neutral"><i class="fa-solid fa-bolt" aria-hidden="true"></i></span>
+                                <div>
+                                    <h3 class="profile-panel__title">Quick actions</h3>
+                                    <p class="profile-panel__sub">Jump to common clinic tasks.</p>
+                                </div>
+                            </header>
+                            <div class="profile-actions profile-actions--mobile-row">
+                                <a class="profile-action-card" href="my_visits.php">
+                                    <span class="profile-action-card__icon"><i class="fa-solid fa-file-waveform" aria-hidden="true"></i></span>
+                                    <span class="profile-action-card__text">
+                                        <strong>Medical records</strong>
+                                        <small>Visit history &amp; details</small>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-right profile-action-card__chev" aria-hidden="true"></i>
+                                </a>
+                                <a class="profile-action-card" href="appointments.php">
+                                    <span class="profile-action-card__icon"><i class="fa-solid fa-calendar-plus" aria-hidden="true"></i></span>
+                                    <span class="profile-action-card__text">
+                                        <strong>Book appointment</strong>
+                                        <small>Schedule with the clinic</small>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-right profile-action-card__chev" aria-hidden="true"></i>
+                                </a>
+                                <a class="profile-action-card" href="medicines.php">
+                                    <span class="profile-action-card__icon"><i class="fa-solid fa-pills" aria-hidden="true"></i></span>
+                                    <span class="profile-action-card__text">
+                                        <strong>Medicines</strong>
+                                        <small>Formulary &amp; availability</small>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-right profile-action-card__chev" aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        </article>
+
             </div>
+
+            <?php endif; ?>
+
         </section>
     </main>
 </div>
 
 <!-- Edit modal -->
+<?php if ($userData): ?>
 <div id="editProfileModal" class="profile-modal" aria-hidden="true" hidden>
     <div class="profile-modal__backdrop" data-close-modal></div>
     <div class="profile-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="editProfileTitle">
@@ -342,6 +367,7 @@ $medlogPageHeader = [
         <form id="editProfileForm" class="profile-modal__form" novalidate>
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($profileCsrf, ENT_QUOTES, 'UTF-8') ?>">
 
+            <div class="profile-modal__body">
             <label class="profile-field">
                 <span class="profile-field__label">Course</span>
                 <input type="text" name="course" class="profile-field__input" maxlength="160" value="<?= htmlspecialchars((string) ($userData['course'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" autocomplete="organization-title">
@@ -377,6 +403,7 @@ $medlogPageHeader = [
             </label>
 
             <p class="profile-modal__footnote">Email, role, and student ID cannot be changed here. Use your STI Microsoft account for email issues.</p>
+            </div>
 
             <div class="profile-modal__actions">
                 <button type="button" class="profile-btn profile-btn--ghost" data-close-modal>Cancel</button>
@@ -388,6 +415,7 @@ $medlogPageHeader = [
         </form>
     </div>
 </div>
+<?php endif; ?>
 
 <script>
 (function () {
