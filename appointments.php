@@ -891,7 +891,6 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
 
         </section>
     </main>
-    <?php include 'includes/student-bottom-nav.php'; ?>
 </div>
 
 <div id="apptConfirmDialog" class="appt-dialog" hidden aria-hidden="true">

@@ -18,12 +18,25 @@ if (strtolower(trim((string) ($user['role'] ?? ''))) !== 'student') {
 $stmt = $conn->prepare('SELECT * FROM users WHERE user_id = ?');
 $stmt->execute([$user_id]);
 $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+$profileLoadWarning = null;
 
 if (!$userData) {
-    session_unset();
-    session_destroy();
-    header('Location: index.php?error=account_deleted');
-    exit();
+    // Session is still valid; missing DB row can be transient or a data issue — do not destroy the session.
+    $userData = [
+        'user_id' => $user_id,
+        'name' => (string) ($user['name'] ?? 'User'),
+        'email' => (string) ($user['email'] ?? ''),
+        'role' => (string) ($user['role'] ?? 'student'),
+        'course' => '',
+        'year_level' => '',
+        'phone_number' => '',
+        'emergency_contact_name' => '',
+        'emergency_contact_number' => '',
+        'allergies' => '',
+        'last_login' => null,
+        'status' => 'active',
+    ];
+    $profileLoadWarning = 'Your profile could not be loaded from the database. Showing account details from your session; try again later or contact support if this continues.';
 }
 
 $stmt = $conn->prepare('
@@ -104,6 +117,10 @@ $medlogPageHeader = [
         <section class="content profile-page">
 
             <?php include 'includes/medlog-page-header.php'; ?>
+
+            <?php if (!empty($profileLoadWarning)): ?>
+                <div class="profile-fetch-banner" role="alert"><?= htmlspecialchars($profileLoadWarning, ENT_QUOTES, 'UTF-8') ?></div>
+            <?php endif; ?>
 
             <div id="profileToast" class="profile-toast" role="status" aria-live="polite" hidden></div>
 
@@ -312,7 +329,6 @@ $medlogPageHeader = [
             </div>
         </section>
     </main>
-    <?php include 'includes/student-bottom-nav.php'; ?>
 </div>
 
 <!-- Edit modal -->

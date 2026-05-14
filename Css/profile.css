@@ -33,6 +33,20 @@
     margin: 0 auto;
 }
 
+.profile-fetch-banner {
+    max-width: 1120px;
+    margin: 0 auto 16px;
+    padding: 12px 16px;
+    border-radius: var(--profile-radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--profile-accent-deep);
+    background: var(--profile-alert-bg);
+    border: 1px solid var(--profile-alert-border);
+    box-shadow: var(--profile-shadow-soft);
+}
+
 /* Toast */
 .profile-toast {
     position: fixed;

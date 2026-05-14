@@ -183,7 +183,6 @@ $medlogPageHeader = [
 
 </section>
 </main>
-<?php include 'includes/student-bottom-nav.php'; ?>
 </div>
 
 <!-- 🔥 VIEW MODAL -->
