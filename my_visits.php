@@ -9,7 +9,7 @@ if (!isset($_SESSION['user'])) {
 
 $user = $_SESSION['user'];
 $user_id = $user['user_id'];
-$role = $user['role'] ?? 'guest';
+$role = strtolower(trim((string) ($user['role'] ?? 'guest')));
 
 $stmt = $conn->prepare("
     SELECT 
@@ -179,6 +179,11 @@ $medlogPageHeader = [
         </div>
     <?php endif; ?>
     </div>
+</div>
+
+</section>
+</main>
+<?php include 'includes/student-bottom-nav.php'; ?>
 </div>
 
 <!-- 🔥 VIEW MODAL -->

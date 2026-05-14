@@ -7,7 +7,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 $user = $_SESSION['user'];
-$role = $user['role'];
+$role = strtolower(trim((string) ($user['role'] ?? 'guest')));
 
 require 'Database/connection.php';
 
@@ -406,6 +406,7 @@ $medlogPageHeader = [
 
             </section>
         </main>
+        <?php include 'includes/student-bottom-nav.php'; ?>
     </div>
 
     <!-- CLINIC MODAL -->

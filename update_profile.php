@@ -23,7 +23,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 $user = $_SESSION['user'];
-if (($user['role'] ?? '') !== 'student') {
+if (strtolower(trim((string) ($user['role'] ?? ''))) !== 'student') {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Only students can update this profile.']);
     exit;

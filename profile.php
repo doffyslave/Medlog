@@ -10,7 +10,7 @@ if (!isset($_SESSION['user'])) {
 $user = $_SESSION['user'];
 $user_id = (int) $user['user_id'];
 
-if (($user['role'] ?? '') !== 'student') {
+if (strtolower(trim((string) ($user['role'] ?? ''))) !== 'student') {
     header('Location: dashboard.php');
     exit();
 }
@@ -312,6 +312,7 @@ $medlogPageHeader = [
             </div>
         </section>
     </main>
+    <?php include 'includes/student-bottom-nav.php'; ?>
 </div>
 
 <!-- Edit modal -->

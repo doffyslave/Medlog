@@ -410,12 +410,30 @@ body::before {
 
 /* ---- Student mobile: bottom navigation (see body.medlog-student-shell) ---- */
 .medlog-bottom-nav {
-    display: none;
+    display: none !important;
+    flex: 0 0 0 !important;
+    width: 0 !important;
+    max-width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
 }
 
 @media (max-width: 760px) {
     body.medlog-student-shell .medlog-bottom-nav {
-        display: flex;
+        display: flex !important;
+        flex: none !important;
+        width: auto !important;
+        max-width: none !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 8px 8px 10px !important;
+        overflow: visible !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
         position: fixed;
         z-index: 40;
         left: max(10px, env(safe-area-inset-left));
@@ -424,7 +442,6 @@ body::before {
         align-items: stretch;
         justify-content: space-between;
         gap: 4px;
-        padding: 8px 8px 10px;
         border-radius: 22px;
         background: rgba(255, 255, 255, 0.94);
         border: 1px solid var(--line);

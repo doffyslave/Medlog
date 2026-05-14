@@ -10,7 +10,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 $user = $_SESSION['user'];
-$role = $user['role'];
+$role = strtolower(trim((string) ($user['role'] ?? 'guest')));
 $user_id = $user['user_id'];
 
 $isAdmin = $role === 'admin';
@@ -891,6 +891,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
 
         </section>
     </main>
+    <?php include 'includes/student-bottom-nav.php'; ?>
 </div>
 
 <div id="apptConfirmDialog" class="appt-dialog" hidden aria-hidden="true">
