@@ -25,25 +25,26 @@
     box-shadow: var(--profile-shadow);
 }
 
-/* Profile uses full main column width (no narrow “boxed” island on desktop) */
+/* Profile lives in the scrollable <section>; hero can span full column width */
 section.content.profile-page {
     max-width: none;
     width: 100%;
-    padding-left: clamp(16px, 2.2vw, 28px);
-    padding-right: clamp(16px, 2.2vw, 28px);
-    padding-top: clamp(18px, 2.5vw, 26px);
+    padding-left: clamp(14px, 2vw, 24px);
+    padding-right: clamp(14px, 2vw, 24px);
+    padding-top: clamp(12px, 1.8vw, 20px);
+    padding-bottom: clamp(20px, 3vw, 32px);
 }
 
 .profile-layout {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: clamp(14px, 2vw, 22px);
     width: 100%;
-    max-width: min(1320px, 100%);
+    max-width: min(1180px, 100%);
     margin: 0 auto;
 }
 
-/* Responsive profile body: desktop = hero + two columns + full-width quick actions */
+/* Desktop: Facebook-style — wide hero, quick row, then two columns */
 .profile-body-grid {
     display: flex;
     flex-direction: column;
@@ -54,17 +55,21 @@ section.content.profile-page {
 @media (min-width: 960px) {
     .profile-body-grid {
         display: grid;
-        grid-template-columns: minmax(0, 1.22fr) minmax(300px, 0.78fr);
+        grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
         grid-template-areas:
             "hero hero"
-            "med aside"
-            "quick quick";
-        gap: 22px;
+            "quick quick"
+            "med aside";
+        gap: 20px 24px;
         align-items: start;
     }
 
     .profile-body-grid__hero {
         grid-area: hero;
+    }
+
+    .profile-body-grid__quick {
+        grid-area: quick;
     }
 
     .profile-body-grid__med {
@@ -79,27 +84,18 @@ section.content.profile-page {
         min-width: 0;
     }
 
-    .profile-body-grid__quick {
-        grid-area: quick;
+    /* Hero cover uses horizontal space like a portal header */
+    .profile-body-grid__hero.profile-hero {
+        margin-left: calc(-1 * clamp(14px, 2vw, 24px));
+        margin-right: calc(-1 * clamp(14px, 2vw, 24px));
+        width: calc(100% + 2 * clamp(14px, 2vw, 24px));
+        max-width: none;
     }
 }
 
-/* Mobile / tablet: app-like section order */
+/* Mobile: natural DOM order = hero → quick → medical → account (app profile) */
 @media (max-width: 959px) {
-    .profile-body-grid__hero {
-        order: 1;
-    }
-
-    .profile-body-grid__quick {
-        order: 2;
-    }
-
-    .profile-body-grid__med {
-        order: 3;
-    }
-
     .profile-body-grid__aside {
-        order: 4;
         display: flex;
         flex-direction: column;
         gap: 14px;
@@ -1011,9 +1007,9 @@ body.profile-modal-open {
     }
 }
 
-/* Toast clears bottom nav on small screens */
-@media (max-width: 760px) {
-    .profile-toast {
-        bottom: 108px;
+/* Toast clears student bottom nav */
+@media (max-width: 1024px) {
+    body.medlog-student-shell .profile-toast {
+        bottom: calc(14px + var(--student-bottom-nav-space));
     }
 }

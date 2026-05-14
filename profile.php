@@ -106,12 +106,6 @@ if ($userData && !empty($userData['status'])) {
     }
 }
 
-$medlogPageHeader = [
-    'title' => 'Profile',
-    'subtitle' => 'Your student clinic profile, medical readiness, and account details.',
-    'icon' => 'profile',
-    'class' => 'medlog-page-header--profile',
-];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -134,8 +128,6 @@ $medlogPageHeader = [
         <?php include 'includes/header.php'; ?>
 
         <section class="content profile-page">
-
-            <?php include 'includes/medlog-page-header.php'; ?>
 
             <?php if (!empty($profileLoadError)): ?>
                 <div class="profile-fetch-banner profile-fetch-banner--error" role="alert"><?= htmlspecialchars($profileLoadError, ENT_QUOTES, 'UTF-8') ?></div>
@@ -200,6 +192,43 @@ $medlogPageHeader = [
                         <a class="profile-hero__stat-link" href="my_visits.php">View records <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
                     </div>
                 </article>
+
+                        <!-- Quick actions -->
+                        <article class="profile-panel medlog-card-elevated profile-body-grid__quick">
+                            <header class="profile-panel__head">
+                                <span class="profile-panel__icon profile-panel__icon--neutral"><i class="fa-solid fa-bolt" aria-hidden="true"></i></span>
+                                <div>
+                                    <h3 class="profile-panel__title">Quick actions</h3>
+                                    <p class="profile-panel__sub">Jump to common clinic tasks.</p>
+                                </div>
+                            </header>
+                            <div class="profile-actions profile-actions--mobile-row">
+                                <a class="profile-action-card" href="my_visits.php">
+                                    <span class="profile-action-card__icon"><i class="fa-solid fa-file-waveform" aria-hidden="true"></i></span>
+                                    <span class="profile-action-card__text">
+                                        <strong>Medical records</strong>
+                                        <small>Visit history &amp; details</small>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-right profile-action-card__chev" aria-hidden="true"></i>
+                                </a>
+                                <a class="profile-action-card" href="appointments.php">
+                                    <span class="profile-action-card__icon"><i class="fa-solid fa-calendar-plus" aria-hidden="true"></i></span>
+                                    <span class="profile-action-card__text">
+                                        <strong>Book appointment</strong>
+                                        <small>Schedule with the clinic</small>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-right profile-action-card__chev" aria-hidden="true"></i>
+                                </a>
+                                <a class="profile-action-card" href="medicines.php">
+                                    <span class="profile-action-card__icon"><i class="fa-solid fa-pills" aria-hidden="true"></i></span>
+                                    <span class="profile-action-card__text">
+                                        <strong>Medicines</strong>
+                                        <small>Formulary &amp; availability</small>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-right profile-action-card__chev" aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        </article>
 
                         <!-- Medical readiness -->
                         <article class="profile-panel profile-panel--alert medlog-card-elevated profile-body-grid__med">
@@ -309,43 +338,6 @@ $medlogPageHeader = [
                             </dl>
                         </article>
                 </div>
-
-                        <!-- Quick actions (full width on desktop, early on mobile) -->
-                        <article class="profile-panel medlog-card-elevated profile-body-grid__quick">
-                            <header class="profile-panel__head">
-                                <span class="profile-panel__icon profile-panel__icon--neutral"><i class="fa-solid fa-bolt" aria-hidden="true"></i></span>
-                                <div>
-                                    <h3 class="profile-panel__title">Quick actions</h3>
-                                    <p class="profile-panel__sub">Jump to common clinic tasks.</p>
-                                </div>
-                            </header>
-                            <div class="profile-actions profile-actions--mobile-row">
-                                <a class="profile-action-card" href="my_visits.php">
-                                    <span class="profile-action-card__icon"><i class="fa-solid fa-file-waveform" aria-hidden="true"></i></span>
-                                    <span class="profile-action-card__text">
-                                        <strong>Medical records</strong>
-                                        <small>Visit history &amp; details</small>
-                                    </span>
-                                    <i class="fa-solid fa-chevron-right profile-action-card__chev" aria-hidden="true"></i>
-                                </a>
-                                <a class="profile-action-card" href="appointments.php">
-                                    <span class="profile-action-card__icon"><i class="fa-solid fa-calendar-plus" aria-hidden="true"></i></span>
-                                    <span class="profile-action-card__text">
-                                        <strong>Book appointment</strong>
-                                        <small>Schedule with the clinic</small>
-                                    </span>
-                                    <i class="fa-solid fa-chevron-right profile-action-card__chev" aria-hidden="true"></i>
-                                </a>
-                                <a class="profile-action-card" href="medicines.php">
-                                    <span class="profile-action-card__icon"><i class="fa-solid fa-pills" aria-hidden="true"></i></span>
-                                    <span class="profile-action-card__text">
-                                        <strong>Medicines</strong>
-                                        <small>Formulary &amp; availability</small>
-                                    </span>
-                                    <i class="fa-solid fa-chevron-right profile-action-card__chev" aria-hidden="true"></i>
-                                </a>
-                            </div>
-                        </article>
 
             </div>
 
