@@ -8,22 +8,28 @@
 }
 
 :root {
-    --sidebar-width: 282px;
-    --sidebar-collapsed-width: 86px;
+    --sidebar-gutter: 18px;
+    --sidebar-float-gap: 16px;
+    --sidebar-width: 276px;
+    --sidebar-collapsed-width: 78px;
+    --sidebar-surface: linear-gradient(165deg, rgba(255, 255, 255, 0.97) 0%, rgba(248, 251, 253, 0.94) 45%, rgba(241, 247, 250, 0.92) 100%);
+    --sidebar-border: rgba(200, 217, 230, 0.65);
+    --sidebar-shadow:
+        0 4px 7px rgba(15, 35, 55, 0.03),
+        0 22px 50px rgba(83, 104, 122, 0.14),
+        0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+    --nav-pill-shadow: 0 8px 22px rgba(74, 127, 167, 0.28);
     --page-bg: #f7f8fb;
-    --page-glow: #edf4f8;
-    --panel: #ffffff;
-    --panel-soft: #f5efeb;
     --line: rgba(200, 217, 230, 0.52);
     --text: #456b80;
     --text-strong: #3f5c71;
     --text-muted: #8ea1af;
     --icon: #567c8d;
-    --active-top: #6c8a9a;
-    --active-bottom: #506e82;
+    --active-top: #5d7d92;
+    --active-bottom: #3d5a70;
     --shadow: 0 14px 32px rgba(83, 104, 122, 0.12);
     --soft-shadow: 0 10px 22px rgba(83, 104, 122, 0.08);
-    --student-bottom-nav-space: calc(92px + env(safe-area-inset-bottom, 0px));
+    --student-bottom-nav-space: calc(104px + env(safe-area-inset-bottom, 0px));
 }
 
 body {
@@ -34,7 +40,6 @@ body {
     color: var(--text);
 }
 
-/* App pages: single scroll surface inside main (sidebar chrome fixed) */
 html:has(.dashboard) {
     height: 100%;
 }
@@ -57,7 +62,6 @@ body::before {
         radial-gradient(ellipse 50% 35% at 50% 100%, rgba(10, 25, 49, 0.04), transparent 55%);
 }
 
-/* Shell: sidebar out of flow; main column is the app viewport */
 .dashboard {
     position: relative;
     z-index: 1;
@@ -67,128 +71,167 @@ body::before {
     max-height: 100%;
 }
 
+/* ——— Floating desktop sidebar ——— */
 .sidebar {
     position: fixed;
-    top: 0;
-    left: 0;
     z-index: 30;
+    top: var(--sidebar-gutter);
+    left: var(--sidebar-gutter);
     width: var(--sidebar-width);
     min-width: var(--sidebar-width);
-    height: 100vh;
-    height: 100dvh;
-    max-height: 100vh;
-    max-height: 100dvh;
-    padding: 18px 16px 22px;
+    height: calc(100vh - 2 * var(--sidebar-gutter));
+    height: calc(100dvh - 2 * var(--sidebar-gutter));
+    max-height: calc(100vh - 2 * var(--sidebar-gutter));
+    max-height: calc(100dvh - 2 * var(--sidebar-gutter));
+    padding: 14px 14px 12px;
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 14px;
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    background:
-        radial-gradient(circle at 86% 16%, rgba(220, 232, 240, 0.9), transparent 20%),
-        linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(245, 239, 235, 0.94));
-    border: 1px solid var(--line);
-    border-radius: 0 28px 28px 0;
-    box-shadow: var(--shadow);
-    transition: width 0.25s ease, min-width 0.25s ease, padding 0.25s ease, transform 0.25s ease;
+    background: var(--sidebar-surface);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 22px;
+    box-shadow: var(--sidebar-shadow);
+    transition:
+        width 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+        min-width 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+        padding 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.28s ease;
 }
 
 .sidebar-brand {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    gap: 12px;
-    padding: 6px 6px 18px;
-    border-bottom: 1px solid var(--line);
+    gap: 10px;
+    padding: 4px 4px 14px;
+    border-bottom: 1px solid rgba(200, 217, 230, 0.45);
     flex-shrink: 0;
 }
 
-.brand-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 0;
-}
-
-.brand-icon {
-    width: 34px;
-    height: 34px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+.sidebar-brand-mark {
     flex: 0 0 auto;
-    border-radius: 12px;
-    background: linear-gradient(145deg, #f8fbfd, #dde9f1);
-    border: 1px solid rgba(200, 217, 230, 0.9);
-    box-shadow: 0 8px 18px rgba(83, 104, 122, 0.12);
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 6px 16px rgba(83, 104, 122, 0.1);
+    border: 1px solid rgba(200, 217, 230, 0.5);
+    line-height: 0;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
 }
 
-.brand-symbol {
-    color: var(--text-strong);
-    font-size: 14px;
-    line-height: 1;
+.sidebar-brand-mark:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(83, 104, 122, 0.14);
+}
+
+.sidebar-brand-logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    display: block;
+}
+
+.sidebar-brand-text {
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .logo {
     color: var(--text-strong);
-    font-size: 18px;
+    font-size: 1.15rem;
     font-weight: 800;
-    line-height: 1;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+}
+
+.sidebar-collapse-btn {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 12px;
+    background: rgba(220, 232, 240, 0.55);
+    color: var(--text-strong);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background 0.2s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sidebar-collapse-btn:hover {
+    background: rgba(179, 207, 229, 0.65);
+}
+
+.sidebar.collapsed .sidebar-collapse-btn i {
+    transform: rotate(180deg);
 }
 
 .user {
     display: flex;
     align-items: center;
-    gap: 12px;
-    min-height: 66px;
-    padding: 12px;
+    gap: 14px;
+    padding: 14px 14px;
     border-radius: 18px;
-    border: 1px solid var(--line);
-    background: linear-gradient(145deg, rgba(251, 252, 253, 0.98), rgba(243, 246, 248, 0.92));
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(200, 217, 230, 0.55);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(237, 244, 249, 0.88));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
     flex-shrink: 0;
 }
 
 .user img,
 .userImage {
-    width: 46px;
-    height: 46px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid rgba(255, 255, 255, 0.96);
+    border: 3px solid rgba(255, 255, 255, 0.98);
     background: #eef4f8;
-    box-shadow: 0 8px 16px rgba(83, 104, 122, 0.1);
+    box-shadow: 0 8px 20px rgba(83, 104, 122, 0.14);
+    flex-shrink: 0;
 }
 
 .user-copy {
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 6px;
 }
 
 .user-name {
-    max-width: 170px;
+    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     color: var(--text-strong);
     font-size: 14px;
     font-weight: 800;
-    line-height: 1.2;
+    line-height: 1.25;
 }
 
-.user small {
-    color: var(--text-muted);
-    font-size: 12px;
-    line-height: 1.1;
+.user-role-badge {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #1a3d63;
+    background: rgba(179, 207, 229, 0.55);
+    border: 1px solid rgba(74, 127, 167, 0.28);
 }
 
 .menu {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 10px;
     flex: 1 1 auto;
     min-height: 0;
 }
@@ -197,11 +240,12 @@ body::before {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin: 10px 2px 2px;
+    margin: 4px 4px 2px;
     color: var(--text-muted);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
-    letter-spacing: 1.8px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     flex-shrink: 0;
 }
 
@@ -212,39 +256,65 @@ body::before {
     background: var(--line);
 }
 
-.menu ul {
+.sidebar-nav-list {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 6px;
 }
 
-.menu a {
-    min-height: 48px;
+.sidebar-nav-list > li {
+    position: relative;
+}
+
+.sidebar-nav-list > li > a {
+    min-height: 46px;
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 10px 14px;
-    border-radius: 15px;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 14px;
     text-decoration: none;
     color: var(--text);
-    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+    position: relative;
+    z-index: 1;
+    transition: color 0.22s ease, transform 0.2s ease;
 }
 
-.menu a:hover {
+.sidebar-nav-list > li > a:hover {
     color: var(--text-strong);
-    background: rgba(220, 232, 240, 0.46);
     transform: translateX(2px);
 }
 
-.menu .active a {
+.sidebar-nav-list > li.active > a {
     color: #ffffff;
-    background:
-        radial-gradient(circle at 88% 50%, rgba(255, 255, 255, 0.08), transparent 22%),
-        linear-gradient(135deg, var(--active-top), var(--active-bottom));
-    box-shadow:
-        inset 0 0 0 1px rgba(255, 255, 255, 0.14),
-        0 16px 28px rgba(83, 104, 122, 0.22);
+}
+
+/* Animated active pill */
+.sidebar-nav-list > li.active::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    top: 50%;
+    height: 40px;
+    margin-top: -20px;
+    border-radius: 13px;
+    background: linear-gradient(135deg, var(--active-top), var(--active-bottom));
+    box-shadow: var(--nav-pill-shadow), inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+    z-index: 0;
+    animation: ml-nav-pill-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes ml-nav-pill-in {
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .menu-icon {
@@ -260,45 +330,59 @@ body::before {
 }
 
 .menuText {
-    font-size: 15px;
-    font-weight: 500;
+    font-size: 14px;
+    font-weight: 600;
     line-height: 1.2;
 }
 
-.profile-menu-icon {
-    position: relative;
-    border-radius: 50%;
-    overflow: hidden;
+/* Student-only row: logout in mobile dock */
+.sidebar-nav-dock-logout {
+    display: none;
 }
 
-.profile-head,
-.profile-body {
-    position: absolute;
-    left: 50%;
-    display: block;
-    background: currentColor;
-    transform: translateX(-50%);
+/* Footer logout (desktop / drawer) */
+.sidebar-footer {
+    flex-shrink: 0;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid rgba(200, 217, 230, 0.45);
 }
 
-.profile-head {
-    top: 3px;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
+.sidebar-logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 14px;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 700;
+    background: rgba(248, 251, 253, 0.65);
+    border: 1px solid rgba(200, 217, 230, 0.45);
+    transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
-.profile-body {
-    bottom: 2px;
-    width: 15px;
-    height: 9px;
-    border-radius: 12px 12px 4px 4px;
+.sidebar-logout:hover {
+    color: #9b1c1c;
+    background: rgba(254, 242, 242, 0.85);
+    border-color: rgba(248, 113, 113, 0.35);
+    transform: translateY(-1px);
 }
 
-/* Main column: fills viewport beside sidebar; only <section> scrolls */
+.sidebar-logout-icon {
+    width: 22px;
+    display: grid;
+    place-items: center;
+    font-size: 15px;
+}
+
+/* Main column offset for floating sidebar */
 .main-content {
     position: relative;
     z-index: 1;
-    margin-left: var(--sidebar-width);
+    margin-left: calc(var(--sidebar-gutter) + var(--sidebar-width) + var(--sidebar-float-gap));
     height: 100vh;
     height: 100dvh;
     max-height: 100vh;
@@ -310,11 +394,17 @@ body::before {
     background:
         radial-gradient(circle at 12% 10%, rgba(220, 232, 240, 0.72), transparent 18%),
         linear-gradient(135deg, #f8fbfd 0%, #eef5f9 56%, #deebf4 100%);
-    transition: margin-left 0.25s ease;
+    transition: margin-left 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .dashboard:has(.sidebar.collapsed) .main-content {
-    margin-left: var(--sidebar-collapsed-width);
+    margin-left: calc(var(--sidebar-gutter) + var(--sidebar-collapsed-width) + var(--sidebar-float-gap));
+}
+
+@media (min-width: 761px) {
+    .main-content {
+        padding-top: 8px;
+    }
 }
 
 .main-content > .topnav {
@@ -329,61 +419,39 @@ body::before {
     -webkit-overflow-scrolling: touch;
 }
 
-.topnav {
-    height: 58px;
-    margin: 16px 18px 0;
-    padding: 0 18px;
+/* ——— Top shell header ——— */
+.topnav--shell {
+    height: 52px;
+    margin: 14px 18px 0;
+    padding: 0 14px;
     display: flex;
     align-items: center;
     gap: 12px;
-    background: rgba(255, 255, 255, 0.92);
-    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(200, 217, 230, 0.4);
+    border-radius: 16px;
     box-shadow: var(--soft-shadow);
-}
-
-.topnav .actions {
-    margin-left: auto;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .toggle-btn {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
     border: 0;
-    border-radius: 10px;
-    background: transparent;
-    color: var(--text);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.65);
+    color: var(--text-strong);
     display: grid;
     place-items: center;
     cursor: pointer;
+    box-shadow: 0 4px 12px rgba(83, 104, 122, 0.08);
+    transition: background 0.2s ease, transform 0.18s ease;
 }
 
 .toggle-btn:hover {
-    background: rgba(220, 232, 240, 0.44);
-}
-
-.hamburger {
-    width: 18px;
-    height: 14px;
-    display: inline-flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.hamburger span {
-    width: 100%;
-    height: 2px;
-    border-radius: 999px;
-    background: currentColor;
-}
-
-.actions a {
-    text-decoration: none;
-    color: var(--text);
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 14px;
+    background: rgba(220, 232, 240, 0.75);
+    transform: translateY(-1px);
 }
 
 .content {
@@ -397,6 +465,7 @@ body::before {
     line-height: 1.1;
 }
 
+/* ——— Collapsed floating rail ——— */
 .sidebar.collapsed {
     width: var(--sidebar-collapsed-width);
     min-width: var(--sidebar-collapsed-width);
@@ -405,15 +474,34 @@ body::before {
 }
 
 .sidebar.collapsed .sidebar-brand {
-    justify-content: center;
-    padding-left: 0;
-    padding-right: 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 12px;
 }
 
-.sidebar.collapsed .logo,
+.sidebar.collapsed .sidebar-brand-text {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-brand-mark {
+    width: 44px;
+    height: 44px;
+}
+
+.sidebar.collapsed .sidebar-brand-logo {
+    width: 32px;
+    height: 32px;
+}
+
+.sidebar.collapsed .sidebar-collapse-btn {
+    width: 100%;
+}
+
 .sidebar.collapsed .user-copy,
+.sidebar.collapsed .section-title,
 .sidebar.collapsed .menuText,
-.sidebar.collapsed .section-title {
+.sidebar.collapsed .sidebar-logout-text {
     display: none;
 }
 
@@ -422,29 +510,71 @@ body::before {
     padding: 10px;
 }
 
-.sidebar.collapsed .menu a {
-    justify-content: center;
-    gap: 0;
-    padding: 11px;
+.sidebar.collapsed .userImage {
+    width: 44px;
+    height: 44px;
 }
 
-/* Desktop & tablet: collapsed = icon rail, never off-screen */
+.sidebar.collapsed .sidebar-nav-list > li > a {
+    justify-content: center;
+    gap: 0;
+    padding: 11px 8px;
+}
+
+.sidebar.collapsed .sidebar-footer {
+    display: flex;
+    justify-content: center;
+}
+
+.sidebar.collapsed .sidebar-logout {
+    width: auto;
+    padding: 11px;
+    justify-content: center;
+}
+
+.sidebar.collapsed .sidebar-logout-icon {
+    width: auto;
+}
+
 @media (min-width: 761px) {
     .sidebar.collapsed {
         transform: none;
     }
+
+    .topnav--shell {
+        display: none !important;
+    }
 }
 
-/* Small screens (non-student): drawer — collapsed = hidden off-canvas */
+/* Student: no top bar chrome */
+body.medlog-student-shell .topnav--shell {
+    display: none !important;
+}
+
+body.medlog-student-shell .main-content {
+    padding-top: 10px;
+}
+
+/* Small screens (non-student): drawer */
 @media (max-width: 760px) {
+    body:not(.medlog-student-shell) .sidebar {
+        max-width: calc(100vw - 2 * var(--sidebar-gutter));
+    }
+
+    body:not(.medlog-student-shell) .sidebar-collapse-btn {
+        display: none !important;
+    }
+
     body:not(.medlog-student-shell) .sidebar.collapsed {
-        transform: translateX(calc(-100% - 24px));
+        transform: translateX(calc(-100% - 40px));
         pointer-events: none;
         visibility: hidden;
     }
 
     body:not(.medlog-student-shell) .sidebar:not(.collapsed) {
-        box-shadow: 16px 0 40px rgba(26, 61, 99, 0.18);
+        box-shadow:
+            var(--sidebar-shadow),
+            20px 0 50px rgba(26, 61, 99, 0.12);
     }
 
     body:not(.medlog-student-shell) .main-content,
@@ -453,39 +583,50 @@ body::before {
     }
 }
 
-/* Students (tablet/phone): bottom nav — same sidebar markup, no drawer */
+/* ——— Student: premium floating bottom dock ——— */
 @media (max-width: 1024px) {
     body.medlog-student-shell .sidebar {
         top: auto;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        width: 100% !important;
-        min-width: 100% !important;
-        max-width: none !important;
+        right: auto;
+        bottom: max(14px, env(safe-area-inset-bottom));
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(520px, calc(100% - 28px)) !important;
+        min-width: 0 !important;
+        max-width: min(520px, calc(100% - 28px)) !important;
         height: auto !important;
         max-height: none !important;
         min-height: 0 !important;
+        padding: 10px 12px 12px !important;
         flex-direction: column;
         align-items: stretch;
-        padding: 10px 10px calc(12px + env(safe-area-inset-bottom, 0px)) !important;
-        border-radius: 22px 22px 0 0 !important;
+        border-radius: 22px !important;
         gap: 0;
         z-index: 40;
         overflow: visible;
+        background: linear-gradient(180deg, rgba(26, 45, 62, 0.97) 0%, rgba(15, 28, 42, 0.98) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         box-shadow:
-            0 -10px 30px rgba(83, 104, 122, 0.16),
-            inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            0 4px 6px rgba(0, 0, 0, 0.12),
+            0 24px 48px rgba(10, 25, 49, 0.35),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
     }
 
     body.medlog-student-shell .sidebar-brand,
     body.medlog-student-shell .sidebar .user,
-    body.medlog-student-shell .sidebar .section-title {
+    body.medlog-student-shell .sidebar .section-title,
+    body.medlog-student-shell .sidebar-footer {
+        display: none !important;
+    }
+
+    body.medlog-student-shell .sidebar-collapse-btn {
         display: none !important;
     }
 
     body.medlog-student-shell .sidebar.collapsed {
-        transform: none !important;
+        transform: translateX(-50%) !important;
         pointer-events: auto !important;
         visibility: visible !important;
     }
@@ -496,76 +637,101 @@ body::before {
         padding-bottom: var(--student-bottom-nav-space);
     }
 
-    body.medlog-student-shell .toggle-btn {
-        display: none !important;
-    }
-
     body.medlog-student-shell .sidebar .menu {
         flex: none;
     }
 
-    body.medlog-student-shell .sidebar .menu ul {
+    body.medlog-student-shell .sidebar-nav-dock-logout {
+        display: list-item;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list {
         flex-direction: row;
         align-items: stretch;
         justify-content: space-between;
-        gap: 6px;
+        gap: 4px;
         width: 100%;
     }
 
-    body.medlog-student-shell .sidebar .menu li {
+    body.medlog-student-shell .sidebar-nav-list > li {
         flex: 1 1 0;
         min-width: 0;
     }
 
-    body.medlog-student-shell .sidebar .menu a {
+    body.medlog-student-shell .sidebar-nav-list > li > a {
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: 5px;
-        padding: 10px 4px;
-        min-height: 56px;
-        border-radius: 15px;
+        gap: 4px;
+        padding: 8px 2px 6px;
+        min-height: 54px;
+        border-radius: 14px;
+        color: rgba(255, 255, 255, 0.72);
         -webkit-tap-highlight-color: transparent;
     }
 
-    body.medlog-student-shell .sidebar .menu a:hover {
+    body.medlog-student-shell .sidebar-nav-list > li > a:hover {
         transform: none;
+        color: #fff;
+        background: rgba(255, 255, 255, 0.06);
     }
 
-    body.medlog-student-shell .sidebar .menuText {
-        font-size: 9px;
+    body.medlog-student-shell .sidebar-nav-list > li.active > a {
+        color: #0f1c2a;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li.active::after {
+        left: 2px;
+        right: 2px;
+        height: 44px;
+        margin-top: -22px;
+        background: linear-gradient(180deg, #ffffff 0%, rgba(246, 250, 253, 0.96) 100%);
+        box-shadow:
+            0 10px 24px rgba(0, 0, 0, 0.18),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.95);
+        animation: ml-dock-pill 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes ml-dock-pill {
+        from {
+            opacity: 0;
+            transform: scale(0.88);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    body.medlog-student-shell .sidebar-nav-list .menuText {
+        font-size: 8px;
         font-weight: 800;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.06em;
         text-transform: uppercase;
         text-align: center;
-        line-height: 1.15;
+        line-height: 1.1;
         max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
-    body.medlog-student-shell .sidebar .menu-icon {
+    body.medlog-student-shell .sidebar-nav-list .menu-icon {
         font-size: 17px;
+    }
+
+    body.medlog-student-shell .sidebar-dock-logout-link {
+        color: rgba(255, 255, 255, 0.55);
+    }
+
+    body.medlog-student-shell .sidebar-nav-dock-logout > a:hover {
+        color: #fecaca;
+        background: rgba(248, 113, 113, 0.12);
     }
 }
 
-.brand-icon i,
 .menu-icon i {
     display: block;
     line-height: 1;
     color: currentColor;
-}
-
-.brand-symbol {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 16px;
-    height: 16px;
-}
-
-.menu a {
-    justify-content: flex-start;
-    text-align: left;
 }

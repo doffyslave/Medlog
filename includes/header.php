@@ -1,53 +1,68 @@
-<header class="topnav">
-    <button type="button" class="toggle-btn" aria-label="Toggle sidebar">
+<header class="topnav topnav--shell" role="banner">
+    <button type="button" class="toggle-btn" aria-label="Open menu">
         <i class="fas fa-bars" aria-hidden="true"></i>
     </button>
-
-    <div class="actions">
-        <a href="auth/logout.php" class="logout" id="logoutBtn">
-            <i class="fas fa-sign-out-alt"></i> Logout
-        </a>
-    </div>
 </header>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    var toggleBtn = document.querySelector('.toggle-btn');
     var sidebar = document.querySelector('.sidebar');
+    var headerToggle = document.querySelector('.topnav .toggle-btn');
+    var collapseInSidebar = document.querySelector('.sidebar-collapse-btn');
 
     function medlogStudentCompactNav() {
         return document.body.classList.contains('medlog-student-shell') && window.matchMedia('(max-width: 1024px)').matches;
     }
 
-    function bindToggle() {
-        if (!toggleBtn || !sidebar) {
+    function toggleSidebar() {
+        if (!sidebar) {
             return;
         }
-        toggleBtn.addEventListener('click', function (e) {
+        if (medlogStudentCompactNav()) {
+            return;
+        }
+        sidebar.classList.toggle('collapsed');
+    }
+
+    if (headerToggle && sidebar) {
+        headerToggle.addEventListener('click', function (e) {
             if (medlogStudentCompactNav()) {
                 e.preventDefault();
-                e.stopPropagation();
                 return;
             }
-            sidebar.classList.toggle('collapsed');
+            toggleSidebar();
         });
     }
 
-    bindToggle();
+    if (collapseInSidebar && sidebar) {
+        collapseInSidebar.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (medlogStudentCompactNav()) {
+                return;
+            }
+            toggleSidebar();
+        });
+    }
 
     window.addEventListener('resize', function () {
-        if (medlogStudentCompactNav() && sidebar.classList.contains('collapsed')) {
+        if (medlogStudentCompactNav() && sidebar && sidebar.classList.contains('collapsed')) {
             sidebar.classList.remove('collapsed');
         }
     });
 
-    var logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', function (e) {
-            if (!confirm("Are you sure you want to log out?")) {
-                e.preventDefault();
-            }
+    function bindLogoutConfirm(els) {
+        if (!els || !els.length) {
+            return;
+        }
+        els.forEach(function (el) {
+            el.addEventListener('click', function (e) {
+                if (!confirm('Are you sure you want to log out?')) {
+                    e.preventDefault();
+                }
+            });
         });
     }
+
+    bindLogoutConfirm(document.querySelectorAll('[data-confirm-logout="1"], #sidebarLogoutBtn'));
 });
 </script>
