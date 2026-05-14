@@ -407,3 +407,97 @@ body::before {
     justify-content: flex-start;
     text-align: left;
 }
+
+/* ---- Student mobile: bottom navigation (see body.medlog-student-shell) ---- */
+.medlog-bottom-nav {
+    display: none;
+}
+
+@media (max-width: 760px) {
+    body.medlog-student-shell .medlog-bottom-nav {
+        display: flex;
+        position: fixed;
+        z-index: 40;
+        left: max(10px, env(safe-area-inset-left));
+        right: max(10px, env(safe-area-inset-right));
+        bottom: max(10px, env(safe-area-inset-bottom));
+        align-items: stretch;
+        justify-content: space-between;
+        gap: 4px;
+        padding: 8px 8px 10px;
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid var(--line);
+        box-shadow: 0 14px 34px rgba(83, 104, 122, 0.22);
+        backdrop-filter: blur(10px);
+    }
+
+    body.medlog-student-shell .medlog-bottom-nav__item {
+        flex: 1 1 0;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        padding: 6px 2px 4px;
+        border-radius: 16px;
+        text-decoration: none;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        line-height: 1.1;
+        transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+    }
+
+    body.medlog-student-shell .medlog-bottom-nav__item i {
+        font-size: 16px;
+        margin-bottom: 1px;
+        color: var(--icon);
+    }
+
+    body.medlog-student-shell .medlog-bottom-nav__item span {
+        display: block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: center;
+    }
+
+    body.medlog-student-shell .medlog-bottom-nav__item.is-active {
+        color: #ffffff;
+        background: linear-gradient(135deg, var(--active-top), var(--active-bottom));
+        box-shadow:
+            inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+            0 10px 20px rgba(83, 104, 122, 0.2);
+    }
+
+    body.medlog-student-shell .medlog-bottom-nav__item.is-active i {
+        color: #ffffff;
+    }
+
+    body.medlog-student-shell .medlog-bottom-nav__item:active {
+        transform: scale(0.97);
+    }
+
+    body.medlog-student-shell .sidebar {
+        display: none !important;
+    }
+
+    body.medlog-student-shell .main-content {
+        margin-left: 0 !important;
+        padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+    }
+
+    body.medlog-student-shell .toggle-btn {
+        visibility: hidden;
+        width: 0;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+}

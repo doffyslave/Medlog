@@ -623,7 +623,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
     <link rel="stylesheet" href="Css/appointments.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
+<body<?= $role === 'student' ? ' class="medlog-student-shell"' : '' ?>>
 <div class="dashboard">
     <?php include 'includes/sidebar.php'; ?>
     <main class="main-content">

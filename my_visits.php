@@ -9,6 +9,7 @@ if (!isset($_SESSION['user'])) {
 
 $user = $_SESSION['user'];
 $user_id = $user['user_id'];
+$role = $user['role'] ?? 'guest';
 
 $stmt = $conn->prepare("
     SELECT 
@@ -37,10 +38,12 @@ $medlogPageHeader = [
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Visits | MedLog</title>
 
 <link rel="stylesheet" href="Css/layout.css">
 <link rel="stylesheet" href="Css/visits.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
 .no-data {
@@ -95,7 +98,7 @@ $medlogPageHeader = [
 </style>
 </head>
 
-<body>
+<body<?= $role === 'student' ? ' class="medlog-student-shell"' : '' ?>>
 
 <div class="dashboard">
 
