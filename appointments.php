@@ -1392,7 +1392,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                         if (st && cst !== st) ok = false;
                         if (dFilter && cdt !== dFilter) ok = false;
                         if (scope === 'today' && cdt !== todayStr) ok = false;
-                        if (scope === 'upcoming' && cdt < todayStr) ok = false;
+                        if (scope === 'upcoming' && !(cdt > todayStr)) ok = false;
                         card.classList.toggle('appt-v2-card--filtered-out',!ok);
                     });
 
@@ -1414,6 +1414,17 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                     pill.addEventListener('click',function () {
                         document.querySelectorAll('.appt-pill[data-appt-scope]').forEach(function (p) { p.classList.remove('appt-pill--active'); });
                         pill.classList.add('appt-pill--active');
+                        var scope = pill.getAttribute('data-appt-scope') || '';
+                        var dInput = document.getElementById('apptFilterDate');
+                        var todayStr = adminBoard ? (adminBoard.getAttribute('data-appt-today') || '') : '';
+                        if (dInput && scope === 'today' && todayStr) {
+                            dInput.value = todayStr;
+                        } else if (dInput && scope === 'upcoming') {
+                            dInput.value = '';
+                        } else if (dInput && scope === 'all') {
+                            dInput.value = '';
+                        }
+
                         apptApplyAdminFilters();
                     });
                 });
