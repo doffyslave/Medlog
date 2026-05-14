@@ -26,6 +26,7 @@ appt_mark_past_approved_missed($conn);
 
 $timeSlots = appt_time_slots();
 $apptErrSlotTaken = 'This time slot is already booked. Please choose another slot.';
+$apptErrSlotPast = 'That time has already passed for the selected day. Pick a later slot or another date.';
 
 // ================= STUDENT / TEACHER BOOK =================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_appointment']) && $isBooker) {
@@ -45,6 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_appointment']) &&
         $_SESSION['appointment_error'] = 'Invalid time slot.';
     } elseif (appt_slot_conflict_count($conn, $date, $timeCanon, null) > 0) {
         $_SESSION['appointment_error'] = $apptErrSlotTaken;
+    } elseif (!appt_booking_slot_starts_in_future($date, $timeCanon)) {
+        $_SESSION['appointment_error'] = $apptErrSlotPast;
     } else {
         try {
             $stmt = $conn->prepare('
@@ -80,6 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_create_appointm
         $_SESSION['appointment_error'] = 'Invalid time slot.';
     } elseif (appt_slot_conflict_count($conn, $date, $timeCanon, null) > 0) {
         $_SESSION['appointment_error'] = $apptErrSlotTaken;
+    } elseif (!appt_booking_slot_starts_in_future($date, $timeCanon)) {
+        $_SESSION['appointment_error'] = $apptErrSlotPast;
     } else {
         $roleChk = $conn->prepare("
             SELECT user_id, status FROM users
@@ -236,6 +241,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_reschedule']) &
             $_SESSION['appointment_error'] = 'Invalid time slot.';
         } elseif (appt_slot_conflict_count($conn, $newDate, $newTimeCanon, $appointment_id) > 0) {
             $_SESSION['appointment_error'] = $apptErrSlotTaken;
+        } elseif (!appt_booking_slot_starts_in_future($newDate, $newTimeCanon)) {
+            $_SESSION['appointment_error'] = $apptErrSlotPast;
         } else {
             $noteVal = $reschedule_note !== ''
                 ? $reschedule_note
@@ -447,6 +454,14 @@ if (!$isAdmin) {
         return strcmp((string) ($y['appointment_time'] ?? ''), (string) ($x['appointment_time'] ?? ''));
     });
 }
+
+$todayApptYmd = $nowApptRef->format('Y-m-d');
+$apptPastSlotsToday = [];
+foreach ($timeSlots as $slotLabel) {
+    $slotStartToday = appt_slot_start_immutable($todayApptYmd, $slotLabel);
+    $apptPastSlotsToday[$slotLabel] = $slotStartToday === null || $slotStartToday <= $nowApptRef;
+}
+$apptPastSlotsTodayJson = json_encode($apptPastSlotsToday, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
 $slotsJson = json_encode($timeSlots, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
@@ -1147,6 +1162,8 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
             });
 
             const SLOTS = <?= $slotsJson ?>;
+            const APPT_BOOKING_TODAY = <?= json_encode($todayApptYmd, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+            const APPT_PAST_SLOTS_TODAY = <?= $apptPastSlotsTodayJson ?>;
             const BOOKED = <?= $bookedJson ?>;
 
             <?php if ($isBooker): ?>
@@ -1191,12 +1208,15 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                     const taken = (BOOKED[dateStr] || []).slice();
                     SLOTS.forEach(function (slot) {
                         const busy = taken.indexOf(slot) !== -1;
+                        const past = dateStr === APPT_BOOKING_TODAY && APPT_PAST_SLOTS_TODAY[slot] === true;
                         const btn = document.createElement('button');
                         btn.type = 'button';
-                        btn.className = 'appt-slot-btn' + (busy ? ' is-busy' : '');
+                        btn.className = 'appt-slot-btn'
+                            + (busy ? ' is-busy' : '')
+                            + (past ? ' is-past' : '');
                         btn.textContent = slot;
-                        btn.disabled = busy;
-                        if (!busy) {
+                        btn.disabled = busy || past;
+                        if (!busy && !past) {
                             btn.addEventListener('click',function () {
                                 slotGrid.querySelectorAll('.appt-slot-btn').forEach(function (b) { b.classList.remove('is-selected'); });
                                 btn.classList.add('is-selected');

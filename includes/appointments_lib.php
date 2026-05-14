@@ -102,6 +102,19 @@ if (!function_exists('appt_slot_start_immutable')) {
     }
 }
 
+if (!function_exists('appt_booking_slot_starts_in_future')) {
+    /**
+     * True when the slot start is strictly after "now" in appt_timezone().
+     * Blocks past calendar days, invalid date/time pairs, and same-day times that have already begun.
+     */
+    function appt_booking_slot_starts_in_future(string $dateYmd, string $timeCanon, ?DateTimeImmutable $now = null): bool
+    {
+        $now = $now ?? new DateTimeImmutable('now', appt_timezone());
+        $start = appt_slot_start_immutable($dateYmd, $timeCanon);
+        return $start !== null && $start > $now;
+    }
+}
+
 if (!function_exists('appt_form_token_issue')) {
     function appt_form_token_issue(string $key): string
     {

@@ -488,6 +488,12 @@
     text-decoration: line-through;
 }
 
+.appt-slot-btn.is-past {
+    opacity: 0.45;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
 .appt-submit-btn {
     margin-top: 12px;
     width: 100%;
@@ -1752,6 +1758,12 @@
     opacity: 0.42;
     text-decoration: line-through;
     filter: grayscale(0.2);
+}
+
+.appt-slot-btn.is-past {
+    opacity: 0.45;
+    cursor: not-allowed;
+    text-decoration: line-through;
 }
 
 /* --- Student lists --- */
