@@ -23,6 +23,7 @@
     --active-bottom: #506e82;
     --shadow: 0 14px 32px rgba(83, 104, 122, 0.12);
     --soft-shadow: 0 10px 22px rgba(83, 104, 122, 0.08);
+    --student-bottom-nav-space: calc(92px + env(safe-area-inset-bottom, 0px));
 }
 
 body {
@@ -33,7 +34,17 @@ body {
     color: var(--text);
 }
 
-/* Subtle global atmosphere (MedLog palette) — stays behind app chrome */
+/* App pages: single scroll surface inside main (sidebar chrome fixed) */
+html:has(.dashboard) {
+    height: 100%;
+}
+
+body:has(.dashboard) {
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+}
+
 body::before {
     content: "";
     position: fixed;
@@ -46,28 +57,41 @@ body::before {
         radial-gradient(ellipse 50% 35% at 50% 100%, rgba(10, 25, 49, 0.04), transparent 55%);
 }
 
+/* Shell: sidebar out of flow; main column is the app viewport */
 .dashboard {
     position: relative;
     z-index: 1;
-    display: flex;
-    min-height: 100vh;
+    display: block;
+    min-height: 100%;
+    height: 100%;
+    max-height: 100%;
 }
 
 .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 30;
     width: var(--sidebar-width);
     min-width: var(--sidebar-width);
-    min-height: 100vh;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
     padding: 18px 16px 22px;
     display: flex;
     flex-direction: column;
     gap: 18px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     background:
         radial-gradient(circle at 86% 16%, rgba(220, 232, 240, 0.9), transparent 20%),
         linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(245, 239, 235, 0.94));
     border: 1px solid var(--line);
     border-radius: 0 28px 28px 0;
     box-shadow: var(--shadow);
-    transition: width 0.25s ease, min-width 0.25s ease, padding 0.25s ease;
+    transition: width 0.25s ease, min-width 0.25s ease, padding 0.25s ease, transform 0.25s ease;
 }
 
 .sidebar-brand {
@@ -77,6 +101,7 @@ body::before {
     gap: 12px;
     padding: 6px 6px 18px;
     border-bottom: 1px solid var(--line);
+    flex-shrink: 0;
 }
 
 .brand-left {
@@ -122,6 +147,7 @@ body::before {
     border: 1px solid var(--line);
     background: linear-gradient(145deg, rgba(251, 252, 253, 0.98), rgba(243, 246, 248, 0.92));
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+    flex-shrink: 0;
 }
 
 .user img,
@@ -163,6 +189,8 @@ body::before {
     display: flex;
     flex-direction: column;
     gap: 14px;
+    flex: 1 1 auto;
+    min-height: 0;
 }
 
 .section-title {
@@ -174,6 +202,7 @@ body::before {
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 1.8px;
+    flex-shrink: 0;
 }
 
 .section-title::after {
@@ -265,16 +294,39 @@ body::before {
     border-radius: 12px 12px 4px 4px;
 }
 
+/* Main column: fills viewport beside sidebar; only <section> scrolls */
 .main-content {
     position: relative;
     z-index: 1;
-    flex: 1;
+    margin-left: var(--sidebar-width);
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
     display: flex;
     flex-direction: column;
-    overflow: auto;
+    overflow: hidden;
+    min-width: 0;
     background:
         radial-gradient(circle at 12% 10%, rgba(220, 232, 240, 0.72), transparent 18%),
         linear-gradient(135deg, #f8fbfd 0%, #eef5f9 56%, #deebf4 100%);
+    transition: margin-left 0.25s ease;
+}
+
+.dashboard:has(.sidebar.collapsed) .main-content {
+    margin-left: var(--sidebar-collapsed-width);
+}
+
+.main-content > .topnav {
+    flex-shrink: 0;
+}
+
+.main-content > section {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
 .topnav {
@@ -283,10 +335,14 @@ body::before {
     padding: 0 18px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 12px;
     background: rgba(255, 255, 255, 0.92);
     border-radius: 18px;
     box-shadow: var(--soft-shadow);
+}
+
+.topnav .actions {
+    margin-left: auto;
 }
 
 .toggle-btn {
@@ -372,19 +428,125 @@ body::before {
     padding: 11px;
 }
 
-@media (max-width: 760px) {
-    .sidebar {
-        position: fixed;
-        z-index: 20;
-        inset: 0 auto 0 0;
-    }
-
+/* Desktop & tablet: collapsed = icon rail, never off-screen */
+@media (min-width: 761px) {
     .sidebar.collapsed {
-        transform: translateX(-100%);
+        transform: none;
+    }
+}
+
+/* Small screens (non-student): drawer — collapsed = hidden off-canvas */
+@media (max-width: 760px) {
+    body:not(.medlog-student-shell) .sidebar.collapsed {
+        transform: translateX(calc(-100% - 24px));
+        pointer-events: none;
+        visibility: hidden;
     }
 
-    .main-content {
-        margin-left: 0;
+    body:not(.medlog-student-shell) .sidebar:not(.collapsed) {
+        box-shadow: 16px 0 40px rgba(26, 61, 99, 0.18);
+    }
+
+    body:not(.medlog-student-shell) .main-content,
+    body:not(.medlog-student-shell) .dashboard:has(.sidebar.collapsed) .main-content {
+        margin-left: 0 !important;
+    }
+}
+
+/* Students (tablet/phone): bottom nav — same sidebar markup, no drawer */
+@media (max-width: 1024px) {
+    body.medlog-student-shell .sidebar {
+        top: auto;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: none !important;
+        height: auto !important;
+        max-height: none !important;
+        min-height: 0 !important;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 10px 10px calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+        border-radius: 22px 22px 0 0 !important;
+        gap: 0;
+        z-index: 40;
+        overflow: visible;
+        box-shadow:
+            0 -10px 30px rgba(83, 104, 122, 0.16),
+            inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+
+    body.medlog-student-shell .sidebar-brand,
+    body.medlog-student-shell .sidebar .user,
+    body.medlog-student-shell .sidebar .section-title {
+        display: none !important;
+    }
+
+    body.medlog-student-shell .sidebar.collapsed {
+        transform: none !important;
+        pointer-events: auto !important;
+        visibility: visible !important;
+    }
+
+    body.medlog-student-shell .main-content,
+    body.medlog-student-shell .dashboard:has(.sidebar.collapsed) .main-content {
+        margin-left: 0 !important;
+        padding-bottom: var(--student-bottom-nav-space);
+    }
+
+    body.medlog-student-shell .toggle-btn {
+        display: none !important;
+    }
+
+    body.medlog-student-shell .sidebar .menu {
+        flex: none;
+    }
+
+    body.medlog-student-shell .sidebar .menu ul {
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: space-between;
+        gap: 6px;
+        width: 100%;
+    }
+
+    body.medlog-student-shell .sidebar .menu li {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    body.medlog-student-shell .sidebar .menu a {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        padding: 10px 4px;
+        min-height: 56px;
+        border-radius: 15px;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    body.medlog-student-shell .sidebar .menu a:hover {
+        transform: none;
+    }
+
+    body.medlog-student-shell .sidebar .menuText {
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        text-align: center;
+        line-height: 1.15;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    body.medlog-student-shell .sidebar .menu-icon {
+        font-size: 17px;
     }
 }
 

@@ -10,7 +10,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 $user = $_SESSION['user'];
-$role = $user['role'];
+$role = strtolower(trim((string) ($user['role'] ?? 'guest')));
 $user_id = $user['user_id'];
 
 $isAdmin = $role === 'admin';
@@ -672,8 +672,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
     <link rel="stylesheet" href="Css/appointments.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-
-<body>
+<body<?= $role === 'student' ? ' class="medlog-student-shell"' : '' ?>>
     <div class="dashboard">
         <?php include 'includes/sidebar.php'; ?>
         <main class="main-content">
@@ -696,8 +695,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
 
                 <?php if (!empty($_SESSION['appointment_success'])): ?>
                     <div class="alert-success">
-                        <?= htmlspecialchars($_SESSION['appointment_success'], ENT_QUOTES, 'UTF-8') ?>
-                    </div>
+                        <?= htmlspecialchars($_SESSION['appointment_success'], ENT_QUOTES, 'UTF-8') ?></div>
                     <?php unset($_SESSION['appointment_success']); ?>
                 <?php endif; ?>
 
@@ -726,8 +724,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                             <div>
                                 <h2 class="appt-today-hero__title">Today's schedule</h2>
                                 <p class="appt-today-hero__date">
-                                    <?= htmlspecialchars(date('l — F j, Y'), ENT_QUOTES, 'UTF-8') ?>
-                                </p>
+                                    <?= htmlspecialchars(date('l — F j, Y'), ENT_QUOTES, 'UTF-8') ?></p>
                             </div>
                             <div class="appt-today-hero__pulse" aria-hidden="true">
                                 <span class="appt-today-hero__pulse-dot"></span>
@@ -758,8 +755,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                                                 class="appt-v2-badge <?= htmlspecialchars(appt_badge_class($taSt), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($taSt, ENT_QUOTES, 'UTF-8') ?></span>
                                             <?php if (!empty($ta['reason'])): ?>
                                                 <p class="appt-today-timeline__reason">
-                                                    <?= htmlspecialchars((string) $ta['reason'], ENT_QUOTES, 'UTF-8') ?>
-                                                </p>
+                                                    <?= htmlspecialchars((string) $ta['reason'], ENT_QUOTES, 'UTF-8') ?></p>
                                             <?php endif; ?>
                                         </div>
                                     </li>
@@ -852,8 +848,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                                 data-appt-section="<?= htmlspecialchars($sec['key'], ENT_QUOTES, 'UTF-8') ?>">
                                 <header class="appt-desk-section__head">
                                     <h3 class="appt-desk-section__title">
-                                        <?= htmlspecialchars($sec['title'], ENT_QUOTES, 'UTF-8') ?>
-                                    </h3>
+                                        <?= htmlspecialchars($sec['title'], ENT_QUOTES, 'UTF-8') ?></h3>
                                     <span class="appt-desk-section__count"><?= count($items) ?></span>
                                 </header>
                                 <p class="appt-desk-section__hint"><?= htmlspecialchars($sec['hint'], ENT_QUOTES, 'UTF-8') ?>
@@ -1016,8 +1011,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                     <option value="">Select time</option>
                     <?php foreach ($timeSlots as $slot): ?>
                         <option value="<?= htmlspecialchars($slot, ENT_QUOTES, 'UTF-8') ?>">
-                            <?= htmlspecialchars($slot, ENT_QUOTES, 'UTF-8') ?>
-                        </option>
+                            <?= htmlspecialchars($slot, ENT_QUOTES, 'UTF-8') ?></option>
                     <?php endforeach; ?>
                 </select>
                 <label for="adminApptReason">Reason / notes</label>
@@ -1047,8 +1041,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                         <option value="">Select time</option>
                         <?php foreach ($timeSlots as $slot): ?>
                             <option value="<?= htmlspecialchars($slot, ENT_QUOTES, 'UTF-8') ?>">
-                                <?= htmlspecialchars($slot, ENT_QUOTES, 'UTF-8') ?>
-                            </option>
+                                <?= htmlspecialchars($slot, ENT_QUOTES, 'UTF-8') ?></option>
                         <?php endforeach; ?>
                     </select>
                     <label for="rescheduleNote">Reschedule note (optional)</label>
@@ -1454,6 +1447,8 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
             <?php endif; ?>
         })();
     </script>
-</body>
+    </body>
+
+</html>
 
 </html>

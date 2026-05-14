@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 $user = $_SESSION['user'] ?? null;
-$role = $user['role'] ?? 'guest';
+$role = strtolower(trim((string) ($user['role'] ?? 'guest')));
 $current = basename($_SERVER['PHP_SELF']);
 ?>
 

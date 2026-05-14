@@ -266,7 +266,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="split-screen">
         <div class="hero-side">
             <div class="hero-content">
-                <img src="../Images/FinalLogo.png" alt="MedLog Logo">
+                <img src="../Images/MEDLOG, BG-REMOVED.png" alt="Medlog Logo">
                 <h1>MEDLOG</h1>
                 <p>Inventory Management System</p>
                 <div class="hero-tagline">Secure Admin Portal</div>
