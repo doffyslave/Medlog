@@ -30,21 +30,24 @@
   }
 
   /* PARTICLES */
-  .particles span {
+  .particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.particles span {
   position: absolute;
   width: 6px;
   height: 6px;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.6);
   border-radius: 50%;
   animation: float 18s linear infinite;
-  bottom: -20px;
-  filter: blur(0.5px);
-  box-shadow: 0 0 10px rgba(255,255,255,0.4);
+  top: 100%;
+  opacity: 0;
 }
-  .particles span:nth-child(1) {
-    left: 10%;
-    animation-duration: 18s;
-  }
 
   .particles span:nth-child(2) {
     left: 20%;
