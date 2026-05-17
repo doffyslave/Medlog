@@ -159,5 +159,24 @@ a:hover, button:hover {
   /* Icon subtle depth */
   div[class*="bg-[#E8F1F8]"] {
     box-shadow: inset 0 0 0 1px rgba(0,0,0,0.03);
+
+    .hero {
+  position: relative;
+  z-index: 0;
+}
+
+.particles {
+  z-index: 0;
+}
+
+.floating-icons {
+  z-index: 1;
+  position: absolute;
+}
+
+.hero > div:last-child {
+  position: relative;
+  z-index: 2;
+}
   }
   

@@ -183,10 +183,10 @@ div[class*="bg-[#E8F1F8]"] {
   </div>
 </nav>
 
-<<!-- HERO -->
+<!-- HERO -->
 <section class="hero text-white py-32 text-center relative overflow-hidden">
 
-  <!-- PARTICLES (FIXED) -->
+  <!-- PARTICLES -->
   <div class="particles">
     <span></span><span></span><span></span><span></span><span></span>
     <span></span><span></span><span></span><span></span>
@@ -229,8 +229,7 @@ div[class*="bg-[#E8F1F8]"] {
 </section>
 
 <!-- STATS -->
-<section class="py-20">
- <section class="py-24 bg-[#F6FAFD]">
+<section class="py-24 bg-[#F6FAFD]">
   <div class="max-w-6xl mx-auto">
 
     <h2 class="text-center text-3xl font-bold mb-12" data-aos="fade-up">
