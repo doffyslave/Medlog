@@ -131,3 +131,49 @@ body {
 .lottie-adjust {
   margin-top: 80px; /* 👈 THIS LOWERS THE GUY */
 }
+
+
+/* ========================= */
+/* GLOBAL IMPROVEMENTS (ADDED) */
+/* ========================= */
+
+/* Smooth transitions everywhere */
+* {
+  transition: all 0.3s ease;
+}
+
+/* Card hover effect */
+.card {
+  border-radius: 16px;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+
+/* Button hover glow */
+button:hover {
+  box-shadow: 0 10px 25px rgba(74, 127, 167, 0.4);
+}
+
+/* Section spacing consistency */
+section {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+/* Background upgrade */
+body {
+  background: linear-gradient(180deg, #F6FAFD 0%, #EAF3FA 100%);
+}
+
+/* Headings */
+h1, h2, h3 {
+  letter-spacing: -0.5px;
+}
+
+/* Icon subtle depth */
+div[class*="bg-[#E8F1F8]"] {
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.03);
+}

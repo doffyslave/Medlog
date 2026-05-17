@@ -142,60 +142,97 @@
   </section>
 
   <!-- STATS -->
-  <section class="py-20 text-center bg-white" data-aos="fade-up">
-    <div class="max-w-6xl mx-auto grid md:grid-cols-4 gap-8">
-      <div><h3 class="text-4xl font-bold">100%</h3><p>Digital Records</p></div>
-      <div><h3 class="text-4xl font-bold">24/7</h3><p>Access</p></div>
-      <div><h3 class="text-4xl font-bold">Real-Time</h3><p>Tracking</p></div>
-      <div><h3 class="text-4xl font-bold">Secure</h3><p>Data</p></div>
+  <section class="py-20 bg-[#F6FAFD]" data-aos="fade-up">
+  <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-10 grid md:grid-cols-4 gap-8 text-left">
+
+    <div class="flex items-start gap-4">
+      <div class="bg-[#E8F1F8] p-4 rounded-xl text-2xl">📄</div>
+      <div>
+        <h3 class="text-xl font-bold text-[#0A1931]">100%</h3>
+        <p class="text-sm text-gray-500">Digital Records</p>
+      </div>
     </div>
-  </section>
+
+    <div class="flex items-start gap-4">
+      <div class="bg-[#E8F1F8] p-4 rounded-xl text-2xl">⏱</div>
+      <div>
+        <h3 class="text-xl font-bold text-[#0A1931]">24/7</h3>
+        <p class="text-sm text-gray-500">Access</p>
+      </div>
+    </div>
+
+    <div class="flex items-start gap-4">
+      <div class="bg-[#E8F1F8] p-4 rounded-xl text-2xl">📊</div>
+      <div>
+        <h3 class="text-xl font-bold text-[#0A1931]">Real-Time</h3>
+        <p class="text-sm text-gray-500">Tracking</p>
+      </div>
+    </div>
+
+    <div class="flex items-start gap-4">
+      <div class="bg-[#E8F1F8] p-4 rounded-xl text-2xl">🔒</div>
+      <div>
+        <h3 class="text-xl font-bold text-[#0A1931]">Secure</h3>
+        <p class="text-sm text-gray-500">Data Protection</p>
+      </div>
+    </div>
+
+  </div>
+</section>
 
   <!-- FEATURES -->
-  <section id="features" class="py-24 bg-[#F6FAFD] text-center">
-    <h2 class="text-4xl font-bold mb-16" data-aos="fade-up">Everything You Need</h2>
+  <section class="py-24 text-center">
+  <h2 class="text-4xl font-bold mb-16">Features</h2>
 
-    <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-10 px-6">
+  <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-10">
 
-      <div class="p-8 bg-white rounded-2xl card" data-aos="fade-up">
-        <h3 class="font-bold text-xl mb-4">Health Records</h3>
-        <p>Track student illnesses, allergies, visits, and treatment history.</p>
-      </div>
-
-      <div class="p-8 bg-white rounded-2xl card" data-aos="fade-up" data-aos-delay="150">
-        <h3 class="font-bold text-xl mb-4">Inventory System</h3>
-        <p>Monitor medicines, supplies, and expiration dates automatically.</p>
-      </div>
-
-      <div class="p-8 bg-white rounded-2xl card" data-aos="fade-up" data-aos-delay="300">
-        <h3 class="font-bold text-xl mb-4">Reports & Analytics</h3>
-        <p>Generate insights for administrators and better decisions.</p>
-      </div>
-
+    <div class="p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition">
+      <div class="w-16 h-16 bg-gradient-to-br from-[#4A7FA7] to-[#1A3D63] text-white flex items-center justify-center rounded-xl mb-4">🩺</div>
+      <h3 class="font-bold text-lg mb-2">Health Records</h3>
+      <p class="text-gray-600">Track illnesses and student visits.</p>
     </div>
-  </section>
+
+    <div class="p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition">
+      <div class="w-16 h-16 bg-gradient-to-br from-[#4A7FA7] to-[#1A3D63] text-white flex items-center justify-center rounded-xl mb-4">💊</div>
+      <h3 class="font-bold text-lg mb-2">Medicine Logs</h3>
+      <p class="text-gray-600">Monitor medicines and treatments.</p>
+    </div>
+
+    <div class="p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition">
+      <div class="w-16 h-16 bg-gradient-to-br from-[#4A7FA7] to-[#1A3D63] text-white flex items-center justify-center rounded-xl mb-4">📈</div>
+      <h3 class="font-bold text-lg mb-2">Reports</h3>
+      <p class="text-gray-600">Generate real-time reports.</p>
+    </div>
+
+  </div>
+</section>
 
   <!-- HOW -->
-  <section id="how" class="py-24 text-center bg-white">
-    <h2 class="text-4xl font-bold mb-16" data-aos="fade-up">How MedLog Works</h2>
+  <section class="py-24 bg-[#EAF3FA] text-center">
+  <h2 class="text-4xl font-bold mb-16">How It Works</h2>
 
-    <div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-10">
-      <div data-aos="zoom-in">
-        <h3 class="font-bold">1. Record</h3>
-        <p>Input student health data.</p>
-      </div>
+  <div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-10">
 
-      <div data-aos="zoom-in" data-aos-delay="150">
-        <h3 class="font-bold">2. Track</h3>
-        <p>Monitor medicine usage.</p>
-      </div>
-
-      <div data-aos="zoom-in" data-aos-delay="300">
-        <h3 class="font-bold">3. Analyze</h3>
-        <p>Generate reports instantly.</p>
-      </div>
+    <div>
+      <div class="text-3xl mb-3">📝</div>
+      <h3 class="font-bold">Input Data</h3>
+      <p class="text-gray-600">Nurses log student health info.</p>
     </div>
-  </section>
+
+    <div>
+      <div class="text-3xl mb-3">💾</div>
+      <h3 class="font-bold">Store</h3>
+      <p class="text-gray-600">Data is securely saved.</p>
+    </div>
+
+    <div>
+      <div class="text-3xl mb-3">📊</div>
+      <h3 class="font-bold">Analyze</h3>
+      <p class="text-gray-600">Generate reports instantly.</p>
+    </div>
+
+  </div>
+</section>
 
   <!-- ABOUT -->
   <section id="about" class="glow-section text-white py-28 text-center relative">
