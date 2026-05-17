@@ -183,8 +183,14 @@ div[class*="bg-[#E8F1F8]"] {
   </div>
 </nav>
 
-<!-- HERO -->
+<<!-- HERO -->
 <section class="hero text-white py-32 text-center relative overflow-hidden">
+
+  <!-- PARTICLES (FIXED) -->
+  <div class="particles">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span>
+  </div>
 
   <!-- FLOATING ICONS -->
   <div class="floating-icons">
@@ -196,7 +202,7 @@ div[class*="bg-[#E8F1F8]"] {
     <img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png">
   </div>
 
-  <div class="max-w-6xl mx-auto px-6">
+   <div class="max-w-6xl mx-auto px-6">
 
     <h1 class="text-5xl md:text-6xl font-extrabold leading-tight" data-aos="fade-up">
       Official School Clinic Management System
@@ -208,7 +214,7 @@ div[class*="bg-[#E8F1F8]"] {
 
     <div class="mt-10" data-aos="zoom-in" data-aos-delay="400">
       <a href="auth/login.php"
-         class="bg-white text-[#0A1931] px-10 py-4 rounded-xl text-lg font-semibold shadow-lg">
+         class="bg-white text-[#0A1931] px-10 py-4 rounded-xl text-lg font-semibold shadow-lg hover:scale-105">
         Access School System
       </a>
     </div>
@@ -224,62 +230,101 @@ div[class*="bg-[#E8F1F8]"] {
 
 <!-- STATS -->
 <section class="py-20">
-  <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl p-10 grid md:grid-cols-4 gap-8">
+ <section class="py-24 bg-[#F6FAFD]">
+  <div class="max-w-6xl mx-auto">
 
-    <div class="flex gap-4">
-      <div class="bg-[#E8F1F8] p-4 rounded-xl">📄</div>
-      <div>
-        <h3 class="text-xl font-bold">100%</h3>
-        <p class="text-sm text-gray-500">Digital Records</p>
+    <h2 class="text-center text-3xl font-bold mb-12" data-aos="fade-up">
+      System Overview
+    </h2>
+
+    <div class="grid md:grid-cols-4 gap-6">
+
+      <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl hover:-translate-y-2">
+        <div class="text-3xl">📄</div>
+        <h3 class="text-2xl font-extrabold mt-3">100%</h3>
+        <p class="text-gray-500">Digital Records</p>
+        <div class="mt-4 h-1 bg-gray-100 rounded-full">
+          <div class="h-1 bg-[#4A7FA7] rounded-full w-full"></div>
+        </div>
       </div>
-    </div>
 
-    <div class="flex gap-4">
-      <div class="bg-[#E8F1F8] p-4 rounded-xl">⏱</div>
-      <div>
-        <h3 class="text-xl font-bold">24/7</h3>
-        <p class="text-sm text-gray-500">Access</p>
+      <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl hover:-translate-y-2">
+        <div class="text-3xl">⏱</div>
+        <h3 class="text-2xl font-extrabold mt-3">24/7</h3>
+        <p class="text-gray-500">System Access</p>
+        <div class="mt-4 h-1 bg-gray-100 rounded-full">
+          <div class="h-1 bg-[#6EA8D9] rounded-full w-full"></div>
+        </div>
       </div>
-    </div>
 
-    <div class="flex gap-4">
-      <div class="bg-[#E8F1F8] p-4 rounded-xl">📊</div>
-      <div>
-        <h3 class="text-xl font-bold">Real-Time</h3>
-        <p class="text-sm text-gray-500">Tracking</p>
+      <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl hover:-translate-y-2">
+        <div class="text-3xl">📊</div>
+        <h3 class="text-2xl font-extrabold mt-3">Live</h3>
+        <p class="text-gray-500">Health Tracking</p>
+        <div class="mt-4 h-1 bg-gray-100 rounded-full">
+          <div class="h-1 bg-[#1A3D63] rounded-full w-4/5"></div>
+        </div>
       </div>
-    </div>
 
-    <div class="flex gap-4">
-      <div class="bg-[#E8F1F8] p-4 rounded-xl">🔒</div>
-      <div>
-        <h3 class="text-xl font-bold">Secure</h3>
-        <p class="text-sm text-gray-500">Data Protection</p>
+      <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl hover:-translate-y-2">
+        <div class="text-3xl">🔒</div>
+        <h3 class="text-2xl font-extrabold mt-3">Secure</h3>
+        <p class="text-gray-500">Data Protection</p>
+        <div class="mt-4 h-1 bg-gray-100 rounded-full">
+          <div class="h-1 bg-green-500 rounded-full w-full"></div>
+        </div>
       </div>
-    </div>
 
+    </div>
   </div>
 </section>
 
 <!-- FEATURES -->
 <section class="py-24 text-center">
-<h2 class="text-4xl font-bold mb-16">Features</h2>
+<!-- FEATURES -->
+<section id="features" class="py-28 text-center bg-white relative overflow-hidden">
 
-<div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-10">
+  <div class="max-w-6xl mx-auto px-6">
 
-  <div class="card p-8 bg-white shadow-lg">
-    🩺 <h3 class="font-bold mt-3">Student Health Records</h3>
+    <p class="text-gray-500 mb-4" data-aos="fade-up">
+      Everything your school clinic needs in one system
+    </p>
+
+    <h2 class="text-4xl font-extrabold mb-14" data-aos="fade-up">
+      Features
+    </h2>
+
+    <div class="grid md:grid-cols-3 gap-10">
+
+      <!-- CARD 1 -->
+      <div class="group bg-white border border-gray-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl hover:-translate-y-3">
+        <div class="text-5xl">🩺</div>
+        <h3 class="font-bold text-xl mt-5">Student Health Records</h3>
+        <p class="text-gray-500 mt-3">
+          Store complete student medical history securely and access it instantly.
+        </p>
+      </div>
+
+      <!-- CARD 2 -->
+      <div class="group bg-white border border-gray-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl hover:-translate-y-3">
+        <div class="text-5xl">💊</div>
+        <h3 class="font-bold text-xl mt-5">Medication Tracking</h3>
+        <p class="text-gray-500 mt-3">
+          Track medicines, treatments, and clinic supply usage in real time.
+        </p>
+      </div>
+
+      <!-- CARD 3 -->
+      <div class="group bg-white border border-gray-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl hover:-translate-y-3">
+        <div class="text-5xl">📈</div>
+        <h3 class="font-bold text-xl mt-5">Smart Health Reports</h3>
+        <p class="text-gray-500 mt-3">
+          Generate automatic reports for school administrators and nurses.
+        </p>
+      </div>
+
+    </div>
   </div>
-
-  <div class="card p-8 bg-white shadow-lg">
-    💊 <h3 class="font-bold mt-3">Medication Tracking</h3>
-  </div>
-
-  <div class="card p-8 bg-white shadow-lg">
-    📈 <h3 class="font-bold mt-3">Health Reports</h3>
-  </div>
-
-</div>
 </section>
 
 <!-- CTA -->
