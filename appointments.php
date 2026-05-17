@@ -377,6 +377,7 @@ if ($isAdmin) {
     ');
     $stmt->execute([$user_id]);
     $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    <?php print_r($appointments[0]); ?>
 }
 
 foreach ($appointments as &$apptRow) {
@@ -668,6 +669,47 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
 </head>
 <body<?= $role === 'student' ? ' class="medlog-student-shell"' : '' ?>>
     <div class="dashboard">
+        <div class="appointments-section">
+
+  <div class="appointments-header">
+    <h1>Appointments</h1>
+    <button class="btn-primary">+ Book Appointment</button>
+  </div>
+
+  <div class="appointments-card">
+    <h2>Appointment List</h2>
+
+    <table class="appointments-table">
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Reason</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+     <tbody>
+<?php foreach ($appointments as $a): ?>
+  <tr>
+    <td><?= htmlspecialchars($a['student_name'] ?? 'N/A') ?></td>
+    <td><?= htmlspecialchars($a['appointment_date'] ?? '') ?></td>
+    <td><?= htmlspecialchars($a['appointment_time'] ?? '') ?></td>
+    <td><?= htmlspecialchars($a['reason'] ?? '') ?></td>
+    <td>
+      <span class="status <?= strtolower($a['status']) ?>">
+        <?= htmlspecialchars($a['status']) ?>
+      </span>
+    </td>
+  </tr>
+<?php endforeach; ?>
+</tbody>
+    </table>
+
+  </div>
+
+</div>
         <?php include 'includes/sidebar.php'; ?>
         <main class="main-content">
             <?php include 'includes/header.php'; ?>
