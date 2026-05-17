@@ -11,8 +11,8 @@ $current = basename($_SERVER['PHP_SELF']);
 <aside class="sidebar" aria-label="Main navigation">
     <div class="sidebar-brand">
         <a href="dashboard.php" class="sidebar-brand-mark" title="MedLog home">
-            <img src="Images/MEDLOG, BG-REMOVED.png" alt="" class="sidebar-brand-logo" width="40" height="40" decoding="async">
-        </a>
+            <img src="Images/FinalLogo.png" alt="" class="sidebar-brand-logo" width="40" height="40" decoding="async">
+        </a> 
         <div class="sidebar-brand-text">
             <span class="logo">MedLog</span>
         </div>
