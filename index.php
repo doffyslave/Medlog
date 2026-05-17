@@ -101,45 +101,53 @@
     </div>
   </nav>
 
-  <!-- HERO -->
-  <section class="hero text-white py-32 text-center relative overflow-hidden">
+ <!-- HERO -->
+<section class="hero text-white py-32 text-center relative overflow-hidden">
 
-    <!-- FLOATING ICONS -->
-    <div class="floating-icons">
-      <img src="https://cdn-icons-png.flaticon.com/512/2966/2966480.png">
-      <img src="https://cdn-icons-png.flaticon.com/512/3209/3209265.png">
-      <img src="https://cdn-icons-png.flaticon.com/512/3771/3771417.png">
-      <img src="https://cdn-icons-png.flaticon.com/512/4320/4320337.png">
-      <img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png">
-      <img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png">
+  <!-- FLOATING ICONS -->
+  <div class="floating-icons">
+    <img src="https://cdn-icons-png.flaticon.com/512/2966/2966480.png">
+    <img src="https://cdn-icons-png.flaticon.com/512/3209/3209265.png">
+    <img src="https://cdn-icons-png.flaticon.com/512/3771/3771417.png">
+    <img src="https://cdn-icons-png.flaticon.com/512/4320/4320337.png">
+    <img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png">
+    <img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png">
+  </div>
+
+  <div class="max-w-6xl mx-auto px-6">
+
+    <!-- MAIN TITLE -->
+    <h1 class="text-5xl md:text-6xl font-extrabold leading-tight" data-aos="fade-up">
+      Official School Clinic Management System
+    </h1>
+
+    <!-- SUBTITLE -->
+    <p class="mt-6 text-xl text-[#B3CFE5] max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="200">
+      A centralized system designed for school nurses and administrators to securely manage student health records, clinic visits, and medical reports.
+    </p>
+
+    <!-- TRUST LINE -->
+    <div class="mt-4 text-sm text-[#B3CFE5] opacity-80" data-aos="fade-up" data-aos-delay="300">
+      ✔ Built for school clinic use • ✔ Secure student data • ✔ Admin-ready reporting system
     </div>
 
-    <div class="max-w-6xl mx-auto px-6">
-
-      <h1 class="text-6xl md:text-7xl font-extrabold leading-tight" data-aos="fade-up">
-        School Clinic Management Made Simple
-      </h1>
-
-      <p class="mt-6 text-xl text-[#B3CFE5] max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="200">
-        MedLog helps school nurses manage student health records, monitor clinic visits, track medicine inventory, and generate reports, all in one powerful system.
-      </p>
-
-      <div class="mt-10" data-aos="zoom-in" data-aos-delay="400">
-        <a href="auth/login.php" class="bg-white text-[#0A1931] px-10 py-4 rounded-xl text-lg font-semibold shadow-lg hover:scale-105 transition">
-          Get Started
-        </a>
-      </div>
-
-      <!-- LOTTIE -->
-      <lottie-player
-        src="https://assets7.lottiefiles.com/packages/lf20_tutvdkg0.json"
-        style="width:420px;height:420px;margin:auto;margin-top:50px"
-        loop
-        autoplay>
-      </lottie-player>
-
+    <!-- BUTTON -->
+    <div class="mt-10" data-aos="zoom-in" data-aos-delay="400">
+      <a href="auth/login.php" class="bg-white text-[#0A1931] px-10 py-4 rounded-xl text-lg font-semibold shadow-lg hover:scale-105 transition">
+        Access School System
+      </a>
     </div>
-  </section>
+
+    <!-- LOTTIE -->
+    <lottie-player
+      src="https://assets7.lottiefiles.com/packages/lf20_tutvdkg0.json"
+      style="width:420px;height:420px;margin:auto;margin-top:50px"
+      loop
+      autoplay>
+    </lottie-player>
+
+  </div>
+</section>
 
   <!-- STATS -->
   <section class="py-20 bg-[#F6FAFD]" data-aos="fade-up">
@@ -188,20 +196,41 @@
 
     <div class="p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition">
       <div class="w-16 h-16 bg-gradient-to-br from-[#4A7FA7] to-[#1A3D63] text-white flex items-center justify-center rounded-xl mb-4">🩺</div>
-      <h3 class="font-bold text-lg mb-2">Health Records</h3>
+      <h3 class="font-bold text-lg mb-2">Student Health Records</h3>
       <p class="text-gray-600">Track illnesses and student visits.</p>
     </div>
 
     <div class="p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition">
       <div class="w-16 h-16 bg-gradient-to-br from-[#4A7FA7] to-[#1A3D63] text-white flex items-center justify-center rounded-xl mb-4">💊</div>
-      <h3 class="font-bold text-lg mb-2">Medicine Logs</h3>
+      <h3 class="font-bold text-lg mb-2">Clinic Medication Tracking</h3>
       <p class="text-gray-600">Monitor medicines and treatments.</p>
     </div>
 
     <div class="p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition">
       <div class="w-16 h-16 bg-gradient-to-br from-[#4A7FA7] to-[#1A3D63] text-white flex items-center justify-center rounded-xl mb-4">📈</div>
-      <h3 class="font-bold text-lg mb-2">Reports</h3>
+      <h3 class="font-bold text-lg mb-2">Administrative Health Reports</h3>
       <p class="text-gray-600">Generate real-time reports.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- TRUST -->
+ <section class="py-24 bg-[#0A1931] text-white text-center">
+  <h2 class="text-4xl font-bold mb-10">Secure & School-Ready</h2>
+
+  <div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-8 px-6">
+
+    <div class="bg-white/10 p-6 rounded-xl">
+      🔒 Role-based Access Control
+    </div>
+
+    <div class="bg-white/10 p-6 rounded-xl">
+      🗂️ Centralized Student Records
+    </div>
+
+    <div class="bg-white/10 p-6 rounded-xl">
+      📊 Audit-ready Reports for Schools
     </div>
 
   </div>
@@ -252,7 +281,7 @@
   <!-- CTA -->
   <section class="py-24 text-center bg-[#F6FAFD]">
     <div class="max-w-4xl mx-auto cta-box" data-aos="zoom-in">
-      <h2 class="text-4xl font-bold text-white mb-6">Start Managing Your Clinic Smarter</h2>
+      <h2 class="text-4xl font-bold text-white mb-6">Ready to Deploy in Your School Clinic</h2>
 
       <a href="auth/login.php" class="bg-white text-[#0A1931] px-10 py-4 rounded-xl text-lg font-semibold hover:scale-105 transition">
         Launch MedLog
@@ -262,12 +291,19 @@
 
   <!-- FOOTER -->
   <footer class="bg-[#0A1931] text-white text-center py-6">
-    <p>© 2026 MedLog</p>
+    <p>MedLog School Clinic System  
+For educational institution use only  
+© 2026 MedLog. All rights reserved.</p>
   </footer>
 
   <script>
-    AOS.init({ duration: 1000, once: true });
-  </script>
+  AOS.init({
+    duration: 900,
+    once: false,
+    offset: 120,
+    easing: 'ease-out-cubic'
+  });
+</script>
 
 </body>
 </html>

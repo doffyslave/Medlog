@@ -1,179 +1,190 @@
-html {
-  scroll-behavior: smooth;
-}
+  html {
+    scroll-behavior: smooth;
+  }
 
-body {
+  body {
   font-family: 'Inter', system-ui;
   overflow-x: hidden;
+  background: radial-gradient(circle at top, #F6FAFD, #EAF3FA);
 }
 
-/* GRADIENT */
-.hero-animated {
-  background: linear-gradient(-45deg, #0A1931, #1A3D63, #4A7FA7, #6EA8D9);
-  background-size: 400% 400%;
-  animation: gradientMove 12s ease infinite;
-  position: relative;
-  overflow: hidden;
-}
-
-@keyframes gradientMove {
-  0% {
-    background-position: 0%;
+  /* GRADIENT */
+  .hero-animated {
+    background: linear-gradient(-45deg, #0A1931, #1A3D63, #4A7FA7, #6EA8D9);
+    background-size: 400% 400%;
+    animation: gradientMove 12s ease infinite;
+    position: relative;
+    overflow: hidden;
   }
-  50% {
-    background-position: 100%;
+
+  @keyframes gradientMove {
+    0% {
+      background-position: 0%;
+    }
+    50% {
+      background-position: 100%;
+    }
+    100% {
+      background-position: 0%;
+    }
   }
-  100% {
-    background-position: 0%;
+
+  /* PARTICLES */
+  .particles span {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    animation: float 20s linear infinite;
+    bottom: -50px;
   }
-}
 
-/* PARTICLES */
-.particles span {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 50%;
-  animation: float 20s linear infinite;
-  bottom: -50px;
-}
-
-.particles span:nth-child(1) {
-  left: 10%;
-  animation-duration: 18s;
-}
-
-.particles span:nth-child(2) {
-  left: 20%;
-  animation-duration: 22s;
-}
-
-.particles span:nth-child(3) {
-  left: 30%;
-  animation-duration: 17s;
-}
-
-.particles span:nth-child(4) {
-  left: 40%;
-  animation-duration: 25s;
-}
-
-.particles span:nth-child(5) {
-  left: 50%;
-  animation-duration: 19s;
-}
-
-.particles span:nth-child(6) {
-  left: 60%;
-  animation-duration: 21s;
-}
-
-.particles span:nth-child(7) {
-  left: 70%;
-  animation-duration: 23s;
-}
-
-.particles span:nth-child(8) {
-  left: 80%;
-  animation-duration: 20s;
-}
-
-.particles span:nth-child(9) {
-  left: 90%;
-  animation-duration: 18s;
-}
-
-@keyframes float {
-  0% {
-    transform: translateY(0);
-    opacity: 0;
+  .particles span:nth-child(1) {
+    left: 10%;
+    animation-duration: 18s;
   }
-  20% {
-    opacity: 1;
+
+  .particles span:nth-child(2) {
+    left: 20%;
+    animation-duration: 22s;
   }
-  100% {
-    transform: translateY(-100vh);
-    opacity: 0;
+
+  .particles span:nth-child(3) {
+    left: 30%;
+    animation-duration: 17s;
   }
-}
 
-/* GLASS */
-.glass {
-  background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(16px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
+  .particles span:nth-child(4) {
+    left: 40%;
+    animation-duration: 25s;
+  }
 
-.glass-light {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(12px);
-  border-radius: 20px;
-  transition: 0.3s;
-}
+  .particles span:nth-child(5) {
+    left: 50%;
+    animation-duration: 19s;
+  }
 
-/* HOVER */
-.btn-hover {
-  transition: 0.25s;
-}
+  .particles span:nth-child(6) {
+    left: 60%;
+    animation-duration: 21s;
+  }
 
-.btn-hover:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(74, 127, 167, 0.4);
-}
+  .particles span:nth-child(7) {
+    left: 70%;
+    animation-duration: 23s;
+  }
 
-.glass-light:hover {
-  transform: translateY(-8px) scale(1.03);
-}
+  .particles span:nth-child(8) {
+    left: 80%;
+    animation-duration: 20s;
+  }
 
-/* LOWERED LOTTIE */
-.lottie-adjust {
-  margin-top: 80px; /* 👈 THIS LOWERS THE GUY */
-}
+  .particles span:nth-child(9) {
+    left: 90%;
+    animation-duration: 18s;
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+    20% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-100vh);
+      opacity: 0;
+    }
+  }
+
+  /* GLASS */
+  .glass {
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(16px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .glass-light {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    transition: 0.3s;
+  }
+
+  /* HOVER */
+  .btn-hover {
+    transition: 0.25s;
+  }
+
+  .btn-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(74, 127, 167, 0.4);
+  }
+
+  .glass-light:hover {
+    transform: translateY(-8px) scale(1.03);
+  }
+
+  /* LOWERED LOTTIE */
+  .lottie-adjust {
+    margin-top: 80px; /* 👈 THIS LOWERS THE GUY */
+  }
 
 
-/* ========================= */
-/* GLOBAL IMPROVEMENTS (ADDED) */
-/* ========================= */
+  /* ========================= */
+  /* GLOBAL IMPROVEMENTS (ADDED) */
+  /* ========================= */
 
-/* Smooth transitions everywhere */
-* {
-  transition: all 0.3s ease;
-}
+  /* Smooth transitions everywhere */
+  * {
+    transition: all 0.3s ease;
+  }
 
-/* Card hover effect */
-.card {
-  border-radius: 16px;
+  /* Card hover effect */
+  .card {
+  transition: all 0.35s cubic-bezier(.2,.8,.2,1);
+  will-change: transform;
 }
 
 .card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18);
 }
 
-/* Button hover glow */
-button:hover {
-  box-shadow: 0 10px 25px rgba(74, 127, 167, 0.4);
+  /* Button hover glow */
+ a, button {
+  transition: all 0.25s ease;
 }
 
-/* Section spacing consistency */
-section {
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+a:hover, button:hover {
+  transform: translateY(-2px);
 }
 
-/* Background upgrade */
-body {
-  background: linear-gradient(180deg, #F6FAFD 0%, #EAF3FA 100%);
+[data-aos] {
+  will-change: transform, opacity;
 }
 
-/* Headings */
-h1, h2, h3 {
-  letter-spacing: -0.5px;
-}
+  /* Section spacing consistency */
+  section {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 
-/* Icon subtle depth */
-div[class*="bg-[#E8F1F8]"] {
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.03);
-}
+  /* Background upgrade */
+  body {
+    background: linear-gradient(180deg, #F6FAFD 0%, #EAF3FA 100%);
+  }
+
+  /* Headings */
+  h1, h2, h3 {
+    letter-spacing: -0.5px;
+  }
+
+  /* Icon subtle depth */
+  div[class*="bg-[#E8F1F8]"] {
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.03);
+  }
+  
