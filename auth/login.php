@@ -16,7 +16,7 @@ session_start();
 
         <!-- LOGO -->
         <div class="logoContainer">
-            <img src="../Images/MEDLOG, BG-REMOVED.png" alt="MedLog Logo">
+            <img src="../Images/FinalLogo.png" alt="MedLog Logo">
         </div>
 
         <!-- HEADER -->

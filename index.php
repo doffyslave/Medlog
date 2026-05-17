@@ -26,23 +26,17 @@
 
     /* GRADIENT HERO */
     .hero {
-      background: linear-gradient(-45deg, #0A1931, #1A3D63, #4A7FA7, #6EA8D9);
-      background-size: 400% 400%;
-      animation: gradientMove 12s ease infinite;
+      position: relative;
+      overflow: hidden;
+      min-height: 100vh;
     }
 
-    @keyframes gradientMove {
-      0% { background-position: 0%; }
-      50% { background-position: 100%; }
-      100% { background-position: 0%; }
-    }
-
-    /* FLOATING ICONS */
-    .floating-icons img {
+    .hero::before {
+      content: "";
       position: absolute;
-      width: 50px;
-      opacity: 0.12;
-      animation: floatIcon linear infinite;
+      inset: 0;
+      background: rgba(10, 25, 49, 0.35);
+      z-index: 1;
     }
 
     @keyframes floatIcon {
@@ -102,19 +96,10 @@
   </nav>
 
  <!-- HERO -->
-<section class="hero text-white py-32 text-center relative overflow-hidden">
+<section id="hero-bg" class="hero text-white py-32 text-center relative overflow-hidden">
 
-  <!-- FLOATING ICONS -->
-  <div class="floating-icons">
-    <img src="https://cdn-icons-png.flaticon.com/512/2966/2966480.png">
-    <img src="https://cdn-icons-png.flaticon.com/512/3209/3209265.png">
-    <img src="https://cdn-icons-png.flaticon.com/512/3771/3771417.png">
-    <img src="https://cdn-icons-png.flaticon.com/512/4320/4320337.png">
-    <img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png">
-    <img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png">
-  </div>
 
-  <div class="max-w-6xl mx-auto px-6">
+  <div class="max-w-6xl mx-auto px-6 relative z-10">
 
     <!-- MAIN TITLE -->
     <h1 class="text-5xl md:text-6xl font-extrabold leading-tight" data-aos="fade-up">
@@ -303,6 +288,25 @@ For educational institution use only
     offset: 120,
     easing: 'ease-out-cubic'
   });
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.cells.min.js"></script>
+
+<script>
+VANTA.CELLS({
+  el: "#hero-bg",
+  mouseControls: true,
+  touchControls: true,
+  gyroControls: false,
+  minHeight: 200,
+  minWidth: 200,
+  scale: 1.0,
+  color1: 0x4c64cf,
+  color2: 0x1389b1,
+  size: 1.5,
+  speed: 1
+});
 </script>
 
 </body>
