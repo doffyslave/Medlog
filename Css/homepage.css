@@ -31,15 +31,16 @@
 
   /* PARTICLES */
   .particles span {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    background: rgba(255, 255, 255, 0.6);
-    border-radius: 50%;
-    animation: float 20s linear infinite;
-    bottom: -50px;
-  }
-
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  animation: float 18s linear infinite;
+  bottom: -20px;
+  filter: blur(0.5px);
+  box-shadow: 0 0 10px rgba(255,255,255,0.4);
+}
   .particles span:nth-child(1) {
     left: 10%;
     animation-duration: 18s;
