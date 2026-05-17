@@ -188,10 +188,16 @@ div[class*="bg-[#E8F1F8]"] {
 
   <!-- PARTICLES -->
   <div class="particles">
-    <span></span><span></span><span></span><span></span><span></span>
-    <span></span><span></span><span></span><span></span>
-  </div>
-
+  <span style="--i:1"></span>
+  <span style="--i:2"></span>
+  <span style="--i:3"></span>
+  <span style="--i:4"></span>
+  <span style="--i:5"></span>
+  <span style="--i:6"></span>
+  <span style="--i:7"></span>
+  <span style="--i:8"></span>
+  <span style="--i:9"></span>
+</div>
   <!-- FLOATING ICONS -->
   <div class="floating-icons">
     <img src="https://cdn-icons-png.flaticon.com/512/2966/2966480.png">
