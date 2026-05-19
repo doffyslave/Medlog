@@ -581,8 +581,8 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                         data-appt-confirm-msg="Cancel this appointment? You can book a new visit later if needed."
                         data-appt-confirm-danger="1">
                         <input type="hidden" name="appointment_id" value="<?= (int) $a['appointment_id'] ?>">
-                        <button type="submit" name="cancel_appointment" value="1"
-                            class="appt-btn appt-btn--danger appt-btn--sm">Cancel</button>
+                        <input type="hidden" name="cancel_appointment" value="1">
+                        <button type="submit" class="appt-btn appt-btn--danger appt-btn--sm">Cancel</button>
                     </form>
                 <?php elseif ($isAdmin && !$readonly): ?>
                     <div class="appt-v2-actions">
@@ -598,6 +598,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                                 data-appt-confirm-msg="Reject this appointment request? The patient will see it as rejected."
                                 data-appt-confirm-danger="1">
                                 <input type="hidden" name="appointment_id" value="<?= (int) $a['appointment_id'] ?>">
+                                <input type="hidden" name="admin_appointment_action" value="1">
                                 <input type="hidden" name="admin_action" value="reject">
                                 <button type="submit" name="admin_appointment_action" value="1"
                                     class="appt-btn appt-btn--outline-danger appt-btn--sm">Reject</button>
@@ -610,6 +611,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                                 data-appt-confirm-msg="<?= htmlspecialchars($completeIsFuture ? 'This visit has not occurred yet by the schedule. Mark it completed anyway?' : 'Mark this appointment as completed?', ENT_QUOTES, 'UTF-8') ?>"
                                 data-complete-future="<?= $completeIsFuture ? '1' : '0' ?>">
                                 <input type="hidden" name="appointment_id" value="<?= (int) $a['appointment_id'] ?>">
+                                <input type="hidden" name="admin_appointment_action" value="1">
                                 <input type="hidden" name="admin_action" value="complete">
                                 <button type="submit" name="admin_appointment_action" value="1"
                                     class="appt-btn appt-btn--primary appt-btn--sm">Complete</button>
@@ -618,6 +620,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                                 data-appt-confirm-title="Mark missed"
                                 data-appt-confirm-msg="Mark this appointment as missed (no-show)?" data-appt-confirm-danger="1">
                                 <input type="hidden" name="appointment_id" value="<?= (int) $a['appointment_id'] ?>">
+                                <input type="hidden" name="admin_appointment_action" value="1">
                                 <input type="hidden" name="admin_action" value="missed">
                                 <button type="submit" name="admin_appointment_action" value="1"
                                     class="appt-btn appt-btn--outline-danger appt-btn--sm">Missed</button>
@@ -641,6 +644,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                                 data-appt-confirm-title="Cancel appointment"
                                 data-appt-confirm-msg="Cancel this appointment on the schedule?" data-appt-confirm-danger="1">
                                 <input type="hidden" name="appointment_id" value="<?= (int) $a['appointment_id'] ?>">
+                                <input type="hidden" name="admin_appointment_action" value="1">
                                 <input type="hidden" name="admin_action" value="cancel">
                                 <button type="submit" name="admin_appointment_action" value="1"
                                     class="appt-btn appt-btn--ghost appt-btn--sm">Cancel</button>
@@ -1144,7 +1148,10 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                         }
                         form.dataset.apptSkipConfirm = '1';
                         apptDeferDisableSubmit(form);
-                        if (typeof form.requestSubmit === 'function') {
+                        var submitBtn = form.querySelector('button[type="submit"]');
+                        if (submitBtn && typeof form.requestSubmit === 'function') {
+                            form.requestSubmit(submitBtn);
+                        } else if (typeof form.requestSubmit === 'function') {
                             form.requestSubmit();
                         } else {
                             form.submit();
@@ -1468,6 +1475,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
 </html>
 
 </html>
+
 
 
 
