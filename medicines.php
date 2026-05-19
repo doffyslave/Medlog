@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require 'Database/connection.php';
 session_start();
 
@@ -142,7 +142,7 @@ $medlogPageHeader = [
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Medicines</title>
-<link rel="stylesheet" href="Css/layout.css">
+<link rel="stylesheet" href="Css/layout.css?v=20260519-dock-circle-lock">
 <link rel="stylesheet" href="Css/medicines.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -521,3 +521,12 @@ $medlogPageHeader = [
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+

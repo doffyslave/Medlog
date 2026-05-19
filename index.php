@@ -14,10 +14,6 @@
   <!-- Lottie -->
   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
-  <!-- AOS -->
-  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
-  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-
   <style>
     body {
       font-family: 'Inter', system-ui;
@@ -28,13 +24,6 @@
     .hero {
       background: linear-gradient(-45deg, #0A1931, #1A3D63, #4A7FA7, #6EA8D9);
       background-size: 400% 400%;
-      animation: gradientMove 12s ease infinite;
-    }
-
-    @keyframes gradientMove {
-      0% { background-position: 0%; }
-      50% { background-position: 100%; }
-      100% { background-position: 0%; }
     }
 
     /* FLOATING ICONS */
@@ -42,28 +31,21 @@
       position: absolute;
       width: 50px;
       opacity: 0.12;
-      animation: floatIcon linear infinite;
+      animation: none !important;
     }
 
-    @keyframes floatIcon {
-      0% { transform: translateY(100vh) rotate(0); }
-      100% { transform: translateY(-120vh) rotate(360deg); }
-    }
-
-    .floating-icons img:nth-child(1) { left: 10%; animation-duration: 18s; }
-    .floating-icons img:nth-child(2) { left: 25%; animation-duration: 22s; }
-    .floating-icons img:nth-child(3) { left: 40%; animation-duration: 20s; }
-    .floating-icons img:nth-child(4) { left: 60%; animation-duration: 25s; }
-    .floating-icons img:nth-child(5) { left: 75%; animation-duration: 19s; }
-    .floating-icons img:nth-child(6) { left: 90%; animation-duration: 23s; }
+    .floating-icons img:nth-child(1) { left: 10%; }
+    .floating-icons img:nth-child(2) { left: 25%; }
+    .floating-icons img:nth-child(3) { left: 40%; }
+    .floating-icons img:nth-child(4) { left: 60%; }
+    .floating-icons img:nth-child(5) { left: 75%; }
+    .floating-icons img:nth-child(6) { left: 90%; }
 
     /* CARDS */
     .card {
-      transition: 0.35s;
     }
 
     .card:hover {
-      transform: translateY(-14px) scale(1.05);
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
     }
 
@@ -234,3 +216,6 @@
 
 </body>
 </html>
+
+
+

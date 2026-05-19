@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 $user = $_SESSION['user'] ?? null;
@@ -38,7 +38,7 @@ if ($start > $end) {
     $end = $tmp;
 }
 
-$rangeLabel = date('M j, Y', strtotime($start)) . ' – ' . date('M j, Y', strtotime($end));
+$rangeLabel = date('M j, Y', strtotime($start)) . ' â€“ ' . date('M j, Y', strtotime($end));
 
 $patientStatsStmt = $conn->query("
     SELECT
@@ -183,8 +183,8 @@ $medlogPageHeader = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports — MedLog</title>
-    <link rel="stylesheet" href="Css/layout.css">
+    <title>Reports â€” MedLog</title>
+    <link rel="stylesheet" href="Css/layout.css?v=20260519-dock-circle-lock">
     <link rel="stylesheet" href="Css/dashboard.css">
     <link rel="stylesheet" href="Css/reports.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -289,7 +289,7 @@ $medlogPageHeader = [
                                     <?= $totalLowStock ?>
                                 </h2>
                                 <p>Low stock SKUs</p>
-                                <span class="stat-hint">Stocks ∑ ≤ 10 per medicine</span>
+                                <span class="stat-hint">Stocks âˆ‘ â‰¤ 10 per medicine</span>
                             </div>
                         </div>
                     </div>
@@ -314,7 +314,7 @@ $medlogPageHeader = [
                                     <?= $appointmentPending ?>
                                 </h2>
                                 <p>Pending requests</p>
-                                <span class="stat-hint">Appointments · Pending</span>
+                                <span class="stat-hint">Appointments Â· Pending</span>
                             </div>
                         </div>
                         <div class="card-reports stat">
@@ -325,7 +325,7 @@ $medlogPageHeader = [
                                 </h2>
                                 <p>Medicine SKUs</p>
                                 <span class="stat-hint">
-                                    <?= $medicineLow ?> low ·
+                                    <?= $medicineLow ?> low Â·
                                     <?= $medicineOut ?> out
                                 </span>
                             </div>
@@ -338,7 +338,7 @@ $medlogPageHeader = [
                                 </h2>
                                 <p>Registered roster</p>
                                 <span class="stat-hint">
-                                    <?= (int) ($patientStats['student_count'] ?? 0) ?> students ·
+                                    <?= (int) ($patientStats['student_count'] ?? 0) ?> students Â·
                                     <?= (int) ($patientStats['teacher_count'] ?? 0) ?> teachers
                                 </span>
                             </div>
@@ -351,7 +351,7 @@ $medlogPageHeader = [
                     <div class="card reports-chart-card">
                         <div class="reports-chart-head">
                             <h3>Visit volume</h3>
-                            <span class="reports-chart-note">Visits module · daily</span>
+                            <span class="reports-chart-note">Visits module Â· daily</span>
                         </div>
                         <?php if (!$hasVisitActivity): ?>
                             <div class="reports-empty-card" role="status">
@@ -369,7 +369,7 @@ $medlogPageHeader = [
                     <div class="card reports-chart-card">
                         <div class="reports-chart-head">
                             <h3>Chief complaints</h3>
-                            <span class="reports-chart-note">Top reasons · Visits</span>
+                            <span class="reports-chart-note">Top reasons Â· Visits</span>
                         </div>
                         <?php if (!$hasVisitActivity): ?>
                             <div class="reports-empty-card" role="status">
@@ -432,7 +432,7 @@ $medlogPageHeader = [
                 <div class="card reports-chart-card reports-chart-card--wide">
                     <div class="reports-chart-head">
                         <h3>Medicines dispensed</h3>
-                        <span class="reports-chart-note">Treatments tied to visits in range · Medicines</span>
+                        <span class="reports-chart-note">Treatments tied to visits in range Â· Medicines</span>
                     </div>
                     <?php if (empty($topMeds)): ?>
                         <div class="reports-empty-card" role="status">
@@ -552,7 +552,7 @@ $medlogPageHeader = [
             if (form && btn) {
                 form.addEventListener('submit',function () {
                     btn.disabled = true;
-                    btn.textContent = 'Applying…';
+                    btn.textContent = 'Applyingâ€¦';
                 });
             }
 
@@ -756,3 +756,12 @@ $medlogPageHeader = [
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+

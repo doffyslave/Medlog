@@ -1,4 +1,4 @@
-@import url("page-header.css");
+﻿@import url("page-header.css");
 
 * {
     margin: 0;
@@ -10,38 +10,43 @@
 :root {
     --sidebar-gutter: 18px;
     --sidebar-float-gap: 16px;
-    --sidebar-width: 276px;
-    --sidebar-collapsed-width: 78px;
-    --sidebar-surface: linear-gradient(165deg, rgba(255, 255, 255, 0.97) 0%, rgba(248, 251, 253, 0.94) 45%, rgba(241, 247, 250, 0.92) 100%);
-    --sidebar-border: rgba(200, 217, 230, 0.65);
+    --sidebar-width: 272px;
+    --sidebar-collapsed-width: 88px;
+    --sidebar-bg: #bcd6ea;
+    --sidebar-bg-soft: #dceaf5;
+    --sidebar-line: rgba(74, 127, 167, 0.18);
+    --sidebar-text: #1a3d63;
+    --sidebar-text-strong: #0a1931;
+    --sidebar-muted: #4a7fa7;
+    --sidebar-active-bg: #ffffff;
+    --sidebar-active-text: #f6fafd;
+    --sidebar-hover-bg: rgba(179, 207, 229, 0.26);
     --sidebar-shadow:
-        0 4px 7px rgba(15, 35, 55, 0.03),
-        0 22px 50px rgba(83, 104, 122, 0.14),
-        0 0 0 1px rgba(255, 255, 255, 0.8) inset;
-    --nav-pill-shadow: 0 8px 22px rgba(74, 127, 167, 0.28);
-    --page-bg: #f7f8fb;
+        0 8px 20px rgba(0, 0, 0, 0.14),
+        0 26px 54px rgba(0, 0, 0, 0.24);
+    --sidebar-icon-accent: #4a7fa7;
+    --logout-accent: #f6fafd;
+    --logout-accent-text: #1a3d63;
+    --page-bg: #eceff4;
+    --text: #435f74;
+    --text-strong: #314d62;
+    --text-muted: #8fa1ae;
     --line: rgba(200, 217, 230, 0.52);
-    --text: #456b80;
-    --text-strong: #3f5c71;
-    --text-muted: #8ea1af;
-    --icon: #567c8d;
-    --active-top: #5d7d92;
-    --active-bottom: #3d5a70;
-    --shadow: 0 14px 32px rgba(83, 104, 122, 0.12);
-    --soft-shadow: 0 10px 22px rgba(83, 104, 122, 0.08);
+    --soft-shadow: 0 14px 30px rgba(83, 104, 122, 0.08);
     --student-bottom-nav-space: calc(104px + env(safe-area-inset-bottom, 0px));
-}
-
-body {
-    position: relative;
-    background:
-        radial-gradient(circle at top left, rgba(220, 232, 240, 0.82), transparent 26%),
-        linear-gradient(135deg, #ffffff 0%, #f7f1ec 52%, #edf4f8 100%);
-    color: var(--text);
 }
 
 html:has(.dashboard) {
     height: 100%;
+}
+
+body {
+    position: relative;
+    min-height: 100%;
+    background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.7), transparent 18%),
+        linear-gradient(135deg, #f5f7fb 0%, #ebf0f5 58%, #e2e8ef 100%);
+    color: var(--text);
 }
 
 body:has(.dashboard) {
@@ -54,12 +59,11 @@ body::before {
     content: "";
     position: fixed;
     inset: 0;
-    z-index: 0;
     pointer-events: none;
+    z-index: 0;
     background:
-        radial-gradient(ellipse 85% 55% at 100% -8%, rgba(179, 207, 229, 0.38), transparent 52%),
-        radial-gradient(ellipse 70% 50% at 0% 105%, rgba(74, 127, 167, 0.12), transparent 48%),
-        radial-gradient(ellipse 50% 35% at 50% 100%, rgba(10, 25, 49, 0.04), transparent 55%);
+        radial-gradient(ellipse 70% 50% at 95% 0%, rgba(255, 255, 255, 0.55), transparent 55%),
+        radial-gradient(ellipse 50% 35% at 0% 100%, rgba(31, 29, 32, 0.05), transparent 50%);
 }
 
 .dashboard {
@@ -71,7 +75,6 @@ body::before {
     max-height: 100%;
 }
 
-/* ——— Floating desktop sidebar ——— */
 .sidebar {
     position: fixed;
     z-index: 30;
@@ -83,56 +86,46 @@ body::before {
     height: calc(100dvh - 2 * var(--sidebar-gutter));
     max-height: calc(100vh - 2 * var(--sidebar-gutter));
     max-height: calc(100dvh - 2 * var(--sidebar-gutter));
-    padding: 14px 14px 12px;
+    padding: 18px 14px 14px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 18px;
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    background: var(--sidebar-surface);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid var(--sidebar-border);
-    border-radius: 22px;
+    background: linear-gradient(180deg, #d4e6f4 0%, #b3cfe5 54%, #a2c4de 100%);
+    border: 1px solid rgba(74, 127, 167, 0.16);
+    border-radius: 26px;
     box-shadow: var(--sidebar-shadow);
     transition:
         width 0.32s cubic-bezier(0.22, 1, 0.36, 1),
         min-width 0.32s cubic-bezier(0.22, 1, 0.36, 1),
         padding 0.32s cubic-bezier(0.22, 1, 0.36, 1),
-        transform 0.28s ease;
+        transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
-
 .sidebar-brand {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 4px 4px 14px;
-    border-bottom: 1px solid rgba(200, 217, 230, 0.45);
+    gap: 12px;
+    padding: 2px 4px 10px;
     flex-shrink: 0;
 }
 
 .sidebar-brand-mark {
     flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
     display: grid;
     place-items: center;
-    border-radius: 14px;
+    border-radius: 13px;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 6px 16px rgba(83, 104, 122, 0.1);
-    border: 1px solid rgba(200, 217, 230, 0.5);
-    line-height: 0;
-    transition: transform 0.22s ease, box-shadow 0.22s ease;
-}
-
-.sidebar-brand-mark:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 10px 22px rgba(83, 104, 122, 0.14);
+    background: transparent;
+    text-decoration: none;
 }
 
 .sidebar-brand-logo {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
     object-fit: contain;
     display: block;
 }
@@ -143,29 +136,30 @@ body::before {
 }
 
 .logo {
-    color: var(--text-strong);
-    font-size: 1.15rem;
+    color: var(--sidebar-text-strong);
+    font-size: 1.4rem;
     font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1.15;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
 }
 
 .sidebar-collapse-btn {
     flex: 0 0 auto;
-    width: 36px;
-    height: 36px;
-    border: none;
-    border-radius: 12px;
-    background: rgba(220, 232, 240, 0.55);
-    color: var(--text-strong);
-    cursor: pointer;
+    width: 38px;
+    height: 38px;
     display: grid;
     place-items: center;
-    transition: background 0.2s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    border: none;
+    border-radius: 12px;
+    background: rgba(246, 250, 253, 0.52);
+    color: var(--sidebar-text);
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.24s ease, color 0.2s ease;
 }
 
 .sidebar-collapse-btn:hover {
-    background: rgba(179, 207, 229, 0.65);
+    background: rgba(246, 250, 253, 0.78);
+    color: var(--sidebar-text-strong);
 }
 
 .sidebar.collapsed .sidebar-collapse-btn i {
@@ -175,24 +169,22 @@ body::before {
 .user {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 14px 14px;
+    gap: 12px;
+    padding: 12px;
     border-radius: 18px;
-    border: 1px solid rgba(200, 217, 230, 0.55);
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(237, 244, 249, 0.88));
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    background: rgba(246, 250, 253, 0.58);
+    border: 1px solid rgba(74, 127, 167, 0.14);
     flex-shrink: 0;
 }
 
 .user img,
 .userImage {
-    width: 52px;
-    height: 52px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid rgba(255, 255, 255, 0.98);
-    background: #eef4f8;
-    box-shadow: 0 8px 20px rgba(83, 104, 122, 0.14);
+    border: 2px solid rgba(255, 255, 255, 0.16);
+    background: rgba(179, 207, 229, 0.45);
     flex-shrink: 0;
 }
 
@@ -200,7 +192,7 @@ body::before {
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
 }
 
 .user-name {
@@ -208,24 +200,23 @@ body::before {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: var(--text-strong);
+    color: var(--sidebar-text-strong);
     font-size: 14px;
-    font-weight: 800;
-    line-height: 1.25;
+    font-weight: 700;
+    line-height: 1.2;
 }
 
 .user-role-badge {
     display: inline-flex;
     align-self: flex-start;
-    padding: 3px 10px;
+    padding: 2px 8px;
     border-radius: 999px;
     font-size: 10px;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #1a3d63;
-    background: rgba(179, 207, 229, 0.55);
-    border: 1px solid rgba(74, 127, 167, 0.28);
+    color: #4a7fa7;
+    background: rgba(179, 207, 229, 0.45);
 }
 
 .menu {
@@ -240,10 +231,10 @@ body::before {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin: 4px 4px 2px;
-    color: var(--text-muted);
+    padding: 4px 6px 0;
+    color: var(--sidebar-muted);
     font-size: 11px;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     flex-shrink: 0;
@@ -253,7 +244,7 @@ body::before {
     content: "";
     flex: 1;
     height: 1px;
-    background: var(--line);
+    background: var(--sidebar-line);
 }
 
 .sidebar-nav-list {
@@ -268,53 +259,41 @@ body::before {
 }
 
 .sidebar-nav-list > li > a {
-    min-height: 46px;
+    min-height: 48px;
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 12px;
-    border-radius: 14px;
+    padding: 11px 14px;
+    border-radius: 16px;
     text-decoration: none;
-    color: var(--text);
+    color: var(--sidebar-text);
     position: relative;
     z-index: 1;
-    transition: color 0.22s ease, transform 0.2s ease;
+    transition: color 0.22s ease, transform 0.2s ease, background 0.2s ease;
 }
 
 .sidebar-nav-list > li > a:hover {
-    color: var(--text-strong);
+    color: var(--sidebar-text-strong);
+    background: var(--sidebar-hover-bg);
     transform: translateX(2px);
 }
 
 .sidebar-nav-list > li.active > a {
-    color: #ffffff;
+    color: var(--sidebar-active-text);
 }
 
-/* Animated active pill */
 .sidebar-nav-list > li.active::after {
     content: "";
     position: absolute;
-    left: 4px;
-    right: 4px;
+    left: 2px;
+    right: 2px;
     top: 50%;
-    height: 40px;
-    margin-top: -20px;
-    border-radius: 13px;
-    background: linear-gradient(135deg, var(--active-top), var(--active-bottom));
-    box-shadow: var(--nav-pill-shadow), inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+    height: 44px;
+    margin-top: -22px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #4a7fa7 0%, #1a3d63 100%);
+    box-shadow: 0 16px 28px rgba(10, 25, 49, 0.24);
     z-index: 0;
-    animation: ml-nav-pill-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-@keyframes ml-nav-pill-in {
-    from {
-        opacity: 0;
-        transform: scale(0.92);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
 }
 
 .menu-icon {
@@ -335,17 +314,14 @@ body::before {
     line-height: 1.2;
 }
 
-/* Student-only row: logout in mobile dock */
 .sidebar-nav-dock-logout {
     display: none;
 }
 
-/* Footer logout (desktop / drawer) */
 .sidebar-footer {
-    flex-shrink: 0;
     margin-top: auto;
     padding-top: 10px;
-    border-top: 1px solid rgba(200, 217, 230, 0.45);
+    flex-shrink: 0;
 }
 
 .sidebar-logout {
@@ -353,22 +329,20 @@ body::before {
     align-items: center;
     gap: 10px;
     width: 100%;
-    padding: 12px 14px;
-    border-radius: 14px;
+    padding: 14px 16px;
+    border-radius: 18px;
     text-decoration: none;
-    color: var(--text-muted);
-    font-size: 13px;
-    font-weight: 700;
-    background: rgba(248, 251, 253, 0.65);
-    border: 1px solid rgba(200, 217, 230, 0.45);
-    transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    color: var(--logout-accent-text);
+    font-size: 14px;
+    font-weight: 800;
+    background: var(--logout-accent);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 14px 28px rgba(216, 242, 76, 0.18);
 }
 
 .sidebar-logout:hover {
-    color: #9b1c1c;
-    background: rgba(254, 242, 242, 0.85);
-    border-color: rgba(248, 113, 113, 0.35);
     transform: translateY(-1px);
+    box-shadow: 0 18px 30px rgba(216, 242, 76, 0.24);
 }
 
 .sidebar-logout-icon {
@@ -378,7 +352,6 @@ body::before {
     font-size: 15px;
 }
 
-/* Main column offset for floating sidebar */
 .main-content {
     position: relative;
     z-index: 1;
@@ -392,8 +365,8 @@ body::before {
     overflow: hidden;
     min-width: 0;
     background:
-        radial-gradient(circle at 12% 10%, rgba(220, 232, 240, 0.72), transparent 18%),
-        linear-gradient(135deg, #f8fbfd 0%, #eef5f9 56%, #deebf4 100%);
+        radial-gradient(circle at 12% 10%, rgba(255, 255, 255, 0.8), transparent 18%),
+        linear-gradient(135deg, #f3f5f8 0%, #eceff4 56%, #e3e7ed 100%);
     transition: margin-left 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -419,39 +392,49 @@ body::before {
     -webkit-overflow-scrolling: touch;
 }
 
-/* ——— Top shell header ——— */
 .topnav--shell {
-    height: 52px;
+    height: 56px;
     margin: 14px 18px 0;
     padding: 0 14px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 12px;
-    background: rgba(255, 255, 255, 0.55);
-    border: 1px solid rgba(200, 217, 230, 0.4);
-    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 18px;
     box-shadow: var(--soft-shadow);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 }
 
 .toggle-btn {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     border: 0;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.65);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.82);
     color: var(--text-strong);
     display: grid;
     place-items: center;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(83, 104, 122, 0.08);
+    box-shadow: 0 8px 18px rgba(83, 104, 122, 0.08);
     transition: background 0.2s ease, transform 0.18s ease;
 }
 
 .toggle-btn:hover {
-    background: rgba(220, 232, 240, 0.75);
+    background: #ffffff;
     transform: translateY(-1px);
+}
+
+.actions a {
+    text-decoration: none;
+    color: var(--text-strong);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
 }
 
 .content {
@@ -465,7 +448,6 @@ body::before {
     line-height: 1.1;
 }
 
-/* ——— Collapsed floating rail ——— */
 .sidebar.collapsed {
     width: var(--sidebar-collapsed-width);
     min-width: var(--sidebar-collapsed-width);
@@ -476,11 +458,14 @@ body::before {
 .sidebar.collapsed .sidebar-brand {
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    padding-bottom: 12px;
+    gap: 10px;
 }
 
-.sidebar.collapsed .sidebar-brand-text {
+.sidebar.collapsed .sidebar-brand-text,
+.sidebar.collapsed .user-copy,
+.sidebar.collapsed .section-title,
+.sidebar.collapsed .menuText,
+.sidebar.collapsed .sidebar-logout-text {
     display: none;
 }
 
@@ -490,19 +475,14 @@ body::before {
 }
 
 .sidebar.collapsed .sidebar-brand-logo {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
 }
 
 .sidebar.collapsed .sidebar-collapse-btn {
-    width: 100%;
-}
-
-.sidebar.collapsed .user-copy,
-.sidebar.collapsed .section-title,
-.sidebar.collapsed .menuText,
-.sidebar.collapsed .sidebar-logout-text {
-    display: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
 }
 
 .sidebar.collapsed .user {
@@ -518,7 +498,12 @@ body::before {
 .sidebar.collapsed .sidebar-nav-list > li > a {
     justify-content: center;
     gap: 0;
-    padding: 11px 8px;
+    padding: 12px 8px;
+}
+
+.sidebar.collapsed .sidebar-nav-list > li.active::after {
+    left: 6px;
+    right: 6px;
 }
 
 .sidebar.collapsed .sidebar-footer {
@@ -527,9 +512,9 @@ body::before {
 }
 
 .sidebar.collapsed .sidebar-logout {
-    width: auto;
-    padding: 11px;
+    width: 48px;
     justify-content: center;
+    padding: 12px;
 }
 
 .sidebar.collapsed .sidebar-logout-icon {
@@ -546,7 +531,6 @@ body::before {
     }
 }
 
-/* Student: no top bar chrome */
 body.medlog-student-shell .topnav--shell {
     display: none !important;
 }
@@ -555,7 +539,7 @@ body.medlog-student-shell .main-content {
     padding-top: 10px;
 }
 
-/* Small screens (non-student): drawer */
+
 @media (max-width: 760px) {
     body:not(.medlog-student-shell) .sidebar {
         max-width: calc(100vw - 2 * var(--sidebar-gutter));
@@ -574,7 +558,7 @@ body.medlog-student-shell .main-content {
     body:not(.medlog-student-shell) .sidebar:not(.collapsed) {
         box-shadow:
             var(--sidebar-shadow),
-            20px 0 50px rgba(26, 61, 99, 0.12);
+            20px 0 50px rgba(0, 0, 0, 0.28);
     }
 
     body:not(.medlog-student-shell) .main-content,
@@ -583,7 +567,6 @@ body.medlog-student-shell .main-content {
     }
 }
 
-/* ——— Student: premium floating bottom dock ——— */
 @media (max-width: 1024px) {
     body.medlog-student-shell .sidebar {
         top: auto;
@@ -604,14 +587,6 @@ body.medlog-student-shell .main-content {
         gap: 0;
         z-index: 40;
         overflow: visible;
-        background: linear-gradient(180deg, rgba(26, 45, 62, 0.97) 0%, rgba(15, 28, 42, 0.98) 100%);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow:
-            0 4px 6px rgba(0, 0, 0, 0.12),
-            0 24px 48px rgba(10, 25, 49, 0.35),
-            inset 0 1px 0 rgba(255, 255, 255, 0.08);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
     }
 
     body.medlog-student-shell .sidebar-brand,
@@ -673,11 +648,11 @@ body.medlog-student-shell .main-content {
     body.medlog-student-shell .sidebar-nav-list > li > a:hover {
         transform: none;
         color: #fff;
-        background: rgba(255, 255, 255, 0.06);
+        background: rgba(246, 250, 253, 0.52);
     }
 
     body.medlog-student-shell .sidebar-nav-list > li.active > a {
-        color: #0f1c2a;
+        color: #17161a;
     }
 
     body.medlog-student-shell .sidebar-nav-list > li.active::after {
@@ -689,21 +664,10 @@ body.medlog-student-shell .main-content {
         box-shadow:
             0 10px 24px rgba(0, 0, 0, 0.18),
             inset 0 0 0 1px rgba(255, 255, 255, 0.95);
-        animation: ml-dock-pill 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
-
-    @keyframes ml-dock-pill {
-        from {
-            opacity: 0;
-            transform: scale(0.88);
-        }
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
     }
 
     body.medlog-student-shell .sidebar-nav-list .menuText {
+        display: block;
         font-size: 8px;
         font-weight: 800;
         letter-spacing: 0.06em;
@@ -725,8 +689,8 @@ body.medlog-student-shell .main-content {
     }
 
     body.medlog-student-shell .sidebar-nav-dock-logout > a:hover {
-        color: #fecaca;
-        background: rgba(248, 113, 113, 0.12);
+        color: #1a3d63;
+        background: rgba(179, 207, 229, 0.3);
     }
 }
 
@@ -734,4 +698,594 @@ body.medlog-student-shell .main-content {
     display: block;
     line-height: 1;
     color: currentColor;
+}
+
+/* Role theme overrides */
+
+/* Sidebar visual repair. */
+.sidebar {
+    padding: 20px 14px 14px;
+}
+
+.sidebar-brand {
+    gap: 14px;
+    padding: 0 8px 12px;
+}
+
+.sidebar-brand-mark {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-brand-logo {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+}
+
+.sidebar-collapse-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    color: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+
+.sidebar-admin .user {
+    padding: 12px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-nav-list {
+    gap: 8px;
+}
+
+.sidebar-nav-list > li > a {
+    min-height: 48px;
+    padding: 11px 16px;
+    border-radius: 16px;
+}
+
+.sidebar-admin .sidebar-nav-list > li:not(.active) > a:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-admin .sidebar-nav-list > li.active::after {
+    left: 2px;
+    right: 2px;
+    height: 46px;
+    margin-top: -23px;
+    border-radius: 15px;
+    background: #ffffff;
+}
+
+.sidebar-admin .sidebar-nav-list > li.active > a {
+    color: #1f1d20;
+}
+
+.sidebar-admin .menu-icon {
+    color: currentColor;
+    opacity: 0.95;
+}
+
+.sidebar-admin .sidebar-logout {
+    border-radius: 16px;
+    color: #17161a;
+    background: #d8f24c;
+}
+
+@media (max-width: 760px) {
+    body:not(.medlog-student-shell) .sidebar {
+        width: min(272px, calc(100vw - 24px));
+        min-width: 0;
+        top: 12px;
+        left: 12px;
+        height: calc(100dvh - 24px);
+        border-radius: 24px;
+    }
+}
+
+/* Admin sidebar light theme update. */
+.sidebar-admin {
+    --sidebar-text: #43576a;
+    --sidebar-text-strong: #1f3448;
+    --sidebar-muted: #7b8b99;
+    --sidebar-hover-bg: rgba(47, 99, 143, 0.08);
+    --sidebar-active-text: #1f3448;
+    --logout-accent: #d8f24c;
+    --logout-accent-text: #17161a;
+    background:
+        linear-gradient(90deg, rgba(213, 219, 224, 0.95) 0%, rgba(238, 241, 244, 0.98) 38%, #ffffff 100%);
+    border: 1px solid rgba(190, 201, 211, 0.72);
+    box-shadow:
+        10px 0 28px rgba(47, 62, 76, 0.16),
+        0 18px 34px rgba(47, 62, 76, 0.12);
+}
+
+.sidebar-admin .sidebar-brand-mark,
+.sidebar-admin .sidebar-collapse-btn,
+.sidebar-admin .user {
+    background: rgba(255, 255, 255, 0.72);
+    border-color: rgba(190, 201, 211, 0.72);
+}
+
+.sidebar-admin .sidebar-collapse-btn {
+    color: #43576a;
+}
+
+.sidebar-admin .sidebar-collapse-btn:hover {
+    color: #1f3448;
+    background: #ffffff;
+}
+
+.sidebar-admin .user img,
+.sidebar-admin .userImage {
+    background: #ffffff;
+    border-color: rgba(190, 201, 211, 0.82);
+}
+
+.sidebar-admin .user-role-badge {
+    color: #43576a;
+    background: rgba(47, 99, 143, 0.1);
+}
+
+.sidebar-admin .section-title::after {
+    background: rgba(123, 139, 153, 0.28);
+}
+
+.sidebar-admin .sidebar-nav-list > li:not(.active) > a:hover {
+    background: rgba(47, 99, 143, 0.08);
+    color: #1f3448;
+}
+
+.sidebar-admin .sidebar-nav-list > li.active::after {
+    background: #ffffff;
+    box-shadow:
+        0 12px 24px rgba(47, 62, 76, 0.12),
+        inset 0 0 0 1px rgba(190, 201, 211, 0.45);
+}
+
+.sidebar-admin .sidebar-nav-list > li.active > a {
+    color: #1f3448;
+}
+
+.sidebar-admin .sidebar-logout {
+    color: #17161a;
+    background: #d8f24c;
+    box-shadow: 0 14px 28px rgba(143, 166, 31, 0.18);
+}
+
+.sidebar-admin .sidebar-logout:hover {
+    box-shadow: 0 18px 30px rgba(143, 166, 31, 0.24);
+}
+
+/* Student and teacher sidebar light blue theme. */
+.sidebar-student,
+.sidebar-teacher {
+    --sidebar-text: #385872;
+    --sidebar-text-strong: #18354f;
+    --sidebar-muted: #6f8ba2;
+    --sidebar-hover-bg: rgba(74, 127, 167, 0.09);
+    --sidebar-active-text: #f6fafd;
+    --logout-accent: #f6fafd;
+    --logout-accent-text: #1a3d63;
+    background:
+        linear-gradient(90deg, #e4f1fb 0%, #edf7ff 42%, #ffffff 100%);
+    border: 1px solid rgba(179, 207, 229, 0.72);
+    box-shadow:
+        10px 0 28px rgba(74, 127, 167, 0.14),
+        0 18px 34px rgba(74, 127, 167, 0.1);
+}
+
+.sidebar-student .sidebar-brand-mark,
+.sidebar-teacher .sidebar-brand-mark,
+.sidebar-student .sidebar-collapse-btn,
+.sidebar-teacher .sidebar-collapse-btn,
+.sidebar-student .user,
+.sidebar-teacher .user {
+    background: rgba(255, 255, 255, 0.72);
+    border-color: rgba(179, 207, 229, 0.68);
+}
+
+.sidebar-student .sidebar-collapse-btn,
+.sidebar-teacher .sidebar-collapse-btn {
+    color: #385872;
+}
+
+.sidebar-student .sidebar-collapse-btn:hover,
+.sidebar-teacher .sidebar-collapse-btn:hover {
+    color: #18354f;
+    background: #ffffff;
+}
+
+.sidebar-student .user img,
+.sidebar-student .userImage,
+.sidebar-teacher .user img,
+.sidebar-teacher .userImage {
+    background: #ffffff;
+    border-color: rgba(179, 207, 229, 0.82);
+}
+
+.sidebar-student .user-role-badge,
+.sidebar-teacher .user-role-badge {
+    color: #385872;
+    background: rgba(179, 207, 229, 0.42);
+}
+
+.sidebar-student .section-title::after,
+.sidebar-teacher .section-title::after {
+    background: rgba(74, 127, 167, 0.22);
+}
+
+.sidebar-student .sidebar-nav-list > li:not(.active) > a:hover,
+.sidebar-teacher .sidebar-nav-list > li:not(.active) > a:hover {
+    background: rgba(74, 127, 167, 0.09);
+    color: #18354f;
+}
+
+.sidebar-student .sidebar-nav-list > li.active::after,
+.sidebar-teacher .sidebar-nav-list > li.active::after {
+    background: linear-gradient(135deg, #4a7fa7 0%, #1a3d63 100%);
+    box-shadow: 0 14px 26px rgba(26, 61, 99, 0.2);
+}
+
+.sidebar-student .sidebar-logout,
+.sidebar-teacher .sidebar-logout {
+    color: #1a3d63;
+    background: #ffffff;
+    box-shadow: 0 14px 28px rgba(74, 127, 167, 0.14);
+}
+
+.sidebar-student .sidebar-logout:hover,
+.sidebar-teacher .sidebar-logout:hover {
+    box-shadow: 0 18px 30px rgba(74, 127, 167, 0.2);
+}
+
+@media (max-width: 1024px) {
+    body.medlog-student-shell .sidebar.sidebar-student,
+    body.medlog-student-shell .sidebar.sidebar-teacher {
+        background: linear-gradient(90deg, #e4f1fb 0%, #edf7ff 42%, #ffffff 100%) !important;
+        border-color: rgba(179, 207, 229, 0.72) !important;
+    }
+
+    body.medlog-student-shell .sidebar.sidebar-student .sidebar-nav-list > li > a,
+    body.medlog-student-shell .sidebar.sidebar-teacher .sidebar-nav-list > li > a {
+        color: #385872;
+    }
+
+    body.medlog-student-shell .sidebar.sidebar-student .sidebar-nav-list > li.active > a,
+    body.medlog-student-shell .sidebar.sidebar-teacher .sidebar-nav-list > li.active > a {
+        color: #18354f;
+    }
+}
+
+/* Admin logout button color update. */
+.sidebar-admin .sidebar-logout {
+    color: #ffffff;
+    background: #2f638f;
+    box-shadow: 0 14px 28px rgba(47, 99, 143, 0.22);
+}
+
+.sidebar-admin .sidebar-logout:hover {
+    background: #28577f;
+    box-shadow: 0 18px 30px rgba(47, 99, 143, 0.28);
+}
+/* Large student mobile dock like reference. */
+@media (max-width: 1024px) {
+    :root {
+        --student-bottom-nav-space: calc(126px + env(safe-area-inset-bottom, 0px));
+    }
+
+    body.medlog-student-shell .sidebar.sidebar-student,
+    body.medlog-student-shell .sidebar.sidebar-teacher {
+        bottom: max(14px, env(safe-area-inset-bottom)) !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: min(520px, calc(100% - 28px)) !important;
+        max-width: min(520px, calc(100% - 28px)) !important;
+        min-width: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        padding: 16px 16px 12px !important;
+        border-radius: 22px !important;
+        background: #ffffff !important;
+        border: 1px solid rgba(148, 163, 184, 0.16) !important;
+        box-shadow: 0 18px 38px rgba(15, 23, 42, 0.12) !important;
+        overflow: visible;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
+    body.medlog-student-shell .sidebar .menu {
+        width: 100%;
+        flex: none;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list {
+        --dock-active-left: 0px;
+        --dock-active-center: 0px;
+        --dock-active-width: 74px;
+        --dock-ease: cubic-bezier(0.24, 1.42, 0.36, 1);
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: space-between;
+        gap: 2px;
+        position: relative;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list::before {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        left: var(--dock-active-left);
+        top: 8px;
+        width: var(--dock-active-width);
+        height: 62px;
+        border-radius: 20px;
+        background: #edf6ff;
+        box-shadow: 0 10px 24px rgba(74, 127, 167, 0.18);
+        opacity: 0.96;
+        transform: scale(1);
+        transition:
+            left 420ms var(--dock-ease),
+            width 420ms var(--dock-ease),
+            transform 420ms var(--dock-ease),
+            opacity 300ms ease;
+        pointer-events: none;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list::after {
+        content: none !important;
+        display: none !important;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list:not(.dock-ready)::before,
+    body.medlog-student-shell .sidebar-nav-list:not(.dock-ready)::after {
+        opacity: 0;
+        transition: none;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list.dock-moving::before {
+        opacity: 1;
+        transform: scale(1.03, 1.02);
+    }
+
+    body.medlog-student-shell .sidebar-nav-list.dock-moving::after {
+        content: none !important;
+        display: none !important;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li {
+        position: relative;
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li + li::before {
+        content: none !important;
+        display: none !important;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li > a {
+        position: relative;
+        z-index: 3;
+        min-height: 76px;
+        padding: 4px 4px 8px;
+        border-radius: 18px;
+        display: grid;
+        grid-template-rows: 44px auto;
+        justify-items: center;
+        align-items: center;
+        gap: 4px;
+        color: #64748b !important;
+        background: transparent;
+        -webkit-tap-highlight-color: transparent;
+        transition:
+            color 300ms ease,
+            opacity 300ms ease;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li > a::before {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        top: 4px;
+        left: 50%;
+        width: 44px;
+        height: 44px;
+        border-radius: 999px;
+        background: #4a7fa7;
+        box-shadow:
+            0 10px 20px rgba(74, 127, 167, 0.28),
+            0 0 0 8px rgba(237, 246, 255, 0.94);
+        opacity: 0;
+        transform: translateX(-50%) scale(0.96);
+        transition:
+            opacity 260ms ease,
+            transform 360ms var(--dock-ease),
+            box-shadow 360ms ease;
+        pointer-events: none;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li > a:hover {
+        transform: none;
+        color: #385872 !important;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li.active > a {
+        transform: none !important;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li.active > a::before {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.035);
+    }
+
+    body.medlog-student-shell .sidebar-nav-list.dock-moving > li.active > a::before {
+        transform: translateX(-50%) scale(1.05);
+        box-shadow:
+            0 12px 24px rgba(74, 127, 167, 0.32),
+            0 0 0 8px rgba(237, 246, 255, 0.98);
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li.active::after {
+        content: none !important;
+        display: none !important;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li.active::before {
+        opacity: 0;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list .menu-icon {
+        width: 28px;
+        min-width: 28px;
+        height: 28px;
+        font-size: 20px;
+        line-height: 1;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        background: transparent;
+        position: relative;
+        z-index: 2;
+        transition:
+            color 300ms ease,
+            opacity 300ms ease,
+            transform 360ms var(--dock-ease);
+        color: #4b5f75;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li.active .menu-icon {
+        width: 28px;
+        min-width: 28px;
+        height: 28px;
+        background: transparent;
+        box-shadow: none;
+        transform: scale(1.04);
+        color: #ffffff;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li > a:hover .menu-icon {
+        transform: none;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list .menuText {
+        display: block;
+        width: 100%;
+        max-width: 92px;
+        color: #4b5f75;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0;
+        line-height: 1.1;
+        text-align: center;
+        text-transform: none;
+        opacity: 0.76;
+        position: relative;
+        z-index: 2;
+        transition: opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li.active .menuText {
+        color: #1a3d63;
+        opacity: 1;
+    }
+
+    body.medlog-student-shell .sidebar-nav-dock-logout > a,
+    body.medlog-student-shell .sidebar-dock-logout-link {
+        color: #334155 !important;
+    }
+}
+
+@media (max-width: 640px) {
+    :root {
+        --student-bottom-nav-space: calc(108px + env(safe-area-inset-bottom, 0px));
+    }
+
+    body.medlog-student-shell .sidebar.sidebar-student,
+    body.medlog-student-shell .sidebar.sidebar-teacher {
+        bottom: max(10px, env(safe-area-inset-bottom)) !important;
+        width: calc(100% - 14px) !important;
+        max-width: calc(100% - 14px) !important;
+        padding: 14px 8px 10px !important;
+        border-radius: 20px !important;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li + li::before {
+        content: none !important;
+        display: none !important;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li > a {
+        min-height: 68px;
+        padding: 4px 3px 6px;
+        border-radius: 16px;
+        grid-template-rows: 40px auto;
+        gap: 3px;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li.active::after {
+        height: 64px;
+        border-radius: 18px;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list::before {
+        top: 4px;
+        height: 62px;
+        border-radius: 16px;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list::after {
+        content: none !important;
+        display: none !important;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li > a::before {
+        top: 4px;
+        width: 40px;
+        height: 40px;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list .menu-icon {
+        width: 24px;
+        min-width: 24px;
+        height: 24px;
+        font-size: 18px;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li.active .menu-icon {
+        width: 24px;
+        min-width: 24px;
+        height: 24px;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list .menuText {
+        max-width: 62px;
+        font-size: 9px;
+        font-weight: 700;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.medlog-student-shell .sidebar.sidebar-student,
+    body.medlog-student-shell .sidebar.sidebar-teacher,
+    body.medlog-student-shell .sidebar-nav-list > li,
+    body.medlog-student-shell .sidebar-nav-list > li.active::after,
+    body.medlog-student-shell .sidebar-nav-list > li.active .menu-icon {
+        animation: none !important;
+    }
+
+    body.medlog-student-shell .sidebar-nav-list > li > a,
+    body.medlog-student-shell .sidebar-nav-list .menu-icon {
+        transition: none !important;
+    }
 }

@@ -583,3 +583,187 @@
         width: auto;
     }
 }
+
+/* Stocks mobile repair. */
+@media (max-width: 760px) {
+    .stocks-page {
+        padding: 16px 14px calc(118px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .stocks-page .medlog-page-header {
+        margin-bottom: 16px;
+    }
+
+    .stocks-page .medlog-page-header__inner {
+        min-height: 0;
+        padding: 18px 16px;
+        gap: 14px;
+    }
+
+    .stocks-page .medlog-page-header__lead {
+        flex: 1 1 100%;
+        min-width: 0;
+        gap: 14px;
+    }
+
+    .stocks-page .medlog-page-header__icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
+        flex: 0 0 58px;
+    }
+
+    .stocks-page .medlog-page-header__icon svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    .stocks-page .medlog-page-header__title {
+        font-size: 26px;
+        line-height: 1.1;
+    }
+
+    .stocks-page .medlog-page-header__subtitle {
+        margin-top: 8px;
+        font-size: 13px;
+        line-height: 1.35;
+    }
+
+    .stocks-page .medlog-page-header__actions {
+        width: 100%;
+    }
+
+    .stocks-page .medlog-page-header .add-btn {
+        width: 100%;
+        min-height: 46px;
+        justify-content: center;
+    }
+
+    .stocks-shell {
+        padding: 14px;
+        border-radius: 18px;
+        box-shadow: 0 14px 28px rgba(10, 25, 49, 0.08);
+    }
+
+    .stocks-stats {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .stocks-stat {
+        min-width: 0;
+        padding: 14px;
+    }
+
+    .stocks-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .stocks-search {
+        width: 100%;
+        flex: 0 0 auto;
+    }
+
+    .stocks-filters {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        width: 100%;
+    }
+
+    .stocks-filter-chip {
+        width: 100%;
+        min-height: 36px;
+        padding: 0 8px;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .stocks-feed {
+        gap: 10px;
+    }
+
+    .stock-card {
+        grid-template-columns: 5px minmax(0, 1fr);
+        grid-template-rows: auto;
+        gap: 10px;
+        align-items: start;
+        padding: 14px 12px;
+        border-radius: 14px;
+    }
+
+    .stock-card__rail {
+        height: 100%;
+        min-height: 52px;
+    }
+
+    .stock-card__top {
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .stock-card__med {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .stock-card__qty {
+        font-size: 18px;
+    }
+
+    .stock-card__meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .stock-card__chev {
+        display: none;
+    }
+
+    .stock-drawer {
+        left: 10px;
+        right: 10px;
+        top: auto;
+        bottom: 10px;
+        width: auto;
+        max-height: min(82dvh, 620px);
+        border-radius: 18px;
+        overflow-y: auto;
+    }
+
+    .stock-modal {
+        padding: 12px;
+    }
+
+    .stock-modal__card {
+        max-height: calc(100dvh - 24px);
+        overflow-y: auto;
+        border-radius: 18px;
+        padding: 18px;
+    }
+}
+
+@media (max-width: 420px) {
+    .stocks-page {
+        padding-inline: 10px;
+    }
+
+    .stocks-page .medlog-page-header__inner {
+        padding: 16px 14px;
+    }
+
+    .stocks-page .medlog-page-header__title {
+        font-size: 24px;
+    }
+
+    .stocks-shell {
+        padding: 12px;
+    }
+
+    .stocks-filters {
+        grid-template-columns: 1fr;
+    }
+}

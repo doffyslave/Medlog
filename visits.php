@@ -31,7 +31,6 @@ if ($user_id) {
     $userStmt = $conn->prepare("SELECT name FROM users WHERE user_id = ?");
     $userStmt->execute([$user_id]);
     $selectedUser = $userStmt->fetch(PDO::FETCH_ASSOC);
-
 } else {
     $stmt = $conn->prepare("
         SELECT 
@@ -56,7 +55,6 @@ $patientPickerRows = $conn->query("
     SELECT user_id, name
     FROM users
     WHERE LOWER(TRIM(COALESCE(role, ''))) <> 'admin'
-      AND status = 'active'
     ORDER BY name ASC
 ")->fetchAll(PDO::FETCH_ASSOC);
 
@@ -91,7 +89,10 @@ $medicinePickerJson = json_encode(
 
 ob_start();
 ?>
-<button type="button" id="openVisitModal" class="add-btn">+ Add Visit</button>
+<button type="button" id="openVisitModal" class="add-btn medlog-hero-action-btn">
+    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+    <span>Add New Visit</span>
+</button>
 <?php
 $__visitHeaderActions = ob_get_clean();
 
@@ -99,13 +100,13 @@ $__visitBelow = '';
 if ($user_id && !empty($selectedUser)) {
     $__visitBelow = '<div class="medlog-page-header__banner">'
         . '<span>Showing visits for <strong>' . htmlspecialchars($selectedUser['name'], ENT_QUOTES, 'UTF-8') . '</strong></span>'
-        . '<a href="visits.php" class="filter-btn">← All visits</a>'
+        . '<a href="visits.php" class="filter-btn">&larr; All visits</a>'
         . '</div>';
 }
 
 $medlogPageHeader = [
-    'title' => 'Visits',
-    'subtitle' => 'Visit activity timeline — review and record clinic encounters.',
+    'title' => 'Clinic Visits',
+    'subtitle' => 'Manage clinic visits ' . "\xE2\x80\x94" . ' view schedules, monitor records, and organize visits efficiently.',
     'icon' => 'visits',
     'class' => 'medlog-page-header--visits',
     'actions' => $__visitHeaderActions,
@@ -117,10 +118,12 @@ $medlogPageHeader = [
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Visits - MedLog</title>
 
-<link rel="stylesheet" href="Css/layout.css">
-<link rel="stylesheet" href="Css/visits.css">
+<link rel="stylesheet" href="Css/layout.css?v=20260519-dock-circle-lock">
+<link rel="stylesheet" href="Css/visits.css?v=20260519-admin-mobile-page">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 </head>
 
@@ -136,14 +139,10 @@ $medlogPageHeader = [
 
 <?php include 'includes/medlog-page-header.php'; ?>
 
-<div class="visits-shell">
-    <div class="visits-toolbar">
-        <div class="visits-toolbar-label">
-            <span class="visits-timeline-icon" aria-hidden="true"></span>
-            <div>
-                <span class="visits-section-kicker">Timeline</span>
-                <span class="visits-section-title">Recent activity</span>
-            </div>
+<div class="visits-shell visits-shell--timeline">
+    <div class="visits-toolbar visits-toolbar--stacked">
+        <div class="visits-toolbar-copy">
+            <h2 class="visits-toolbar-title">Recent activity</h2>
         </div>
         <div class="visits-filter-chips" role="group" aria-label="Filter by patient role">
             <button type="button" class="visit-filter-chip active" data-filter="all">All</button>
@@ -152,54 +151,91 @@ $medlogPageHeader = [
         </div>
     </div>
 
-    <div class="visit-feed" id="visitFeed">
+    <div class="visit-feed visit-feed--timeline" id="visitFeed">
 <?php if (!empty($visits)): ?>
 <?php foreach ($visits as $index => $visit): ?>
 <?php
-    $layoutClass = $index % 2 === 0 ? 'layout-left' : 'layout-right';
-    $roleSlug = strtolower(trim((string) ($visit['patient_role'] ?? '')));
-    $roleLabel = $roleSlug !== '' ? ucfirst($roleSlug) : '';
+        $roleSlug = strtolower(trim((string) ($visit['patient_role'] ?? '')));
+    $roleKey = preg_replace('/[^a-z]/', '', $roleSlug);
+    if ($roleKey === 'students') {
+        $roleKey = 'student';
+    } elseif ($roleKey === 'teachers') {
+        $roleKey = 'teacher';
+    }
+    $roleLabel = $roleKey !== '' ? ucfirst($roleKey) : 'Guest';
+    $displayName = (string) ($visit['name'] ?? '');
+    $roleSuffix = ($roleLabel !== '' && stripos($displayName, '(' . $roleLabel . ')') === false)
+        ? ' <span class="visit-role-inline">(' . htmlspecialchars($roleLabel, ENT_QUOTES, 'UTF-8') . ')</span>'
+        : '';
     $visitJson = htmlspecialchars(json_encode($visit), ENT_QUOTES, 'UTF-8');
-    $rowNum = str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT);
+
+    $roleCardClass = in_array($roleKey, ['student', 'teacher'], true) ? ' visit-card--student visit-card--role-mobile' : '';
+    $themeClass = 'theme-blue';
+    $iconClass = 'fa-regular fa-user';
+
+    if ($roleKey === 'teacher') {
+        $themeClass = 'theme-green';
+        $iconClass = 'fa-solid fa-graduation-cap';
+    } elseif ($roleKey === 'student') {
+        $themeClass = ($index % 3 === 0) ? 'theme-purple' : (($index % 3 === 1) ? 'theme-blue' : 'theme-amber');
+        $iconClass = 'fa-regular fa-user';
+    }
 ?>
         <article
-            class="visit-card <?= $layoutClass ?>"
+            class="visit-card visit-card--timeline <?= $themeClass ?><?= $roleCardClass ?>"
             style="--stagger-delay: <?= (($index % 12) * 70) ?>ms;"
-            data-patient-role="<?= htmlspecialchars($roleSlug) ?>"
+            data-patient-role="<?= htmlspecialchars($roleKey, ENT_QUOTES, 'UTF-8') ?>"
             role="button"
             tabindex="0"
             data-visit="<?= $visitJson ?>"
         >
-            <div class="visit-accent" aria-hidden="true"></div>
-            <div class="visit-ribbon">
-                <span class="visit-index" aria-hidden="true"><?= $rowNum ?></span>
-                <div class="visit-ribbon-primary">
-                    <span class="visit-name"><?= htmlspecialchars($visit['name']) ?></span>
-                    <?php if ($roleLabel !== ''): ?>
-                        <span class="visit-role-pill"><?= htmlspecialchars($roleLabel) ?></span>
-                    <?php endif; ?>
+            <div class="visit-card-shell">
+                <div class="visit-mobile-date-strip"><span class="visit-card-icon visit-card-icon--calendar" aria-hidden="true"><i class="fa-regular fa-calendar-check"></i></span><span><?= date('M j, Y', strtotime($visit['visit_date'])) ?></span><span class="visit-mobile-dot">&bull;</span><span><?= date('g:i A', strtotime($visit['visit_date'])) ?></span></div>
+                <div class="visit-card-icon" aria-hidden="true">
+                    <i class="<?= htmlspecialchars($iconClass, ENT_QUOTES, 'UTF-8') ?>"></i>
                 </div>
-                <div class="visit-ribbon-col visit-ribbon-complaint">
-                    <span class="visit-kicker">Complaint</span>
-                    <span class="visit-line"><?= htmlspecialchars($visit['complaint']) ?></span>
+
+
+                <div class="visit-card-body">
+                    <div class="visit-card-main">
+                        <div class="visit-card-heading">
+                            <h3 class="visit-name"><?= htmlspecialchars($displayName, ENT_QUOTES, 'UTF-8') ?><?= $roleSuffix ?></h3>
+                            <div class="visit-inline-details visit-stacked-details">
+                                <span class="visit-inline-item visit-inline-item--complaint">
+                                    <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+                                    <span class="visit-info-copy"><span class="visit-info-label">Complaint</span><strong><?= htmlspecialchars($visit['complaint']) ?></strong></span>
+                                </span>
+                                <span class="visit-inline-sep" aria-hidden="true">|</span>
+                                <span class="visit-inline-item visit-inline-item--treatment">
+                                    <i class="fa-solid fa-link" aria-hidden="true"></i>
+                                    <span class="visit-info-copy"><span class="visit-info-label">Treatment</span><strong><?= htmlspecialchars($visit['medicines_used'] ?? 'None') ?></strong></span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="visit-meta-row">
+                            <span class="visit-meta-item">
+                                <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                                <span><?= date('M j, Y', strtotime($visit['visit_date'])) ?></span>
+                            </span>
+                            <span class="visit-meta-item">
+                                <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                                <span><?= date('g:i A', strtotime($visit['visit_date'])) ?></span>
+                            </span>
+                            <span class="visit-meta-item">
+                                <i class="fa-regular fa-user" aria-hidden="true"></i>
+                                <span class="visit-info-copy"><span class="visit-info-label">Recorded by</span><strong><?= htmlspecialchars($visit['recorded_by']) ?></strong></span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="visit-card-actions">
+                        <button type="button" class="visit-details-btn">
+                            <span>View details</span>
+                            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="visit-ribbon-col visit-ribbon-treatment">
-                    <span class="visit-kicker">Treatment</span>
-                    <span class="visit-line"><?= htmlspecialchars($visit['medicines_used'] ?? 'None') ?></span>
-                </div>
-                <div class="visit-ribbon-meta">
-                    <time class="visit-datetime" datetime="<?= htmlspecialchars(date('c', strtotime($visit['visit_date']))) ?>">
-                        <?= date('M j, Y', strtotime($visit['visit_date'])) ?>
-                        <span class="visit-time"><?= date('g:i A', strtotime($visit['visit_date'])) ?></span>
-                    </time>
-                    <span class="visit-recorded">
-                        <span class="visit-recorded-kicker">Recorded</span>
-                        <?= htmlspecialchars($visit['recorded_by']) ?>
-                    </span>
-                </div>
-                <button type="button" class="visit-details-btn">
-                    View details
-                </button>
             </div>
         </article>
 <?php endforeach; ?>
@@ -216,18 +252,18 @@ $medlogPageHeader = [
 </main>
 </div>
 
-<!-- 🔥 VIEW MODAL -->
-<div id="viewModal" class="modal">
-<div class="modal-content">
-<span class="closeView">&times;</span>
+<div id="viewModal" class="modal visit-details-modal">
+<div class="modal-content visit-details-modal__dialog">
+<button type="button" class="closeView visit-details-modal__close" aria-label="Close">&times;</button>
 <h2>Visit Details</h2>
-
-<div id="viewContent"></div>
-
+<div id="viewContent" class="visit-details-modal__content"></div>
+<div class="visit-details-modal__footer">
+    <a id="visitPrintLink" class="visit-print-link" href="#" target="_blank" rel="noopener">Print</a>
+    <button type="button" class="closeView visit-details-modal__button">Close</button>
 </div>
 </div>
+</div>
 
-<!-- ADD VISIT MODAL -->
 <div id="visitModal" class="modal visit-add-modal" aria-hidden="true">
     <div class="modal-content visit-add-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="visitAddTitle">
         <div class="visit-add-modal__hero">
@@ -244,9 +280,9 @@ $medlogPageHeader = [
                     </div>
                     <div class="visit-add-modal__field">
                         <label class="visit-add-modal__label" for="visitPatientSearch">Patient <span class="req">*</span></label>
-                        <div class="medlog-search-select" id="visitPatientSelect" data-medlog-search-select data-placeholder="Search patient by name…">
+                        <div class="medlog-search-select" id="visitPatientSelect" data-medlog-search-select data-placeholder="Search patient by name">
                             <div class="medlog-search-select__control">
-                                <input type="text" id="visitPatientSearch" class="medlog-search-select__input" autocomplete="off" placeholder="Search patient by name…" aria-autocomplete="list" aria-controls="visitPatientList" aria-expanded="false" role="combobox">
+                                <input type="text" id="visitPatientSearch" class="medlog-search-select__input" autocomplete="off" placeholder="Search patient by name" aria-autocomplete="list" aria-controls="visitPatientList" aria-expanded="false" role="combobox">
                                 <span class="medlog-search-select__chevron" aria-hidden="true"></span>
                                 <input type="hidden" name="user_id" id="visitPatientValue" value="" required>
                                 <ul class="medlog-search-select__dropdown" id="visitPatientList" role="listbox" hidden></ul>
@@ -259,7 +295,7 @@ $medlogPageHeader = [
                     </div>
                     <div class="visit-add-modal__field">
                         <label class="visit-add-modal__label" for="visitNotes">Clinical notes</label>
-                        <textarea class="visit-add-modal__textarea" name="notes" id="visitNotes" placeholder="Observations, vitals, follow-up (optional)…" maxlength="4000"></textarea>
+                        <textarea class="visit-add-modal__textarea" name="notes" id="visitNotes" placeholder="Observations, vitals, follow-up (optional)" maxlength="4000"></textarea>
                     </div>
                 </div>
                 <div class="visit-add-modal__section">
@@ -269,9 +305,9 @@ $medlogPageHeader = [
                     </div>
                     <div class="visit-add-modal__field">
                         <label class="visit-add-modal__label" for="visitMedicineSearch">Medicine</label>
-                        <div class="medlog-search-select" id="visitMedicineSelect" data-medlog-search-select data-allow-clear="1" data-placeholder="Search medicine or leave blank…">
+                        <div class="medlog-search-select" id="visitMedicineSelect" data-medlog-search-select data-allow-clear="1" data-placeholder="Search medicine or leave blank">
                             <div class="medlog-search-select__control">
-                                <input type="text" id="visitMedicineSearch" class="medlog-search-select__input" autocomplete="off" placeholder="Search medicine or leave blank…" aria-autocomplete="list" aria-controls="visitMedicineList" aria-expanded="false" role="combobox">
+                                <input type="text" id="visitMedicineSearch" class="medlog-search-select__input" autocomplete="off" placeholder="Search medicine or leave blank" aria-autocomplete="list" aria-controls="visitMedicineList" aria-expanded="false" role="combobox">
                                 <span class="medlog-search-select__chevron" aria-hidden="true"></span>
                                 <input type="hidden" name="med_id" id="visitMedicineValue" value="">
                                 <ul class="medlog-search-select__dropdown" id="visitMedicineList" role="listbox" hidden></ul>
@@ -283,7 +319,7 @@ $medlogPageHeader = [
                     </div>
                     <div class="visit-add-modal__field visit-add-modal__quantity-wrap is-disabled" id="visitQuantityWrap">
                         <label class="visit-add-modal__label" for="visitQuantity">Quantity dispensed</label>
-                        <input class="visit-add-modal__input" type="number" name="quantity" id="visitQuantity" min="1" step="1" value="" placeholder="—" disabled>
+                        <input class="visit-add-modal__input" type="number" name="quantity" id="visitQuantity" min="1" step="1" value="" placeholder="Optional" disabled>
                     </div>
                 </div>
             </div>
@@ -301,6 +337,7 @@ $medlogPageHeader = [
 
     const visitModal = document.getElementById("visitModal");
     const viewModal = document.getElementById("viewModal");
+    const printLink = document.getElementById("visitPrintLink");
     const addVisitForm = document.getElementById("addVisitForm");
     const medHidden = document.getElementById("visitMedicineValue");
     const qtyInput = document.getElementById("visitQuantity");
@@ -381,7 +418,7 @@ $medlogPageHeader = [
 
     function mountSearchSelect(root, items) {
         if (!root || !items) return;
-        const placeholder = root.getAttribute("data-placeholder") || "Search…";
+        const placeholder = root.getAttribute("data-placeholder") || "Search";
         const hidden = root.querySelector('input[type="hidden"][name]');
         const input = root.querySelector(".medlog-search-select__input");
         const list = root.querySelector(".medlog-search-select__dropdown");
@@ -526,20 +563,60 @@ $medlogPageHeader = [
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;");
         };
+        const formatVisitDate = (value) => {
+            const raw = value === undefined || value === null ? "" : String(value);
+            const parsed = new Date(raw.replace(" ", "T"));
+            if (Number.isNaN(parsed.getTime())) return esc(raw);
+            const dateText = new Intl.DateTimeFormat("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric"
+            }).format(parsed);
+            const timeText = new Intl.DateTimeFormat("en-US", {
+                hour: "numeric",
+                minute: "2-digit"
+            }).format(parsed);
+            return `${esc(dateText)} &#8226; ${esc(timeText)}`;
+        };
+        const patientName = data.name || "Unknown patient";
+        const patientRole = data.patient_role ? ` (${esc(data.patient_role)})` : "";
+        if (printLink) {
+            printLink.href = data.visit_id ? `print_visit.php?id=${encodeURIComponent(data.visit_id)}` : "#";
+            printLink.toggleAttribute("aria-disabled", !data.visit_id);
+        }
         document.getElementById("viewContent").innerHTML = `
-        <p><strong>Patient:</strong> ${esc(data.name)}</p>
-        <p><strong>Date:</strong> ${esc(data.visit_date)}</p>
-        <p><strong>Recorded By:</strong> ${esc(data.recorded_by)}</p>
-        <hr>
-        <p><strong>Complaint:</strong> ${esc(data.complaint)}</p>
-        <p><strong>Treatment:</strong> ${esc(data.medicines_used || "None")}</p>
-        <p><strong>Notes:</strong> ${esc(data.notes || "None")}</p>
-
-        <br>
-
-        <a href="print_visit.php?id=${encodeURIComponent(String(data.visit_id))}" target="_blank" class="visit-print-link">
-           🖨 Print Visit
-        </a>
+        <div class="visit-details-modal__rows">
+            <div class="visit-details-modal__row">
+                <span class="visit-details-modal__icon"><i class="fa-regular fa-id-card" aria-hidden="true"></i></span>
+                <span class="visit-details-modal__label">Patient</span>
+                <strong class="visit-details-modal__value">${esc(patientName)}${patientRole}</strong>
+            </div>
+            <div class="visit-details-modal__row">
+                <span class="visit-details-modal__icon"><i class="fa-regular fa-calendar-days" aria-hidden="true"></i></span>
+                <span class="visit-details-modal__label">Date &amp; Time</span>
+                <strong class="visit-details-modal__value">${formatVisitDate(data.visit_date)}</strong>
+            </div>
+            <div class="visit-details-modal__row">
+                <span class="visit-details-modal__icon"><i class="fa-regular fa-user" aria-hidden="true"></i></span>
+                <span class="visit-details-modal__label">Recorded By</span>
+                <strong class="visit-details-modal__value">${esc(data.recorded_by)}</strong>
+            </div>
+            <div class="visit-details-modal__row">
+                <span class="visit-details-modal__icon"><i class="fa-regular fa-file-lines" aria-hidden="true"></i></span>
+                <span class="visit-details-modal__label">Complaint</span>
+                <strong class="visit-details-modal__value">${esc(data.complaint || "None")}</strong>
+            </div>
+            <div class="visit-details-modal__row">
+                <span class="visit-details-modal__icon"><i class="fa-solid fa-link" aria-hidden="true"></i></span>
+                <span class="visit-details-modal__label">Treatment</span>
+                <strong class="visit-details-modal__value">${esc(data.medicines_used || "None")}</strong>
+            </div>
+            <div class="visit-details-modal__row">
+                <span class="visit-details-modal__icon"><i class="fa-regular fa-rectangle-list" aria-hidden="true"></i></span>
+                <span class="visit-details-modal__label">Notes</span>
+                <strong class="visit-details-modal__value">${esc(data.notes || "None")}</strong>
+            </div>
+        </div>
     `;
 
         setModalOpen(viewModal, true);
@@ -576,15 +653,21 @@ $medlogPageHeader = [
         });
     });
 
+    function normalizeRoleForFilter(value) {
+        let role = norm(value).replace(/[^a-z]/g, "");
+        if (role === "students") role = "student";
+        if (role === "teachers") role = "teacher";
+        return role;
+    }
+
     document.querySelectorAll(".visit-filter-chip").forEach((chip) => {
         chip.addEventListener("click", () => {
-            const filter = chip.dataset.filter || "all";
+            const filter = normalizeRoleForFilter(chip.dataset.filter || "all");
             document.querySelectorAll(".visit-filter-chip").forEach((c) => c.classList.remove("active"));
             chip.classList.add("active");
             document.querySelectorAll(".visit-card[data-visit]").forEach((card) => {
-                const role = norm(card.dataset.patientRole);
-                const show = filter === "all" || role === norm(filter);
-                card.hidden = !show;
+                const role = normalizeRoleForFilter(card.dataset.patientRole);
+                card.hidden = !(filter === "all" || role === filter);
             });
         });
     });

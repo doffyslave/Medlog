@@ -32,7 +32,6 @@ body {
     text-align: center;
     position: relative;
     z-index: 2;
-    animation: fadeIn 0.6s ease-out;
 }
 
 /* ---------------- LOGO ---------------- */
@@ -97,19 +96,13 @@ input[type="submit"],
     border-radius: 20px;
     box-shadow: rgba(179, 207, 229) 0px 20px 10px -15px;
     border: none;
-    transition: all 0.2s ease-in-out;
     cursor: pointer;
     text-decoration: none;
     text-align: center;
 }
 
 .m365-btn:hover, input[type="submit"]:hover {
-    transform: scale(1.03);
     box-shadow: rgba(74, 127, 167) 0px 23px 10px -20px;
-}
-
-.m365-btn:active, input[type="submit"]:active {
-    transform: scale(0.95);
 }
 
 
@@ -124,10 +117,8 @@ input[type="submit"],
     padding: 12px;
     margin: 10px auto;
     border-radius: 20px;
-    
     box-shadow: rgba(133, 189, 215, 0.3) 0px 10px 10px -5px;
     border: 2px solid rgb(74, 127, 167); 
-    transition: all 0.2s ease-in-out;
     cursor: pointer;
     text-decoration: none;
     text-align: center;
@@ -137,12 +128,7 @@ input[type="submit"],
 .admin-btn:hover {
     background: rgb(74, 127, 167);
     color: white !important;
-    transform: scale(1.02);
     box-shadow: rgba(133, 189, 215, 0.5) 0px 15px 10px -10px;
-}
-
-.admin-btn:active {
-    transform: scale(0.98);
 }
 
 .back-link {

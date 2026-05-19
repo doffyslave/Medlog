@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 if (!isset($_SESSION['user'])) {
@@ -191,7 +191,7 @@ $medlogPageHeader = [
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <link rel="stylesheet" href="Css/dashboard.css">
-    <link rel="stylesheet" href="Css/layout.css">
+    <link rel="stylesheet" href="Css/layout.css?v=20260519-dock-circle-lock">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
@@ -209,7 +209,7 @@ $medlogPageHeader = [
 
                 <?php include 'includes/medlog-page-header.php'; ?>
 
-                <!-- 🔴 ADMIN DASHBOARD -->
+                <!-- ðŸ”´ ADMIN DASHBOARD -->
                 <?php if ($role === 'admin'): ?>
 
                     <div class="grid-4">
@@ -359,7 +359,7 @@ $medlogPageHeader = [
                 <?php endif; ?>
 
 
-                <!-- 🔵 STUDENT DASHBOARD -->
+                <!-- ðŸ”µ STUDENT DASHBOARD -->
                 <?php if ($role === 'student'): ?>
 
                     <div class="grid-2">
@@ -522,3 +522,12 @@ $medlogPageHeader = [
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+

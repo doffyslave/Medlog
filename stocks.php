@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 $user = $_SESSION['user'] ?? null;
@@ -100,9 +100,10 @@ $medlogPageHeader = [
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stocks Inventory</title>
-<link rel="stylesheet" href="Css/layout.css">
-<link rel="stylesheet" href="Css/stocks-page.css">
+<link rel="stylesheet" href="Css/layout.css?v=20260519-dock-circle-lock">
+<link rel="stylesheet" href="Css/stocks-page.css?v=20260517-mobile-fix">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
@@ -140,7 +141,7 @@ $medlogPageHeader = [
     <section class="stocks-controls" aria-label="Search and filters">
         <label class="stocks-search">
             <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-            <input type="search" id="stockSearchInput" placeholder="Search medicine, type, date, quantity…" autocomplete="off">
+            <input type="search" id="stockSearchInput" placeholder="Search medicine, type, date, quantityâ€¦" autocomplete="off">
         </label>
         <div class="stocks-filters" role="group" aria-label="Filter activity">
             <button type="button" class="stocks-filter-chip active" data-stock-filter="all">All activity</button>
@@ -161,10 +162,10 @@ $medlogPageHeader = [
                         $badgeClass = $isOut ? 'stock-card__badge--out' : 'stock-card__badge--in';
                         $qtyClass = $isOut ? 'stock-card__qty--out' : 'stock-card__qty--in';
                         $qtyPrefix = $entry['quantity'] > 0 ? '+' : '';
-                        $expDisplay = $entry['expiration_date'] !== '' ? $entry['expiration_date'] : '—';
+                        $expDisplay = $entry['expiration_date'] !== '' ? $entry['expiration_date'] : 'â€”';
                         $tsDisplay = $entry['created_at']
-                            ? date('g:i A · M j, Y', strtotime($entry['created_at']))
-                            : ($hasCreatedAt ? '—' : 'Not tracked');
+                            ? date('g:i A Â· M j, Y', strtotime($entry['created_at']))
+                            : ($hasCreatedAt ? 'â€”' : 'Not tracked');
                         $searchBlob = strtolower(
                             $entry['medicine_name'] . ' ' .
                             $entry['label'] . ' ' .
@@ -255,7 +256,7 @@ $medlogPageHeader = [
             <div>
                 <label for="movementQty">Quantity</label>
                 <input type="number" name="quantity" id="movementQty" min="1" step="1" required placeholder="Enter units">
-                <p class="stock-form__hint" id="qtyHint">Positive numbers only — type chooses inbound vs adjustment.</p>
+                <p class="stock-form__hint" id="qtyHint">Positive numbers only â€” type chooses inbound vs adjustment.</p>
             </div>
 
             <div>
@@ -351,7 +352,7 @@ $medlogPageHeader = [
                 ? esc(entry.created_at)
                 : esc(parsed.toLocaleString());
         } else {
-            recorded = 'Not tracked — add <code>created_at</code> on <code>stocks</code> for precise timestamps.';
+            recorded = 'Not tracked â€” add <code>created_at</code> on <code>stocks</code> for precise timestamps.';
         }
         const summary = entry.type === 'adjustment'
             ? 'Inventory correction / deduction recorded against formulary levels.'
@@ -364,7 +365,7 @@ $medlogPageHeader = [
             <div class="stock-drawer__grid">
                 <div class="stock-drawer__row"><span>Transaction</span><strong>${esc(entry.label)}</strong></div>
                 <div class="stock-drawer__row"><span>Quantity change</span><strong>${esc(qtyLabel)}</strong></div>
-                <div class="stock-drawer__row"><span>Expiration</span><strong>${entry.expiration_date ? esc(entry.expiration_date) : '—'}</strong></div>
+                <div class="stock-drawer__row"><span>Expiration</span><strong>${entry.expiration_date ? esc(entry.expiration_date) : 'â€”'}</strong></div>
                 <div class="stock-drawer__row"><span>Recorded</span><strong>${recorded}</strong></div>
                 <div class="stock-drawer__row"><span>Stock ID</span><strong>#${esc(entry.stock_id)}</strong></div>
                 <div class="stock-drawer__row"><span>Summary</span><strong>${esc(summary)}</strong></div>
@@ -566,3 +567,15 @@ $medlogPageHeader = [
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+

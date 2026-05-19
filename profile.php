@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 include 'Database/connection.php';
 require_once __DIR__ . '/includes/ml_session.php';
@@ -97,7 +97,7 @@ function ml_profile_initials(string $name): string
 
 $initials = ml_profile_initials((string) ($userData ? ($userData['name'] ?? '') : ($user['name'] ?? '')));
 $lastLoginRaw = $userData ? ($userData['last_login'] ?? null) : null;
-$lastLoginFmt = $lastLoginRaw ? date('M j, Y g:i A', strtotime((string) $lastLoginRaw)) : '—';
+$lastLoginFmt = $lastLoginRaw ? date('M j, Y g:i A', strtotime((string) $lastLoginRaw)) : 'â€”';
 $accountStatus = 'Active';
 if ($userData && !empty($userData['status'])) {
     $st = strtolower((string) $userData['status']);
@@ -113,7 +113,7 @@ if ($userData && !empty($userData['status'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile | MedLog</title>
-    <link rel="stylesheet" href="Css/layout.css">
+    <link rel="stylesheet" href="Css/layout.css?v=20260519-dock-circle-lock">
     <link rel="stylesheet" href="Css/profile.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -163,7 +163,7 @@ if ($userData && !empty($userData['status'])) {
                             </p>
                             <?php if (!empty($userData['course']) || !empty($userData['year_level'])): ?>
                                 <p class="profile-hero__course">
-                                    <?= htmlspecialchars(trim(($userData['course'] ?? '') . (($userData['course'] ?? '') && ($userData['year_level'] ?? '') ? ' · ' : '') . ($userData['year_level'] ?? '')), ENT_QUOTES, 'UTF-8') ?>
+                                    <?= htmlspecialchars(trim(($userData['course'] ?? '') . (($userData['course'] ?? '') && ($userData['year_level'] ?? '') ? ' Â· ' : '') . ($userData['year_level'] ?? '')), ENT_QUOTES, 'UTF-8') ?>
                                 </p>
                             <?php endif; ?>
                             <div class="profile-hero__actions">
@@ -247,16 +247,16 @@ if ($userData && !empty($userData['status'])) {
                                 <div class="profile-readiness__row">
                                     <div class="profile-readiness__block">
                                         <span class="profile-readiness__label">Emergency contact</span>
-                                        <p class="profile-readiness__value" id="dispEmName"><?= htmlspecialchars((string) ($userData['emergency_contact_name'] ?? ''), ENT_QUOTES, 'UTF-8') !== '' ? htmlspecialchars((string) $userData['emergency_contact_name'], ENT_QUOTES, 'UTF-8') : '<span class="profile-muted">—</span>' ?></p>
+                                        <p class="profile-readiness__value" id="dispEmName"><?= htmlspecialchars((string) ($userData['emergency_contact_name'] ?? ''), ENT_QUOTES, 'UTF-8') !== '' ? htmlspecialchars((string) $userData['emergency_contact_name'], ENT_QUOTES, 'UTF-8') : '<span class="profile-muted">â€”</span>' ?></p>
                                     </div>
                                     <div class="profile-readiness__block profile-readiness__block--phone">
                                         <span class="profile-readiness__label">Emergency number</span>
-                                        <p class="profile-readiness__value" id="dispEmNum"><?= htmlspecialchars((string) ($userData['emergency_contact_number'] ?? ''), ENT_QUOTES, 'UTF-8') !== '' ? htmlspecialchars((string) $userData['emergency_contact_number'], ENT_QUOTES, 'UTF-8') : '<span class="profile-muted">—</span>' ?></p>
+                                        <p class="profile-readiness__value" id="dispEmNum"><?= htmlspecialchars((string) ($userData['emergency_contact_number'] ?? ''), ENT_QUOTES, 'UTF-8') !== '' ? htmlspecialchars((string) $userData['emergency_contact_number'], ENT_QUOTES, 'UTF-8') : '<span class="profile-muted">â€”</span>' ?></p>
                                     </div>
                                 </div>
                                 <div class="profile-readiness__block">
                                     <span class="profile-readiness__label">Your phone</span>
-                                    <p class="profile-readiness__value" id="dispPhone"><?= htmlspecialchars((string) ($userData['phone_number'] ?? ''), ENT_QUOTES, 'UTF-8') !== '' ? htmlspecialchars((string) $userData['phone_number'], ENT_QUOTES, 'UTF-8') : '<span class="profile-muted">—</span>' ?></p>
+                                    <p class="profile-readiness__value" id="dispPhone"><?= htmlspecialchars((string) ($userData['phone_number'] ?? ''), ENT_QUOTES, 'UTF-8') !== '' ? htmlspecialchars((string) $userData['phone_number'], ENT_QUOTES, 'UTF-8') : '<span class="profile-muted">â€”</span>' ?></p>
                                 </div>
                             </div>
                         </article>
@@ -329,11 +329,11 @@ if ($userData && !empty($userData['status'])) {
                             <dl class="profile-kv">
                                 <div class="profile-kv__row">
                                     <dt>Course</dt>
-                                    <dd id="dispCourse"><?= htmlspecialchars((string) ($userData['course'] ?? ''), ENT_QUOTES, 'UTF-8') !== '' ? htmlspecialchars((string) $userData['course'], ENT_QUOTES, 'UTF-8') : '—' ?></dd>
+                                    <dd id="dispCourse"><?= htmlspecialchars((string) ($userData['course'] ?? ''), ENT_QUOTES, 'UTF-8') !== '' ? htmlspecialchars((string) $userData['course'], ENT_QUOTES, 'UTF-8') : 'â€”' ?></dd>
                                 </div>
                                 <div class="profile-kv__row">
                                     <dt>Year level</dt>
-                                    <dd id="dispYear"><?= htmlspecialchars((string) ($userData['year_level'] ?? ''), ENT_QUOTES, 'UTF-8') !== '' ? htmlspecialchars((string) $userData['year_level'], ENT_QUOTES, 'UTF-8') : '—' ?></dd>
+                                    <dd id="dispYear"><?= htmlspecialchars((string) ($userData['year_level'] ?? ''), ENT_QUOTES, 'UTF-8') !== '' ? htmlspecialchars((string) $userData['year_level'], ENT_QUOTES, 'UTF-8') : 'â€”' ?></dd>
                                 </div>
                             </dl>
                         </article>
@@ -499,10 +499,10 @@ if ($userData && !empty($userData['status'])) {
             if (el) el.innerHTML = html;
         }
         function disp(v) {
-            return v ? esc(String(v)) : '<span class="profile-muted">—</span>';
+            return v ? esc(String(v)) : '<span class="profile-muted">â€”</span>';
         }
-        setHtml('dispCourse', d.course ? esc(d.course) : '—');
-        setHtml('dispYear', d.year_level ? esc(d.year_level) : '—');
+        setHtml('dispCourse', d.course ? esc(d.course) : 'â€”');
+        setHtml('dispYear', d.year_level ? esc(d.year_level) : 'â€”');
         setHtml('dispPhone', disp(d.phone_number));
         setHtml('dispEmName', disp(d.emergency_contact_name));
         setHtml('dispEmNum', disp(d.emergency_contact_number));
@@ -581,3 +581,13 @@ if ($userData && !empty($userData['status'])) {
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+

@@ -41,61 +41,10 @@ $medlogPageHeader = [
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Visits | MedLog</title>
 
-<link rel="stylesheet" href="Css/layout.css">
-<link rel="stylesheet" href="Css/visits.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="Css/layout.css?v=20260519-dock-circle-lock">
+<link rel="stylesheet" href="Css/visits.css?v=20260519-my-visits-blue-bg-desktop">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-<style>
-.no-data {
-    text-align: center;
-    margin-top: 20px;
-    color: gray;
-}
-
-.visit-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.visit-card {
-    opacity: 1 !important;
-    transform: none !important;
-    width: 100% !important;
-    cursor: pointer;
-    padding: 14px;
-}
-
-.visit-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-}
-
-.visit-meta {
-    font-size: 12px;
-    color: #4A7FA7;
-    font-weight: 700;
-}
-
-.visit-body p {
-    margin: 0 0 8px;
-}
-
-.badge {
-    display: inline-block;
-    margin-top: 4px;
-    padding: 5px 10px;
-    border-radius: 999px;
-    background: rgba(179, 207, 229, 0.45);
-    color: #1A3D63;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-</style>
 </head>
 
 <body<?= $role === 'student' ? ' class="medlog-student-shell"' : '' ?>>
@@ -108,67 +57,106 @@ $medlogPageHeader = [
 
 <?php include 'includes/header.php'; ?>
 
-<section class="content">
+<section class="content visits-page">
 
 <?php include 'includes/medlog-page-header.php'; ?>
 
-<!-- 🔥 CARD LIST -->
-<div class="visits-shell">
-    <div class="visits-toolbar">
-        <div class="visits-toolbar-label">
-            <span class="visits-timeline-icon" aria-hidden="true"></span>
+<div class="visits-shell visits-shell--timeline visits-shell--student">
+    <div class="visits-toolbar visits-toolbar--student">
+        <div class="visits-toolbar-label visits-toolbar-label--student">
+            <span class="visits-timeline-icon visits-timeline-icon--outline" aria-hidden="true">
+                <i class="fa-regular fa-clock"></i>
+            </span>
             <div>
-                <span class="visits-section-kicker">Timeline</span>
-                <span class="visits-section-title">My visit activity</span>
+                <span class="visits-toolbar-title">Timeline</span>
+                <span class="visits-toolbar-subtitle">My visit activity</span>
             </div>
         </div>
     </div>
 
-    <div class="visit-feed" id="visitFeed">
+    <div class="visit-feed visit-feed--timeline visit-feed--student" id="visitFeed">
     <?php if (!empty($visits)): ?>
         <?php foreach ($visits as $index => $visit): ?>
             <?php
-                $layoutClass = $index % 2 === 0 ? 'layout-left' : 'layout-right';
-                $rowNum = str_pad((string)($index + 1), 2, '0', STR_PAD_LEFT);
                 $visitJson = htmlspecialchars(json_encode($visit), ENT_QUOTES, 'UTF-8');
             ?>
             <article
-                class="visit-card <?= $layoutClass ?>"
+                class="visit-card visit-card--timeline visit-card--student theme-blue"
                 style="--stagger-delay: <?= (($index % 12) * 70) ?>ms;"
                 role="button"
                 tabindex="0"
                 data-visit="<?= $visitJson ?>"
             >
-                <div class="visit-accent" aria-hidden="true"></div>
-                <div class="visit-ribbon">
-                    <span class="visit-index" aria-hidden="true"><?= $rowNum ?></span>
-
-                    <div class="visit-ribbon-primary">
-                        <span class="visit-name">My Visit</span>
+                <div class="visit-card-shell">
+                    <div class="visit-mobile-date-strip"><span class="visit-card-icon visit-card-icon--calendar" aria-hidden="true"><i class="fa-regular fa-calendar-check"></i></span><span><?= date('M j, Y', strtotime($visit['visit_date'])) ?></span><span class="visit-mobile-dot">&bull;</span><span><?= date('g:i A', strtotime($visit['visit_date'])) ?></span></div>
+                    <div class="visit-card-icon visit-card-icon--calendar" aria-hidden="true">
+                        <i class="fa-regular fa-calendar-check"></i>
                     </div>
 
-                    <div class="visit-ribbon-col visit-ribbon-complaint">
-                        <span class="visit-kicker">Complaint</span>
-                        <span class="visit-line"><?= htmlspecialchars($visit['complaint']) ?></span>
+                    <div class="visit-desktop-row">
+                        <div class="visit-desktop-date">
+                            <strong><?= date('M j, Y', strtotime($visit['visit_date'])) ?></strong>
+                            <span><i class="fa-regular fa-clock" aria-hidden="true"></i><?= date('g:i A', strtotime($visit['visit_date'])) ?></span>
+                        </div>
+                        <div class="visit-desktop-info">
+                            <span class="visit-info-label">Complaint</span>
+                            <strong><i class="fa-regular fa-file-lines" aria-hidden="true"></i><?= htmlspecialchars($visit['complaint']) ?></strong>
+                        </div>
+                        <div class="visit-desktop-info">
+                            <span class="visit-info-label">Treatment</span>
+                            <strong><i class="fa-solid fa-link" aria-hidden="true"></i><?= htmlspecialchars($visit['medicines_used'] ?? 'None') ?></strong>
+                        </div>
+                        <div class="visit-desktop-info">
+                            <span class="visit-info-label">Recorded by</span>
+                            <strong><i class="fa-regular fa-user" aria-hidden="true"></i><?= htmlspecialchars($visit['recorded_by']) ?></strong>
+                        </div>
+                        <div class="visit-card-actions visit-card-actions--desktop">
+                            <button type="button" class="visit-details-btn">
+                                <span>View details</span>
+                                <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="visit-ribbon-col visit-ribbon-treatment">
-                        <span class="visit-kicker">Treatment</span>
-                        <span class="visit-line"><?= htmlspecialchars($visit['medicines_used'] ?? 'None') ?></span>
-                    </div>
+                    <div class="visit-card-body">
+                        <div class="visit-card-main">
+                            <div class="visit-card-heading">
+                                <h3 class="visit-name">My Visit</h3>
+                                <div class="visit-stacked-details">
+                                    <span class="visit-inline-item visit-inline-item--complaint">
+                                        <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+                                        <span class="visit-info-copy"><span class="visit-info-label">Complaint</span><strong><?= htmlspecialchars($visit['complaint']) ?></strong></span>
+                                    </span>
+                                    <span class="visit-inline-item visit-inline-item--treatment">
+                                        <i class="fa-solid fa-link" aria-hidden="true"></i>
+                                        <span class="visit-info-copy"><span class="visit-info-label">Treatment</span><strong><?= htmlspecialchars($visit['medicines_used'] ?? 'None') ?></strong></span>
+                                    </span>
+                                </div>
+                            </div>
 
-                    <div class="visit-ribbon-meta">
-                        <time class="visit-datetime" datetime="<?= htmlspecialchars(date('c', strtotime($visit['visit_date']))) ?>">
-                            <?= date('M j, Y', strtotime($visit['visit_date'])) ?>
-                            <span class="visit-time"><?= date('g:i A', strtotime($visit['visit_date'])) ?></span>
-                        </time>
-                        <span class="visit-recorded">
-                            <span class="visit-recorded-kicker">Recorded</span>
-                            <?= htmlspecialchars($visit['recorded_by']) ?>
-                        </span>
-                    </div>
+                            <div class="visit-divider" aria-hidden="true"></div>
 
-                    <button type="button" class="visit-details-btn">View details</button>
+                            <div class="visit-meta-row">
+                                <span class="visit-meta-item visit-meta-item--date"><i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                                    <span><?= date('M j, Y', strtotime($visit['visit_date'])) ?></span>
+                                </span>
+                                <span class="visit-meta-item visit-meta-item--time"><i class="fa-regular fa-clock" aria-hidden="true"></i>
+                                    <span><?= date('g:i A', strtotime($visit['visit_date'])) ?></span>
+                                </span>
+                                <span class="visit-meta-item">
+                                    <i class="fa-regular fa-user" aria-hidden="true"></i>
+                                    <span class="visit-info-copy"><span class="visit-info-label">Recorded by</span><strong><?= htmlspecialchars($visit['recorded_by']) ?></strong></span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="visit-card-actions">
+                            <button type="button" class="visit-details-btn">
+                                <span>View details</span>
+                                <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </article>
         <?php endforeach; ?>
@@ -185,24 +173,28 @@ $medlogPageHeader = [
 </main>
 </div>
 
-<!-- 🔥 VIEW MODAL -->
-<div id="viewModal" class="modal">
-<div class="modal-content">
-<span class="closeView">&times;</span>
+<div id="viewModal" class="modal visit-details-modal">
+<div class="modal-content visit-details-modal__dialog">
+<button type="button" class="closeView visit-details-modal__close" aria-label="Close">&times;</button>
 <h2>Visit Details</h2>
-<div id="viewContent"></div>
+<div id="viewContent" class="visit-details-modal__content"></div>
+<div class="visit-details-modal__footer">
+    <button type="button" class="closeView visit-details-modal__button">Close</button>
+</div>
 </div>
 </div>
 
 <script>
 const viewModal = document.getElementById("viewModal");
 
-document.querySelector(".closeView").onclick = () => {
-    viewModal.classList.remove("show");
-};
+document.querySelectorAll(".closeView").forEach((btn) => {
+    btn.addEventListener("click", () => {
+        viewModal.classList.remove("show");
+    });
+});
 
 window.onclick = (e) => {
-    if (e.target === viewModal) viewModal.classList.remove("show"); 
+    if (e.target === viewModal) viewModal.classList.remove("show");
 };
 
 function esc(v) {
@@ -215,13 +207,49 @@ function esc(v) {
 }
 
 function openViewModal(data) {
+    const formatVisitDate = (value) => {
+        const raw = value === undefined || value === null ? "" : String(value);
+        const parsed = new Date(raw.replace(" ", "T"));
+        if (Number.isNaN(parsed.getTime())) return esc(raw);
+        const dateText = new Intl.DateTimeFormat("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric"
+        }).format(parsed);
+        const timeText = new Intl.DateTimeFormat("en-US", {
+            hour: "numeric",
+            minute: "2-digit"
+        }).format(parsed);
+        return `${esc(dateText)} &#8226; ${esc(timeText)}`;
+    };
     document.getElementById("viewContent").innerHTML = `
-        <p><strong>Date:</strong> ${esc(data.visit_date)}</p>
-        <p><strong>Recorded By:</strong> ${esc(data.recorded_by)}</p>
-        <hr>
-        <p><strong>Complaint:</strong> ${esc(data.complaint)}</p>
-        <p><strong>Treatment:</strong> ${esc(data.medicines_used || 'None')}</p>
-        <p><strong>Notes:</strong> ${esc(data.notes || 'None')}</p>
+        <div class="visit-details-modal__rows">
+            <div class="visit-details-modal__row">
+                <span class="visit-details-modal__icon"><i class="fa-regular fa-calendar-days" aria-hidden="true"></i></span>
+                <span class="visit-details-modal__label">Date &amp; Time</span>
+                <strong class="visit-details-modal__value">${formatVisitDate(data.visit_date)}</strong>
+            </div>
+            <div class="visit-details-modal__row">
+                <span class="visit-details-modal__icon"><i class="fa-regular fa-user" aria-hidden="true"></i></span>
+                <span class="visit-details-modal__label">Recorded By</span>
+                <strong class="visit-details-modal__value">${esc(data.recorded_by)}</strong>
+            </div>
+            <div class="visit-details-modal__row">
+                <span class="visit-details-modal__icon"><i class="fa-regular fa-file-lines" aria-hidden="true"></i></span>
+                <span class="visit-details-modal__label">Complaint</span>
+                <strong class="visit-details-modal__value">${esc(data.complaint || "None")}</strong>
+            </div>
+            <div class="visit-details-modal__row">
+                <span class="visit-details-modal__icon"><i class="fa-solid fa-link" aria-hidden="true"></i></span>
+                <span class="visit-details-modal__label">Treatment</span>
+                <strong class="visit-details-modal__value">${esc(data.medicines_used || "None")}</strong>
+            </div>
+            <div class="visit-details-modal__row">
+                <span class="visit-details-modal__icon"><i class="fa-regular fa-rectangle-list" aria-hidden="true"></i></span>
+                <span class="visit-details-modal__label">Notes</span>
+                <strong class="visit-details-modal__value">${esc(data.notes || "None")}</strong>
+            </div>
+        </div>
     `;
     viewModal.classList.add("show");
 }
@@ -280,3 +308,54 @@ if ("IntersectionObserver" in window) {
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

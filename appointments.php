@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 date_default_timezone_set('Asia/Manila');
 require 'Database/connection.php';
@@ -661,7 +661,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Appointments</title>
-    <link rel="stylesheet" href="Css/layout.css">
+    <link rel="stylesheet" href="Css/layout.css?v=20260519-dock-circle-lock">
     <link rel="stylesheet" href="Css/dashboard.css">
     <link rel="stylesheet" href="Css/appointments.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -719,12 +719,12 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                             <div>
                                 <h2 class="appt-today-hero__title">Today's schedule</h2>
                                 <p class="appt-today-hero__date">
-                                    <?= htmlspecialchars(date('l — F j, Y'), ENT_QUOTES, 'UTF-8') ?>
+                                    <?= htmlspecialchars(date('l â€” F j, Y'), ENT_QUOTES, 'UTF-8') ?>
                                 </p>
                             </div>
                             <div class="appt-today-hero__pulse" aria-hidden="true">
                                 <span class="appt-today-hero__pulse-dot"></span>
-                                Live queue · <?= (int) count($todayAppointments) ?>
+                                Live queue Â· <?= (int) count($todayAppointments) ?>
                                 slot<?= count($todayAppointments) === 1 ? '' : 's' ?>
                             </div>
                         </div>
@@ -766,7 +766,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                         <div class="appt-admin-board__head">
                             <div>
                                 <h2 class="appt-admin-board__title">Appointment desk</h2>
-                                <p class="appt-admin-board__lead"><?= (int) $activeQueueCount ?> active in workflow · use
+                                <p class="appt-admin-board__lead"><?= (int) $activeQueueCount ?> active in workflow Â· use
                                     filters to narrow the list</p>
                             </div>
                         </div>
@@ -803,7 +803,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                             <div class="appt-toolbar__search">
                                 <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                                 <input type="search" id="apptFilterSearch" class="appt-toolbar__input"
-                                    placeholder="Search patient, reason, date…" autocomplete="off"
+                                    placeholder="Search patient, reason, dateâ€¦" autocomplete="off"
                                     aria-label="Search appointments">
                             </div>
                             <div class="appt-toolbar__filters">
@@ -834,7 +834,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                         $apptDeskSections = [
                             ['key' => 'pending', 'title' => 'Pending requests', 'hint' => 'Approve or reject before the visit.', 'items' => $apptAdminBuckets['pending']],
                             ['key' => 'approved', 'title' => 'Approved', 'hint' => 'Confirmed visits awaiting completion.', 'items' => $apptAdminBuckets['approved']],
-                            ['key' => 'rescheduled', 'title' => 'Rescheduled', 'hint' => 'Moved to a new slot — verify details.', 'items' => $apptAdminBuckets['rescheduled']],
+                            ['key' => 'rescheduled', 'title' => 'Rescheduled', 'hint' => 'Moved to a new slot â€” verify details.', 'items' => $apptAdminBuckets['rescheduled']],
                             ['key' => 'completed', 'title' => 'Completed history', 'hint' => 'Closed visits (newest first).', 'items' => $apptAdminBuckets['completed']],
                             ['key' => 'missed', 'title' => 'Missed', 'hint' => 'No-shows or unattended slots.', 'items' => $apptAdminBuckets['missed']],
                         ];
@@ -866,7 +866,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                         <details class="appt-archive-fold">
                             <summary class="appt-archive-fold__summary">
                                 <span class="appt-archive-fold__title">Archived</span>
-                                <span class="appt-archive-fold__meta">Rejected &amp; cancelled ·
+                                <span class="appt-archive-fold__meta">Rejected &amp; cancelled Â·
                                     <?= count($apptAdminBuckets['archived']) ?>
                                     record<?= count($apptAdminBuckets['archived']) === 1 ? '' : 's' ?></span>
                             </summary>
@@ -919,7 +919,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                             <div class="appt-book-panel appt-book-panel--full">
                                 <label class="appt-book-panel__label" for="bookingReason">Reason for visit</label>
                                 <textarea name="reason" id="bookingReason" rows="4" class="appt-book-textarea"
-                                    placeholder="Symptoms, follow-up, or purpose of visit…" required></textarea>
+                                    placeholder="Symptoms, follow-up, or purpose of visitâ€¦" required></textarea>
                                 <button type="submit" name="add_appointment" value="1"
                                     class="appt-btn appt-btn--primary appt-btn--block" id="bookingSubmitBtn" disabled>
                                     <span>Request appointment</span>
@@ -996,7 +996,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                 <label for="adminPatientSearch">Patient</label>
                 <div class="medlog-combo" id="adminPatientCombo">
                     <input type="text" id="adminPatientSearch" name="admin_patient_search_display" autocomplete="off"
-                        placeholder="Search by name…" class="appt-drawer-input">
+                        placeholder="Search by nameâ€¦" class="appt-drawer-input">
                     <input type="hidden" name="patient_user_id" id="adminPatientId" value="">
                     <ul class="medlog-combo__list" id="adminPatientList" hidden></ul>
                 </div>
@@ -1015,7 +1015,7 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
                 </select>
                 <label for="adminApptReason">Reason / notes</label>
                 <textarea name="reason" id="adminApptReason" rows="3" class="appt-drawer-input" required
-                    placeholder="Visit purpose…"></textarea>
+                    placeholder="Visit purposeâ€¦"></textarea>
                 <button type="submit" name="admin_create_appointment" value="1"
                     class="appt-btn appt-btn--primary appt-drawer-submit">Save appointment</button>
             </form>
@@ -1468,3 +1468,12 @@ function appt_render_appointment_card(array $a, bool $isAdmin, DateTimeImmutable
 </html>
 
 </html>
+
+
+
+
+
+
+
+
+

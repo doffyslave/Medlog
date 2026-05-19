@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -8,10 +8,10 @@ $role = strtolower(trim((string) ($user['role'] ?? 'guest')));
 $current = basename($_SERVER['PHP_SELF']);
 ?>
 
-<aside class="sidebar" aria-label="Main navigation">
+<aside class="sidebar sidebar-<?= htmlspecialchars($role, ENT_QUOTES, 'UTF-8') ?>" aria-label="Main navigation">
     <div class="sidebar-brand">
         <a href="dashboard.php" class="sidebar-brand-mark" title="MedLog home">
-            <img src="Images/MEDLOG, BG-REMOVED.png" alt="" class="sidebar-brand-logo" width="40" height="40" decoding="async">
+            <img src="Images/FinalLogo.png?v=20260517" alt="MedLog" class="sidebar-brand-logo" width="40" height="40" decoding="async">
         </a>
         <div class="sidebar-brand-text">
             <span class="logo">MedLog</span>
@@ -46,21 +46,21 @@ $current = basename($_SERVER['PHP_SELF']);
 
                 <li class="<?= $current === 'profile.php' ? 'active' : '' ?>">
                     <a href="profile.php">
-                        <span class="menu-icon"><i class="fa-solid fa-user" aria-hidden="true"></i></span>
+                        <span class="menu-icon"><i class="fa-regular fa-user" aria-hidden="true"></i></span>
                         <span class="menuText">Profile</span>
                     </a>
                 </li>
 
                 <li class="<?= $current === 'my_visits.php' ? 'active' : '' ?>">
                     <a href="my_visits.php">
-                        <span class="menu-icon"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i></span>
+                        <span class="menu-icon"><i class="fa-regular fa-clipboard" aria-hidden="true"></i></span>
                         <span class="menuText">My Visits</span>
                     </a>
                 </li>
 
                 <li class="<?= $current === 'appointments.php' ? 'active' : '' ?>">
                     <a href="appointments.php">
-                        <span class="menu-icon"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i></span>
+                        <span class="menu-icon"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i></span>
                         <span class="menuText">Appointments</span>
                     </a>
                 </li>
@@ -83,7 +83,7 @@ $current = basename($_SERVER['PHP_SELF']);
 
                 <li class="<?= $current === 'appointments.php' ? 'active' : '' ?>">
                     <a href="appointments.php">
-                        <span class="menu-icon"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i></span>
+                        <span class="menu-icon"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i></span>
                         <span class="menuText">Appointments</span>
                     </a>
                 </li>
@@ -108,14 +108,14 @@ $current = basename($_SERVER['PHP_SELF']);
 
                 <li class="<?= $current === 'visits.php' ? 'active' : '' ?>">
                     <a href="visits.php">
-                        <span class="menu-icon"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i></span>
+                        <span class="menu-icon"><i class="fa-regular fa-clipboard" aria-hidden="true"></i></span>
                         <span class="menuText">Visits</span>
                     </a>
                 </li>
 
                 <li class="<?= $current === 'appointments.php' ? 'active' : '' ?>">
                     <a href="appointments.php">
-                        <span class="menu-icon"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i></span>
+                        <span class="menu-icon"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i></span>
                         <span class="menuText">Appointments</span>
                     </a>
                 </li>
@@ -141,6 +141,13 @@ $current = basename($_SERVER['PHP_SELF']);
                     </a>
                 </li>
 
+                <li class="sidebar-nav-dock-logout" aria-hidden="false">
+                    <a href="auth/logout.php" class="sidebar-dock-logout-link" data-confirm-logout="1" title="Log out">
+                        <span class="menu-icon"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i></span>
+                        <span class="menuText">Logout</span>
+                    </a>
+                </li>
+
             <?php endif; ?>
 
         </ul>
@@ -153,3 +160,8 @@ $current = basename($_SERVER['PHP_SELF']);
         </a>
     </div>
 </aside>
+
+
+
+
+

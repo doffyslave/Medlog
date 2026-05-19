@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 if (!isset($_SESSION['user'])) {
@@ -50,7 +50,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
 
 $medlogPageHeader = [
     'title' => 'Patients',
-    'subtitle' => 'Manage clinic patients — search, filter, and open profiles.',
+    'subtitle' => 'Manage clinic patients - search, filter, and open profiles.',
     'icon' => 'patients',
     'class' => 'medlog-page-header--patients',
 ];
@@ -59,9 +59,12 @@ $medlogPageHeader = [
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patients</title>
-    <link rel="stylesheet" href="Css/layout.css">
-    <link rel="stylesheet" href="Css/patients.css">
+    <link rel="stylesheet" href="Css/layout.css?v=20260519-dock-circle-lock">
+    <link rel="stylesheet" href="Css/patients.css?v=20260517-mobile-cards">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -467,3 +470,12 @@ applySort();
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+
