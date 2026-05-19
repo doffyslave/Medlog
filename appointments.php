@@ -377,9 +377,6 @@ if ($isAdmin) {
     ');
     $stmt->execute([$user_id]);
     $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    echo "<pre>";
-    print_r($appointments[0]);
-    echo "</pre>";
 }
 
 foreach ($appointments as &$apptRow) {
