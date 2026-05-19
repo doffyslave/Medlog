@@ -479,7 +479,7 @@ $medlogPageHeader = [
         function openCalendar() {
             const input = document.getElementById('calendarFilter');
 
-            // focus is important for some browsers
+            // focus is important for some browsers - Sheesh
             input.focus();
 
             if (input.showPicker) {
