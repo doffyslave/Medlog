@@ -195,7 +195,7 @@ $medlogPageHeader = [
                         data-id="<?= (int) $alert['id'] ?>"
                     >
                         <span><?= htmlspecialchars($alert['name'], ENT_QUOTES, 'UTF-8') ?></span>
-                        <strong><?= (int) $alert['quantity'] ?> left</strong>
+                        <span style="font-weight: 400;"><?= (int) $alert['quantity'] ?> left</span>
                     </button>
                 <?php endforeach; ?>
             </div>
@@ -226,7 +226,9 @@ $medlogPageHeader = [
                 data-search="<?= htmlspecialchars(strtolower($med['name'] . ' ' . $med['description'] . ' ' . $med['status_admin']), ENT_QUOTES, 'UTF-8') ?>"
             >
                 <div class="med-card__head">
-                    <span class="med-card__icon"><?= htmlspecialchars($med['initial'], ENT_QUOTES, 'UTF-8') ?></span>
+                    <div class="med-card__icon-container" style="width: 64px; height: 64px; background-color: #f0f4f8; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.05); overflow: hidden;">
+                        <img src="Images/medicine_pic.jpg" alt="Medicine" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                    </div>
                     <span class="med-status med-status--<?= htmlspecialchars($med['status_key'], ENT_QUOTES, 'UTF-8') ?>">
                         <?= htmlspecialchars($isAdmin ? $med['status_admin'] : $med['status_public'], ENT_QUOTES, 'UTF-8') ?>
                     </span>
@@ -238,10 +240,7 @@ $medlogPageHeader = [
                     <div class="med-stock">
                         <div class="med-stock__top">
                             <span>Stock quantity</span>
-                            <strong><?= (int) $med['quantity'] ?></strong>
-                        </div>
-                        <div class="med-progress" role="progressbar" aria-valuenow="<?= (int) $med['progress'] ?>" aria-valuemin="0" aria-valuemax="100">
-                            <span style="width: <?= (int) $med['progress'] ?>%"></span>
+                            <span style="font-weight: 400;"><?= (int) $med['quantity'] ?></span>
                         </div>
                     </div>
                     <div class="med-card__actions">
@@ -415,7 +414,9 @@ $medlogPageHeader = [
 
         drawerContent.innerHTML = `
             <div class="med-drawer__hero">
-                <span class="med-card__icon">${escapeHtml(med.initial)}</span>
+                <div class="med-card__icon-container" style="width: 64px; height: 64px; background-color: #f0f4f8; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.05); overflow: hidden;">
+                    <img src="Images/medicine_pic.jpg" alt="Medicine" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                </div>
                 <div>
                     <h3>${escapeHtml(med.name)}</h3>
                     <p>${escapeHtml(med.description)}</p>
@@ -425,7 +426,7 @@ $medlogPageHeader = [
                 <div><span>Status</span><strong>${escapeHtml(IS_ADMIN ? med.status_admin : med.status_public)}</strong></div>
                 <div><span>Expiry</span><strong>${escapeHtml(expiryBadge)}</strong></div>
                 <div><span>Latest expiry date</span><strong>${escapeHtml(expiryLabel)}</strong></div>
-                ${IS_ADMIN ? `<div><span>Stock quantity</span><strong>${escapeHtml(med.quantity)}</strong></div>` : ''}
+                ${IS_ADMIN ? `<div><span>Stock quantity</span><strong style="font-weight: 400;">${escapeHtml(med.quantity)}</strong></div>` : ''}
                 ${IS_ADMIN ? `<div><span>Restock entries</span><strong>${escapeHtml(med.stock_events)}</strong></div>` : ''}
                 ${IS_ADMIN ? `<div><span>Total restocked</span><strong>${escapeHtml(med.lifetime_stock_in)}</strong></div>` : ''}
             </div>
@@ -521,7 +522,6 @@ $medlogPageHeader = [
 
 </body>
 </html>
-
 
 
 
