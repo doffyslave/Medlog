@@ -51,6 +51,252 @@ function getSingle($conn, $query)
     }
 }
 
+function medlog_appt_status_class($apSt)
+{
+    if ($apSt === 'Approved') {
+        return 'approved';
+    }
+    if ($apSt === 'Rejected') {
+        return 'rejected';
+    }
+    if ($apSt === 'Cancelled') {
+        return 'cancelled';
+    }
+    if ($apSt === 'Completed') {
+        return 'completed';
+    }
+    if ($apSt === 'Missed') {
+        return 'missed';
+    }
+    if ($apSt === 'Rescheduled') {
+        return 'rescheduled';
+    }
+    return 'pending';
+}
+
+function medlog_fetch_admin_day_data($conn, $selectedDate)
+{
+    $recentVisits = [];
+    $dayAppointments = [];
+    $lowStockItems = [];
+    $lowStockToShow = [];
+
+    try {
+        $q = $conn->prepare("
+            SELECT v.complaint, v.visit_date, u.name
+            FROM visits v
+            JOIN users u ON v.user_id = u.user_id
+            WHERE DATE(v.visit_date) = ?
+            ORDER BY v.visit_date DESC
+            LIMIT 20
+        ");
+        $q->execute([$selectedDate]);
+        $recentVisits = $q ? $q->fetchAll() : [];
+    } catch (Exception $e) {
+    }
+
+    try {
+        $q = $conn->prepare("
+            SELECT a.appointment_time, a.reason, a.status, u.name
+            FROM appointments a
+            JOIN users u ON a.user_id = u.user_id
+            WHERE a.appointment_date = ?
+            ORDER BY STR_TO_DATE(a.appointment_time, '%h:%i %p') ASC
+            LIMIT 20
+        ");
+        $q->execute([$selectedDate]);
+        $dayAppointments = $q ? $q->fetchAll() : [];
+    } catch (Exception $e) {
+    }
+
+    try {
+        $q = $conn->query("
+            SELECT medicine_name, total_quantity
+            FROM medicines
+            ORDER BY total_quantity ASC
+            LIMIT 5
+        ");
+        $lowStockItems = $q ? $q->fetchAll() : [];
+    } catch (Exception $e) {
+    }
+
+    foreach ($lowStockItems as $item) {
+        if ((int) $item['total_quantity'] <= 10) {
+            $lowStockToShow[] = $item;
+        }
+    }
+
+    $calTs = strtotime($selectedDate);
+    $calYear = (int) date('Y', $calTs);
+    $calMonth = (int) date('m', $calTs);
+
+    return [
+        'recentVisits' => $recentVisits,
+        'dayAppointments' => $dayAppointments,
+        'lowStockToShow' => $lowStockToShow,
+        'dayVisitCount' => count($recentVisits),
+        'dayApptCount' => count($dayAppointments),
+        'busiestLabel' => count($recentVisits) >= count($dayAppointments) ? 'Walk-in visits' : 'Appointments',
+        'busiestCount' => max(count($recentVisits), count($dayAppointments)),
+        'calYear' => $calYear,
+        'calMonth' => $calMonth,
+        'calMonthName' => date('F Y', $calTs),
+        'daysInMonth' => (int) date('t', $calTs),
+        'firstWeekday' => (int) date('N', strtotime("$calYear-$calMonth-01")),
+        'selectedDay' => (int) date('j', $calTs),
+        'prevMonthDate' => date('Y-m-d', strtotime("$calYear-$calMonth-01 -1 month")),
+        'nextMonthDate' => date('Y-m-d', strtotime("$calYear-$calMonth-01 +1 month")),
+        'isTodaySelected' => ($selectedDate === date('Y-m-d')),
+    ];
+}
+
+function medlog_admin_header_labels($selectedDate, $isTodaySelected)
+{
+    $headerDateLabel = date('l, F j, Y', strtotime($selectedDate));
+    $headerContext = $isTodaySelected
+        ? "Today's operations"
+        : 'Operations for ' . date('M j, Y', strtotime($selectedDate));
+
+    return [
+        'subtitle' => $headerContext . ' · ' . $headerDateLabel,
+        'chip' => date('M j, Y', strtotime($selectedDate)),
+        'chipDay' => $isTodaySelected ? 'Today' : date('D', strtotime($selectedDate)),
+    ];
+}
+
+function medlog_render_visits_panel(array $recentVisits)
+{
+    ob_start();
+    if ($recentVisits): ?>
+        <ul class="activity-feed__list">
+            <?php foreach ($recentVisits as $visit): ?>
+                <li class="activity-feed__item">
+                    <span class="activity-feed__dot activity-feed__dot--visit" aria-hidden="true"></span>
+                    <div class="activity-feed__content">
+                        <strong class="activity-feed__name"><?= htmlspecialchars($visit['name'], ENT_QUOTES, 'UTF-8') ?></strong>
+                        <span class="activity-feed__reason"><?= htmlspecialchars($visit['complaint'], ENT_QUOTES, 'UTF-8') ?></span>
+                    </div>
+                    <time class="activity-feed__time" datetime="<?= date('c', strtotime($visit['visit_date'])) ?>">
+                        <?= date('h:i A', strtotime($visit['visit_date'])) ?>
+                    </time>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php else: ?>
+        <div class="empty-state-card">
+            <i class="fas fa-calendar-day" aria-hidden="true"></i>
+            <p>No clinic activity scheduled for this date.</p>
+            <span>Walk-in visits will appear here when recorded.</span>
+        </div>
+    <?php endif;
+    return ob_get_clean();
+}
+
+function medlog_render_appts_panel(array $dayAppointments)
+{
+    ob_start();
+    if ($dayAppointments): ?>
+        <ul class="activity-feed__list">
+            <?php foreach ($dayAppointments as $appointment):
+                $statusClass = medlog_appt_status_class($appointment['status'] ?? '');
+                ?>
+                <li class="activity-feed__item">
+                    <span class="activity-feed__dot activity-feed__dot--appt" aria-hidden="true"></span>
+                    <div class="activity-feed__content">
+                        <strong class="activity-feed__name"><?= htmlspecialchars($appointment['name'], ENT_QUOTES, 'UTF-8') ?></strong>
+                        <span class="activity-feed__reason"><?= htmlspecialchars($appointment['reason'], ENT_QUOTES, 'UTF-8') ?></span>
+                    </div>
+                    <div class="activity-feed__meta">
+                        <span class="activity-feed__time"><?= htmlspecialchars($appointment['appointment_time'], ENT_QUOTES, 'UTF-8') ?></span>
+                        <span class="status-pill <?= $statusClass ?>"><?= htmlspecialchars($appointment['status'], ENT_QUOTES, 'UTF-8') ?></span>
+                    </div>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php else: ?>
+        <div class="empty-state-card">
+            <i class="fas fa-calendar-check" aria-hidden="true"></i>
+            <p>No appointments booked for this date.</p>
+            <span>Scheduled slots will show in this feed.</span>
+        </div>
+    <?php endif;
+    return ob_get_clean();
+}
+
+function medlog_render_insights_mosaic($dayVisitCount, $dayApptCount, $busiestLabel, $busiestCount, $totalLowStock, $selectedDate)
+{
+    ob_start(); ?>
+    <div class="clinical-insights__mosaic">
+        <div class="insight-feature insight-feature--primary">
+            <span class="insight-feature__eyebrow">Featured · busiest channel</span>
+            <strong class="insight-feature__value"><?= htmlspecialchars($busiestLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+            <p class="insight-feature__detail"><?= (int) $busiestCount ?> recorded on <?= date('M j', strtotime($selectedDate)) ?></p>
+            <div class="insight-feature__bar" aria-hidden="true">
+                <span style="width: <?= min(100, max(8, $busiestCount * 12)) ?>%"></span>
+            </div>
+        </div>
+        <div class="insight-stack">
+            <div class="insight-mini">
+                <span class="insight-mini__label">Walk-ins</span>
+                <strong class="insight-mini__value"><?= (int) $dayVisitCount ?></strong>
+            </div>
+            <div class="insight-mini insight-mini--soft">
+                <span class="insight-mini__label">Appointments</span>
+                <strong class="insight-mini__value"><?= (int) $dayApptCount ?></strong>
+            </div>
+        </div>
+        <div class="insight-strip<?= $totalLowStock > 0 ? ' insight-strip--warn' : '' ?>">
+            <div class="insight-strip__copy">
+                <span class="insight-strip__label">Inventory</span>
+                <strong><?= (int) $totalLowStock ?> low-stock <?= $totalLowStock === 1 ? 'item' : 'items' ?></strong>
+            </div>
+            <span class="insight-strip__hint"><?= $totalLowStock > 0 ? 'Review restock list below' : 'Levels look healthy' ?></span>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function medlog_render_calendar_days(array $cal, $selectedDate)
+{
+    ob_start();
+    for ($blank = 1; $blank < $cal['firstWeekday']; $blank++): ?>
+        <span class="calendar-widget__day calendar-widget__day--empty"></span>
+    <?php endfor;
+    for ($day = 1; $day <= $cal['daysInMonth']; $day++):
+        $dayDate = sprintf('%04d-%02d-%02d', $cal['calYear'], $cal['calMonth'], $day);
+        $isSelected = ($day === $cal['selectedDay']);
+        $isToday = ($dayDate === date('Y-m-d'));
+        ?>
+        <button type="button" class="calendar-widget__day<?= $isSelected ? ' is-selected' : '' ?><?= $isToday ? ' is-today' : '' ?>"
+            data-date="<?= htmlspecialchars($dayDate, ENT_QUOTES, 'UTF-8') ?>"><?= $day ?></button>
+    <?php endfor;
+    return ob_get_clean();
+}
+
+function medlog_render_low_stock(array $lowStockToShow)
+{
+    ob_start();
+    if ($lowStockToShow): ?>
+        <ul class="stock-alert-card__list">
+            <?php foreach ($lowStockToShow as $item):
+                $qty = (int) $item['total_quantity'];
+                ?>
+                <li class="stock-alert-card__item">
+                    <span class="stock-alert-card__name"><?= htmlspecialchars($item['medicine_name'], ENT_QUOTES, 'UTF-8') ?></span>
+                    <span class="stock-alert-card__qty<?= $qty <= 5 ? ' stock-alert-card__qty--critical' : '' ?>"><?= $qty ?> left</span>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php else: ?>
+        <div class="empty-state-card empty-state-card--compact">
+            <i class="fas fa-check-circle" aria-hidden="true"></i>
+            <p>All medicines are adequately stocked.</p>
+        </div>
+    <?php endif;
+    return ob_get_clean();
+}
+
 
 // ================= ADMIN KPI =================
 $totalPatients = getSingle($conn, "SELECT COUNT(*) as total FROM users WHERE role='student'");
@@ -98,57 +344,75 @@ if ($role === 'student') {
 // ================= ADMIN DATA =================
 $recentVisits = [];
 $dayAppointments = [];
-$lowStockItems = [];
 $lowStockToShow = [];
+$dayVisitCount = 0;
+$dayApptCount = 0;
+$busiestLabel = 'Walk-in visits';
+$busiestCount = 0;
+$calYear = (int) date('Y');
+$calMonth = (int) date('m');
+$calMonthName = date('F Y');
+$daysInMonth = (int) date('t');
+$firstWeekday = (int) date('N');
+$selectedDay = (int) date('j');
+$prevMonthDate = date('Y-m-d');
+$nextMonthDate = date('Y-m-d');
+$isTodaySelected = true;
+$adminHeaderLabels = ['subtitle' => '', 'chip' => '', 'chipDay' => ''];
 
 if ($role === 'admin') {
-    try {
-        $q = $conn->prepare("
-            SELECT v.complaint, v.visit_date, u.name 
-            FROM visits v
-            JOIN users u ON v.user_id = u.user_id
-            WHERE DATE(v.visit_date) = ?
-            ORDER BY v.visit_date DESC
-            LIMIT 20
-        ");
-        $q->execute([$selectedDate]);
-        $recentVisits = $q ? $q->fetchAll() : [];
-    } catch (Exception $e) {
-    }
-
-    try {
-        $q = $conn->prepare("
-            SELECT a.appointment_time, a.reason, a.status, u.name
-            FROM appointments a
-            JOIN users u ON a.user_id = u.user_id
-            WHERE a.appointment_date = ?
-            ORDER BY STR_TO_DATE(a.appointment_time, '%h:%i %p') ASC
-            LIMIT 20
-        ");
-        $q->execute([$selectedDate]);
-        $dayAppointments = $q ? $q->fetchAll() : [];
-    } catch (Exception $e) {
-    }
-
-    try {
-        $q = $conn->query("
-            SELECT medicine_name, total_quantity 
-            FROM medicines 
-            ORDER BY total_quantity ASC
-            LIMIT 5
-        ");
-        $lowStockItems = $q ? $q->fetchAll() : [];
-    } catch (Exception $e) {
-    }
-    $lowStockToShow = [];
-    foreach ($lowStockItems as $item) {
-        if ((int) $item['total_quantity'] <= 10) {
-            $lowStockToShow[] = $item;
-        }
-    }
+    $adminDay = medlog_fetch_admin_day_data($conn, $selectedDate);
+    $recentVisits = $adminDay['recentVisits'];
+    $dayAppointments = $adminDay['dayAppointments'];
+    $lowStockToShow = $adminDay['lowStockToShow'];
+    $dayVisitCount = $adminDay['dayVisitCount'];
+    $dayApptCount = $adminDay['dayApptCount'];
+    $busiestLabel = $adminDay['busiestLabel'];
+    $busiestCount = $adminDay['busiestCount'];
+    $calYear = $adminDay['calYear'];
+    $calMonth = $adminDay['calMonth'];
+    $calMonthName = $adminDay['calMonthName'];
+    $daysInMonth = $adminDay['daysInMonth'];
+    $firstWeekday = $adminDay['firstWeekday'];
+    $selectedDay = $adminDay['selectedDay'];
+    $prevMonthDate = $adminDay['prevMonthDate'];
+    $nextMonthDate = $adminDay['nextMonthDate'];
+    $isTodaySelected = $adminDay['isTodaySelected'];
+    $adminHeaderLabels = medlog_admin_header_labels($selectedDate, $isTodaySelected);
 }
 
 $isAdmin = ($role === 'admin');
+
+if ($isAdmin && isset($_GET['ajax']) && $_GET['ajax'] === '1') {
+    header('Content-Type: application/json; charset=utf-8');
+    $labels = medlog_admin_header_labels($selectedDate, $isTodaySelected);
+    echo json_encode([
+        'ok' => true,
+        'date' => $selectedDate,
+        'subtitle' => $labels['subtitle'],
+        'chip' => $labels['chip'],
+        'chipDay' => $labels['chipDay'],
+        'activityDesc' => date('M j, Y', strtotime($selectedDate)),
+        'insightsDate' => date('M j', strtotime($selectedDate)),
+        'visitsHtml' => medlog_render_visits_panel($recentVisits),
+        'appointmentsHtml' => medlog_render_appts_panel($dayAppointments),
+        'insightsHtml' => medlog_render_insights_mosaic($dayVisitCount, $dayApptCount, $busiestLabel, $busiestCount, $totalLowStock, $selectedDate),
+        'lowStockHtml' => medlog_render_low_stock($lowStockToShow),
+        'calendarMonth' => $calMonthName,
+        'calendarDaysHtml' => medlog_render_calendar_days([
+            'calYear' => $calYear,
+            'calMonth' => $calMonth,
+            'daysInMonth' => $daysInMonth,
+            'firstWeekday' => $firstWeekday,
+            'selectedDay' => $selectedDay,
+        ], $selectedDate),
+        'prevMonthDate' => $prevMonthDate,
+        'nextMonthDate' => $nextMonthDate,
+        'opsSummary' => (int) $dayVisitCount . ' visits · ' . (int) $dayApptCount . ' appointments today',
+    ]);
+    exit;
+}
+
 ob_start();
 ?>
 <div class="status-inline">
@@ -171,13 +435,16 @@ ob_start();
 </div>
 <?php
 $__dashboardHeaderActions = ob_get_clean();
-$medlogPageHeader = [
-    'title' => 'Dashboard',
-    'subtitle' => "Welcome back! Here's your clinic overview.",
-    'icon' => 'dashboard',
-    'class' => 'medlog-page-header--dashboard',
-    'actions' => $__dashboardHeaderActions,
-];
+
+if (!$isAdmin) {
+    $medlogPageHeader = [
+        'title' => 'Dashboard',
+        'subtitle' => "Welcome back! Here's your clinic overview.",
+        'icon' => 'dashboard',
+        'class' => 'medlog-page-header--dashboard',
+        'actions' => $__dashboardHeaderActions,
+    ];
+}
 ?>
 
 <!DOCTYPE html>
@@ -195,7 +462,7 @@ $medlogPageHeader = [
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
-<body<?= $role === 'student' ? ' class="medlog-student-shell"' : '' ?>>
+<body<?= $role === 'student' ? ' class="medlog-student-shell"' : ($isAdmin ? ' class="medlog-admin-dashboard-body"' : '') ?>>
 
     <div class="dashboard">
 
@@ -207,153 +474,199 @@ $medlogPageHeader = [
 
             <section class="content">
 
-                <?php include 'includes/medlog-page-header.php'; ?>
+                <?php if (!$isAdmin): ?>
+                    <?php include 'includes/medlog-page-header.php'; ?>
+                <?php endif; ?>
 
-                <!-- ðŸ”´ ADMIN DASHBOARD -->
                 <?php if ($role === 'admin'): ?>
 
-                    <div class="grid-4">
-
-                        <div class="card stat danger">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <div>
-                                <h2><?= $totalLowStock ?></h2>
-                                <p>Low Stock</p>
+                    <header class="dash-command-header" id="dashCommandHeader">
+                        <div class="dash-command-header__lead">
+                            <span class="dash-command-header__eyebrow">STI School Clinic · MedLog</span>
+                            <h1 class="dash-command-header__title">Clinic Command Center</h1>
+                            <p class="dash-command-header__subtitle" id="dashHeaderSubtitle"><?= htmlspecialchars($adminHeaderLabels['subtitle'], ENT_QUOTES, 'UTF-8') ?></p>
+                        </div>
+                        <div class="dash-command-header__visual" aria-hidden="true">
+                            <div class="dash-command-header__orb"></div>
+                            <i class="fas fa-heart-pulse"></i>
+                        </div>
+                        <div class="dash-command-header__meta">
+                            <div class="dash-command-header__chips">
+                                <span class="date-chip" id="dashDateChip">
+                                    <span class="date-chip__day" id="dashDateChipDay"><?= htmlspecialchars($adminHeaderLabels['chipDay'], ENT_QUOTES, 'UTF-8') ?></span>
+                                    <span class="date-chip__date" id="dashDateChipDate"><?= htmlspecialchars($adminHeaderLabels['chip'], ENT_QUOTES, 'UTF-8') ?></span>
+                                </span>
+                                <span class="ops-badge" id="dashOpsBadge"><?= (int) $dayVisitCount ?> visits · <?= (int) $dayApptCount ?> appointments today</span>
+                            </div>
+                            <div class="dash-command-header__status">
+                                <button type="button" class="header-status-chip <?= strtolower($clinicStatus) ?>" onclick="openModal('clinicModal')">
+                                    <i class="fas fa-clinic-medical"></i>
+                                    <span>Clinic <strong><?= htmlspecialchars($clinicStatus, ENT_QUOTES, 'UTF-8') ?></strong></span>
+                                </button>
+                                <button type="button" class="header-status-chip <?= strtolower($nurseStatus) ?>" onclick="openModal('nurseModal')">
+                                    <i class="fas fa-user-nurse"></i>
+                                    <span>Nurse <strong><?= htmlspecialchars($nurseStatus, ENT_QUOTES, 'UTF-8') ?></strong></span>
+                                </button>
                             </div>
                         </div>
+                    </header>
 
-                        <div class="card stat">
-                            <i class="fas fa-heartbeat"></i>
-                            <div>
-                                <h2>
-                                    <?= $totalVisits ?>
-                                </h2>
-                                <p>Visits</p>
-                            </div>
-                        </div>
+                    <div class="admin-dashboard" id="adminDashboard" data-selected-date="<?= htmlspecialchars($selectedDate, ENT_QUOTES, 'UTF-8') ?>" data-active-tab="<?= htmlspecialchars($activeTab, ENT_QUOTES, 'UTF-8') ?>">
 
-                        <div class="card stat">
-                            <i class="fas fa-users"></i>
-                            <div>
-                                <h2><?= $totalPatients ?></h2>
-                                <p>Patients</p>
-                            </div>
-                        </div>
-
-                        <div class="card stat">
-                            <i class="fas fa-file-medical"></i>
-                            <div>
-                                <h2><?= $totalRecords ?></h2>
-                                <p>Records</p>
-                            </div>
-                        </div>
-
-
-
-                    </div>
-
-                    <div class="grid-2">
-
-                        <div class="card">
-                            <div class="tabs-header">
-                                <h3>Agenda</h3>
-                                <div class="tabs">
-                                    <a class="tab-btn <?= $activeTab === 'visits' ? 'active' : '' ?>" data-tab="visits"
-                                        href="?date=<?= urlencode($selectedDate) ?>&tab=visits">
-                                        Visits
-                                    </a>
-                                    <a class="tab-btn <?= $activeTab === 'appointments' ? 'active' : '' ?>"
-                                        data-tab="appointments"
-                                        href="?date=<?= urlencode($selectedDate) ?>&tab=appointments">
-                                        Appointments
-                                    </a>
+                        <div class="admin-dashboard__metrics">
+                            <article class="metric-card metric-card--visits">
+                                <div class="metric-card__icon" aria-hidden="true"><i class="fas fa-heartbeat"></i></div>
+                                <div class="metric-card__body">
+                                    <span class="metric-card__value"><?= (int) $totalVisits ?></span>
+                                    <span class="metric-card__label">Visits this month</span>
                                 </div>
-                            </div>
-
-                            <!-- VISITS PANEL -->
-                            <div id="panel-visits" class="agenda-panel <?= $activeTab === 'visits' ? 'active' : '' ?>">
-                                <?php if ($recentVisits): ?>
-                                    <?php foreach ($recentVisits as $visit): ?>
-                                        <div class="list-item">
-                                            <div>
-                                                <strong><?= htmlspecialchars($visit['name'], ENT_QUOTES, 'UTF-8') ?></strong>
-                                                <p><?= htmlspecialchars($visit['complaint'], ENT_QUOTES, 'UTF-8') ?></p>
-                                            </div>
-                                            <div class="visit-meta">
-                                                <div><?= date("M d, Y", strtotime($visit['visit_date'])) ?></div>
-                                                <div class="visit-time"><?= date("h:i A", strtotime($visit['visit_date'])) ?></div>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <p class="empty-state">No visits on this day.</p>
-                                <?php endif; ?>
-                            </div>
-
-                            <!-- APPOINTMENTS PANEL -->
-                            <div id="panel-appointments"
-                                class="agenda-panel <?= $activeTab === 'appointments' ? 'active' : '' ?>">
-                                <?php if ($dayAppointments): ?>
-                                    <?php foreach ($dayAppointments as $appointment): ?>
-                                        <?php
-                                        $statusClass = 'pending';
-                                        $apSt = $appointment['status'] ?? '';
-                                        if ($apSt === 'Approved')
-                                            $statusClass = 'approved';
-                                        elseif ($apSt === 'Rejected')
-                                            $statusClass = 'rejected';
-                                        elseif ($apSt === 'Cancelled')
-                                            $statusClass = 'cancelled';
-                                        elseif ($apSt === 'Completed')
-                                            $statusClass = 'completed';
-                                        elseif ($apSt === 'Missed')
-                                            $statusClass = 'missed';
-                                        elseif ($apSt === 'Rescheduled')
-                                            $statusClass = 'rescheduled';
-                                        ?>
-                                        <div class="list-item">
-                                            <div>
-                                                <strong><?= htmlspecialchars($appointment['name'], ENT_QUOTES, 'UTF-8') ?></strong>
-                                                <p><?= htmlspecialchars($appointment['reason'], ENT_QUOTES, 'UTF-8') ?></p>
-                                            </div>
-                                            <div class="visit-meta">
-                                                <div><?= htmlspecialchars($appointment['appointment_time'], ENT_QUOTES, 'UTF-8') ?>
-                                                </div>
-                                                <div class="status-pill <?= $statusClass ?>">
-                                                    <?= htmlspecialchars($appointment['status'], ENT_QUOTES, 'UTF-8') ?>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <p class="empty-state">No appointments on this day.</p>
-                                <?php endif; ?>
-                            </div>
+                            </article>
+                            <article class="metric-card metric-card--patients">
+                                <div class="metric-card__icon" aria-hidden="true"><i class="fas fa-user-graduate"></i></div>
+                                <div class="metric-card__body">
+                                    <span class="metric-card__value"><?= (int) $totalPatients ?></span>
+                                    <span class="metric-card__label">Registered patients</span>
+                                </div>
+                            </article>
+                            <article class="metric-card metric-card--stock<?= $totalLowStock > 0 ? ' metric-card--alert' : '' ?>">
+                                <div class="metric-card__icon" aria-hidden="true"><i class="fas fa-pills"></i></div>
+                                <div class="metric-card__body">
+                                    <span class="metric-card__value"><?= (int) $totalLowStock ?></span>
+                                    <span class="metric-card__label">Low stock items</span>
+                                </div>
+                            </article>
+                            <article class="metric-card metric-card--records">
+                                <div class="metric-card__icon" aria-hidden="true"><i class="fas fa-file-medical"></i></div>
+                                <div class="metric-card__body">
+                                    <span class="metric-card__value"><?= (int) $totalRecords ?></span>
+                                    <span class="metric-card__label">Total visit records</span>
+                                </div>
+                            </article>
                         </div>
 
-                        <div class="card">
-                            <div class="tabs-header">
-                                <h3>Low Stock</h3>
-                            </div>
-                            <?php if ($lowStockToShow): ?>
-                                <?php foreach ($lowStockToShow as $item):
-                                    $qty = (int) $item['total_quantity'];
-                                    ?>
+                        <div class="admin-dashboard__grid">
 
-                                    <div class="list-item danger-bg">
+                            <div class="admin-dashboard__main">
+
+                                <article class="dashboard-card activity-feed activity-feed--primary">
+                                    <header class="dashboard-card__head tabs-header">
                                         <div>
-                                            <strong><?= htmlspecialchars($item['medicine_name'], ENT_QUOTES, 'UTF-8') ?></strong>
+                                            <h2 class="dashboard-card__title">Activity timeline</h2>
+                                            <p class="dashboard-card__desc" id="activityFeedDesc">Clinic flow for <?= date('M j, Y', strtotime($selectedDate)) ?></p>
                                         </div>
-                                        <div><?= $qty ?></div>
+                                        <div class="tabs" role="tablist" aria-label="Activity type">
+                                            <button type="button" role="tab" class="tab-btn <?= $activeTab === 'visits' ? 'active' : '' ?>"
+                                                data-tab="visits" id="tab-visits" aria-selected="<?= $activeTab === 'visits' ? 'true' : 'false' ?>"
+                                                aria-controls="panel-visits">Visits</button>
+                                            <button type="button" role="tab" class="tab-btn <?= $activeTab === 'appointments' ? 'active' : '' ?>"
+                                                data-tab="appointments" id="tab-appointments" aria-selected="<?= $activeTab === 'appointments' ? 'true' : 'false' ?>"
+                                                aria-controls="panel-appointments">Appointments</button>
+                                        </div>
+                                    </header>
+
+                                    <div id="panel-visits" class="agenda-panel activity-feed__panel <?= $activeTab === 'visits' ? 'active' : '' ?>" role="tabpanel" aria-labelledby="tab-visits">
+                                        <?= medlog_render_visits_panel($recentVisits) ?>
                                     </div>
 
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <p class="empty-state">No medicines are low on stock.</p>
-                            <?php endif; ?>
+                                    <div id="panel-appointments" class="agenda-panel activity-feed__panel <?= $activeTab === 'appointments' ? 'active' : '' ?>" role="tabpanel" aria-labelledby="tab-appointments">
+                                        <?= medlog_render_appts_panel($dayAppointments) ?>
+                                    </div>
+                                </article>
 
+                                <div class="admin-dashboard__lower">
+                                    <article class="dashboard-card clinical-insights" id="clinicalInsightsCard">
+                                        <header class="dashboard-card__head">
+                                            <h2 class="dashboard-card__title">Clinical insights</h2>
+                                            <p class="dashboard-card__desc" id="insightsDesc">Snapshot for <?= date('M j', strtotime($selectedDate)) ?></p>
+                                        </header>
+                                        <div id="insightsMosaic">
+                                            <?= medlog_render_insights_mosaic($dayVisitCount, $dayApptCount, $busiestLabel, $busiestCount, $totalLowStock, $selectedDate) ?>
+                                        </div>
+                                    </article>
+
+                                    <div class="admin-dashboard__lower-secondary">
+                                        <nav class="dashboard-card quick-actions" aria-label="Quick actions">
+                                            <h2 class="dashboard-card__title">Quick actions</h2>
+                                            <div class="quick-actions__grid">
+                                                <a href="patients.php" class="quick-actions__link"><i class="fas fa-users"></i><span>Patients</span></a>
+                                                <a href="visits.php" class="quick-actions__link"><i class="fas fa-stethoscope"></i><span>Visits</span></a>
+                                                <a href="appointments.php" class="quick-actions__link"><i class="fas fa-calendar-check"></i><span>Appointments</span></a>
+                                                <a href="stocks.php" class="quick-actions__link"><i class="fas fa-boxes-stacked"></i><span>Inventory</span></a>
+                                                <a href="reports.php" class="quick-actions__link quick-actions__link--wide"><i class="fas fa-chart-line"></i><span>Reports</span></a>
+                                            </div>
+                                        </nav>
+
+                                        <article class="dashboard-card stock-alert-card stock-alert-card--compact" id="lowStockCard">
+                                            <header class="dashboard-card__head">
+                                                <h2 class="dashboard-card__title">Low stock</h2>
+                                                <p class="dashboard-card__desc">≤10 units</p>
+                                            </header>
+                                            <div id="lowStockContent">
+                                                <?= medlog_render_low_stock($lowStockToShow) ?>
+                                            </div>
+                                        </article>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <aside class="admin-dashboard__aside">
+
+                                <article class="dashboard-card calendar-widget" id="calendarWidget">
+                                    <header class="calendar-widget__head">
+                                        <h2 class="dashboard-card__title">Calendar</h2>
+                                        <div class="calendar-widget__nav">
+                                            <button type="button" class="calendar-widget__arrow" data-date="<?= htmlspecialchars($prevMonthDate, ENT_QUOTES, 'UTF-8') ?>" id="calPrevMonth" aria-label="Previous month"><i class="fas fa-chevron-left"></i></button>
+                                            <span class="calendar-widget__month" id="calendarMonthLabel"><?= htmlspecialchars($calMonthName, ENT_QUOTES, 'UTF-8') ?></span>
+                                            <button type="button" class="calendar-widget__arrow" data-date="<?= htmlspecialchars($nextMonthDate, ENT_QUOTES, 'UTF-8') ?>" id="calNextMonth" aria-label="Next month"><i class="fas fa-chevron-right"></i></button>
+                                        </div>
+                                    </header>
+                                    <div class="calendar-widget__weekdays" aria-hidden="true">
+                                        <span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span>
+                                    </div>
+                                    <div class="calendar-widget__days" id="calendarDays">
+                                        <?= medlog_render_calendar_days([
+                                            'calYear' => $calYear,
+                                            'calMonth' => $calMonth,
+                                            'daysInMonth' => $daysInMonth,
+                                            'firstWeekday' => $firstWeekday,
+                                            'selectedDay' => $selectedDay,
+                                        ], $selectedDate) ?>
+                                    </div>
+                                    <input type="date" id="calendarFilter" class="calendar-widget__picker"
+                                        value="<?= htmlspecialchars($selectedDate, ENT_QUOTES, 'UTF-8') ?>" aria-label="Jump to date">
+                                </article>
+
+                                <article class="dashboard-card status-panel">
+                                    <header class="dashboard-card__head">
+                                        <h2 class="dashboard-card__title">Live clinic status</h2>
+                                        <p class="dashboard-card__desc">Operational control</p>
+                                    </header>
+                                    <p class="status-panel__clock" id="clinicLiveClock" aria-live="polite"></p>
+                                    <div class="status-panel__controls">
+                                        <button type="button" class="status-panel__row clickable <?= strtolower($clinicStatus) ?>"
+                                            onclick="openModal('clinicModal')">
+                                            <span class="status-panel__icon"><i class="fas fa-clinic-medical"></i></span>
+                                            <span class="status-panel__copy">
+                                                <span class="status-panel__label">Clinic</span>
+                                                <span class="status-panel__value"><?= htmlspecialchars($clinicStatus, ENT_QUOTES, 'UTF-8') ?></span>
+                                            </span>
+                                            <i class="fas fa-pen status-panel__edit" aria-hidden="true"></i>
+                                        </button>
+                                        <button type="button" class="status-panel__row clickable <?= strtolower($nurseStatus) ?>"
+                                            onclick="openModal('nurseModal')">
+                                            <span class="status-panel__icon"><i class="fas fa-user-nurse"></i></span>
+                                            <span class="status-panel__copy">
+                                                <span class="status-panel__label">Nurse</span>
+                                                <span class="status-panel__value"><?= htmlspecialchars($nurseStatus, ENT_QUOTES, 'UTF-8') ?></span>
+                                            </span>
+                                            <i class="fas fa-pen status-panel__edit" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </article>
+
+                            </aside>
                         </div>
-
                     </div>
 
                 <?php endif; ?>
@@ -466,57 +779,146 @@ $medlogPageHeader = [
             });
         }
 
-        const calendarInput = document.getElementById('calendarFilter');
-        calendarInput.addEventListener('change',function () {
-            const params = new URLSearchParams(window.location.search);
-            params.set('date',this.value);
-            if (!params.get('tab')) {
-                params.set('tab','visits');
-            }
-            window.location.search = params.toString();
-        });
-
         function openCalendar() {
             const input = document.getElementById('calendarFilter');
-
-            // focus is important for some browsers
+            if (!input) return;
             input.focus();
-
             if (input.showPicker) {
                 input.showPicker();
             } else {
-                input.click(); // fallback
+                input.click();
             }
         }
-        document.addEventListener('DOMContentLoaded',function () {
-            const tabButtons = document.querySelectorAll('.tabs .tab-btn[data-tab]');
+
+        function updateClinicClock() {
+            const el = document.getElementById('clinicLiveClock');
+            if (!el) return;
+            const now = new Date();
+            el.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+        updateClinicClock();
+        setInterval(updateClinicClock, 1000);
+
+        (function initAdminDashboard() {
+            const root = document.getElementById('adminDashboard');
+            if (!root) return;
+
             const panelVisits = document.getElementById('panel-visits');
             const panelAppointments = document.getElementById('panel-appointments');
+            const tabButtons = root.querySelectorAll('.tab-btn[data-tab]');
+            const calendarInput = document.getElementById('calendarFilter');
+            let activeTab = root.dataset.activeTab || 'visits';
+            let loadingDate = false;
 
-            if (!tabButtons.length || !panelVisits || !panelAppointments) return;
+            function getActiveTab() {
+                return activeTab;
+            }
 
-            function setActiveTab(tab,updateUrl = true) {
+            function setActiveTab(tab, updateUrl = true) {
+                activeTab = tab;
+                root.dataset.activeTab = tab;
+
                 tabButtons.forEach(btn => {
-                    btn.classList.toggle('active',btn.dataset.tab === tab);
+                    const on = btn.dataset.tab === tab;
+                    btn.classList.toggle('active', on);
+                    btn.setAttribute('aria-selected', on ? 'true' : 'false');
                 });
 
-                panelVisits.classList.toggle('active',tab === 'visits');
-                panelAppointments.classList.toggle('active',tab === 'appointments');
+                panelVisits.classList.toggle('active', tab === 'visits');
+                panelAppointments.classList.toggle('active', tab === 'appointments');
+                panelVisits.hidden = tab !== 'visits';
+                panelAppointments.hidden = tab !== 'appointments';
 
                 if (updateUrl) {
                     const params = new URLSearchParams(window.location.search);
-                    params.set('tab',tab);
-                    history.replaceState({},'',`${window.location.pathname}?${params.toString()}`);
+                    params.set('date', root.dataset.selectedDate || '');
+                    params.set('tab', tab);
+                    history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
                 }
             }
 
             tabButtons.forEach(btn => {
-                btn.addEventListener('click',function (e) {
-                    e.preventDefault(); // stop full page reload
-                    setActiveTab(this.dataset.tab,true);
+                btn.addEventListener('click', function () {
+                    setActiveTab(this.dataset.tab, true);
                 });
             });
-        });
+
+            document.getElementById('calendarDays')?.addEventListener('click', function (e) {
+                const btn = e.target.closest('.calendar-widget__day[data-date]');
+                if (btn) loadDashboardDate(btn.dataset.date);
+            });
+
+            async function loadDashboardDate(date) {
+                if (!date || loadingDate) return;
+                loadingDate = true;
+                const scrollY = window.scrollY;
+                root.classList.add('is-loading');
+
+                try {
+                    const params = new URLSearchParams({
+                        ajax: '1',
+                        date: date,
+                        tab: getActiveTab(),
+                    });
+                    const res = await fetch(`dashboard.php?${params.toString()}`, {
+                        credentials: 'same-origin',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    });
+                    if (!res.ok) throw new Error('Failed to load');
+                    const data = await res.json();
+                    if (!data.ok) throw new Error('Invalid response');
+
+                    root.dataset.selectedDate = data.date;
+                    panelVisits.innerHTML = data.visitsHtml;
+                    panelAppointments.innerHTML = data.appointmentsHtml;
+                    document.getElementById('insightsMosaic').innerHTML = data.insightsHtml;
+                    document.getElementById('lowStockContent').innerHTML = data.lowStockHtml;
+                    document.getElementById('calendarDays').innerHTML = data.calendarDaysHtml;
+                    document.getElementById('calendarMonthLabel').textContent = data.calendarMonth;
+                    document.getElementById('calPrevMonth').dataset.date = data.prevMonthDate;
+                    document.getElementById('calNextMonth').dataset.date = data.nextMonthDate;
+                    document.getElementById('dashHeaderSubtitle').textContent = data.subtitle;
+                    document.getElementById('dashDateChipDay').textContent = data.chipDay;
+                    document.getElementById('dashDateChipDate').textContent = data.chip;
+                    document.getElementById('dashOpsBadge').textContent = data.opsSummary;
+                    document.getElementById('activityFeedDesc').textContent = 'Clinic flow for ' + data.activityDesc;
+                    document.getElementById('insightsDesc').textContent = 'Snapshot for ' + data.insightsDate;
+
+                    if (calendarInput) calendarInput.value = data.date;
+
+                    document.querySelectorAll('#calendarDays .calendar-widget__day').forEach(el => {
+                        el.classList.toggle('is-selected', el.dataset.date === data.date);
+                    });
+
+                    const urlParams = new URLSearchParams(window.location.search);
+                    urlParams.set('date', data.date);
+                    urlParams.set('tab', getActiveTab());
+                    history.replaceState({}, '', `${window.location.pathname}?${urlParams.toString()}`);
+
+                    window.scrollTo(0, scrollY);
+                } catch (err) {
+                    console.error(err);
+                } finally {
+                    loadingDate = false;
+                    root.classList.remove('is-loading');
+                }
+            }
+
+            document.getElementById('calPrevMonth')?.addEventListener('click', function () {
+                loadDashboardDate(this.dataset.date);
+            });
+            document.getElementById('calNextMonth')?.addEventListener('click', function () {
+                loadDashboardDate(this.dataset.date);
+            });
+
+            if (calendarInput) {
+                calendarInput.addEventListener('change', function () {
+                    loadDashboardDate(this.value);
+                });
+            }
+
+            setActiveTab(activeTab, false);
+        })();
 
     </script>
 </body>
